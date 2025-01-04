@@ -18,9 +18,9 @@ export default function Home() {
           description="Welcome to TeeStartup - Quality T-shirts for every style"
           canonical="/"
         />
-        <Suspense fallback={<div>Loading...</div>}>
+        {/* <Suspense fallback={<div>Loading...</div>}>
           <Scene />
-        </Suspense>
+        </Suspense> */}
         <Hero />
         <FeaturedProducts />
         <GoogleReviews />

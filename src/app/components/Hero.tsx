@@ -7,9 +7,9 @@ import { Button } from "../components/ui/button"
 import { ChevronLeft, ChevronRight } from 'lucide-react'
 
 const shirts = [
-  { id: 1, name: 'Classic White', color: 'white', image: '/placeholder.svg?height=600&width=400&text=White+Shirt' },
+  { id: 1, name: 'Classic White', color: 'white', image: 'https://res.cloudinary.com/midefulness/image/upload/v1657441707/cld-sample-5.jpg' },
   { id: 2, name: 'Midnight Black', color: 'black', image: '/placeholder.svg?height=600&width=400&text=Black+Shirt' },
-  { id: 3, name: 'Navy Blue', color: 'blue', image: '/placeholder.svg?height=600&width=400&text=Blue+Shirt' },
+  { id: 3, name: 'Navy Blue', color: 'blue', image: 'https://res.cloudinary.com/midefulness/image/upload/v1657441707/cld-sample-5.jpg' },
   { id: 4, name: 'Forest Green', color: 'green', image: '/placeholder.svg?height=600&width=400&text=Green+Shirt' },
 ]
 

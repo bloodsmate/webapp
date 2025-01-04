@@ -9,7 +9,7 @@ interface SEOProps {
 
 export default function SEO({ title, description, canonical, ogImage }: SEOProps) {
   const siteUrl = process.env.NEXT_PUBLIC_SITE_URL || 'https://teestartup.com'
-  const fullTitle = `${title} | TeeStartup`
+  const fullTitle = `${title} | BloodsMate`
   const fullCanonical = canonical ? `${siteUrl}${canonical}` : siteUrl
   const fullOgImage = ogImage ? `${siteUrl}${ogImage}` : `${siteUrl}/og-image.jpg`
 
