@@ -50,100 +50,6 @@ function Breadcrumb({ product }: { product: Product }) {
   )
 }
 
-function SizeChart() {
-  return (
-    <Accordion type="single" collapsible className="w-full">
-      <AccordionItem value="size-chart">
-        <AccordionTrigger>Size Chart</AccordionTrigger>
-        <AccordionContent>
-          <div className="space-y-4">
-            <div className="overflow-x-auto">
-              <table className="min-w-full bg-white border border-gray-300">
-                <thead>
-                  <tr>
-                    <th className="py-2 px-4 border-b">Size</th>
-                    <th className="py-2 px-4 border-b">Chest (inches)</th>
-                    <th className="py-2 px-4 border-b">Length (inches)</th>
-                  </tr>
-                </thead>
-                <tbody>
-                  <tr>
-                    <td className="py-2 px-4 border-b text-center">S</td>
-                    <td className="py-2 px-4 border-b text-center">36-38</td>
-                    <td className="py-2 px-4 border-b text-center">28</td>
-                  </tr>
-                  <tr>
-                    <td className="py-2 px-4 border-b text-center">M</td>
-                    <td className="py-2 px-4 border-b text-center">39-41</td>
-                    <td className="py-2 px-4 border-b text-center">29</td>
-                  </tr>
-                  <tr>
-                    <td className="py-2 px-4 border-b text-center">L</td>
-                    <td className="py-2 px-4 border-b text-center">42-44</td>
-                    <td className="py-2 px-4 border-b text-center">30</td>
-                  </tr>
-                  <tr>
-                    <td className="py-2 px-4 text-center">XL</td>
-                    <td className="py-2 px-4 text-center">45-47</td>
-                    <td className="py-2 px-4 text-center">31</td>
-                  </tr>
-                </tbody>
-              </table>
-            </div>
-            <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-              <Image
-                src="/placeholder.svg?height=300&width=300&text=Chest+Measurement"
-                alt="Chest Measurement"
-                width={300}
-                height={300}
-                className="rounded-lg"
-              />
-              <Image
-                src="/placeholder.svg?height=300&width=300&text=Length+Measurement"
-                alt="Length Measurement"
-                width={300}
-                height={300}
-                className="rounded-lg"
-              />
-            </div>
-          </div>
-        </AccordionContent>
-      </AccordionItem>
-    </Accordion>
-  )
-}
-
-function PaymentOptions() {
-  return (
-    <Accordion type="single" collapsible className="w-full">
-      <AccordionItem value="payment-options">
-        <AccordionTrigger>Payment Options</AccordionTrigger>
-        <AccordionContent>
-          <ul className="list-disc list-inside space-y-1">
-            <li>Credit/Debit Card</li>
-            <li>PayPal</li>
-            <li>KOKO Pay (3 months installment)</li>
-          </ul>
-        </AccordionContent>
-      </AccordionItem>
-    </Accordion>
-  )
-}
-
-function DeliveryAndReturns() {
-  return (
-    <Accordion type="single" collapsible className="w-full">
-      <AccordionItem value="delivery-returns">
-        <AccordionTrigger>Delivery & Returns</AccordionTrigger>
-        <AccordionContent>
-          <p className="mb-2">Free standard delivery on orders over $50</p>
-          <p>Easy returns within 30 days</p>
-        </AccordionContent>
-      </AccordionItem>
-    </Accordion>
-  )
-}
-
 function SubscribeSection() {
   return (
     <div className="bg-gray-100 py-8 mt-12">
@@ -206,9 +112,7 @@ export default function ProductPage({ params }: { params: { id: string } }) {
         <ProductDetails product={product} />
       </div>
       <div className="mt-8 space-y-6">
-        <SizeChart />
-        <PaymentOptions />
-        <DeliveryAndReturns />
+        
       </div>
       <YouMightAlsoLike currentProductId={product.id} />
       <SubscribeSection />
