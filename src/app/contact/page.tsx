@@ -31,7 +31,7 @@ export default function ContactPage() {
   }
 
   return (
-    <div className="container mx-auto px-4 py-16">
+    <div className="main-content container mx-auto px-4 py-16">
       <SEO 
         title="Contact Us"
         description="Get in touch with TeeStartup for any inquiries or feedback"

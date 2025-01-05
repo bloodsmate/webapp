@@ -4,10 +4,11 @@ import Image from 'next/image'
 import { motion } from 'framer-motion'
 
 const instagramPosts = [
-  { id: 1, image: '/placeholder.svg?height=300&width=300', likes: 120, comments: 15 },
-  { id: 2, image: '/placeholder.svg?height=300&width=300', likes: 95, comments: 8 },
-  { id: 3, image: '/placeholder.svg?height=300&width=300', likes: 200, comments: 32 },
-  { id: 4, image: '/placeholder.svg?height=300&width=300', likes: 150, comments: 20 },
+  { id: 1, image: 'https://res.cloudinary.com/midefulness/image/upload/v1657441705/cld-sample.jpg', likes: 120, comments: 15 },
+  { id: 2, image: 'https://res.cloudinary.com/midefulness/image/upload/v1657441705/cld-sample.jpg', likes: 95, comments: 8 },
+  { id: 3, image: 'https://res.cloudinary.com/midefulness/image/upload/v1657441705/cld-sample.jpg', likes: 200, comments: 32 },
+  { id: 4, image: 'https://res.cloudinary.com/midefulness/image/upload/v1657441705/cld-sample.jpg', likes: 150, comments: 20 },
+  // { id: 4, image: '/placeholder.svg?height=300&width=300', likes: 150, comments: 20 },
 ]
 
 export default function InstagramFeed() {

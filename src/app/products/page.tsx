@@ -8,12 +8,13 @@ import { ChevronLeft, ChevronRight } from 'lucide-react'
 import SEO from '../components/SEO'
 
 const products = [
-  { id: 1, name: 'Classic White Tee', price: 24.99, image: '/placeholder.svg?height=300&width=300' },
-  { id: 2, name: 'Vintage Black Tee', price: 29.99, image: '/placeholder.svg?height=300&width=300' },
-  { id: 3, name: 'Graphic Print Tee', price: 34.99, image: '/placeholder.svg?height=300&width=300' },
-  { id: 4, name: 'Striped Navy Tee', price: 27.99, image: '/placeholder.svg?height=300&width=300' },
-  { id: 5, name: 'Heather Gray Tee', price: 26.99, image: '/placeholder.svg?height=300&width=300' },
-  { id: 6, name: 'Neon Green Tee', price: 31.99, image: '/placeholder.svg?height=300&width=300' },
+  { id: 1, name: 'Classic White Tee', price: 24.99, image: 'https://res.cloudinary.com/midefulness/image/upload/v1657441707/cld-sample-5.jpg' },
+  { id: 2, name: 'Vintage Black Tee', price: 29.99, image: 'https://res.cloudinary.com/midefulness/image/upload/v1657441707/cld-sample-5.jpg' },
+  { id: 3, name: 'Graphic Print Tee', price: 34.99, image: 'https://res.cloudinary.com/midefulness/image/upload/v1657441707/cld-sample-5.jpg' },
+  { id: 4, name: 'Striped Navy Tee', price: 27.99, image: 'https://res.cloudinary.com/midefulness/image/upload/v1657441707/cld-sample-5.jpg' },
+  { id: 5, name: 'Heather Gray Tee', price: 26.99, image: 'https://res.cloudinary.com/midefulness/image/upload/v1657441707/cld-sample-5.jpg' },
+  { id: 6, name: 'Neon Green Tee', price: 31.99, image: 'https://res.cloudinary.com/midefulness/image/upload/v1657441707/cld-sample-5.jpg' },
+  // { id: 6, name: 'Neon Green Tee', price: 31.99, image: '/placeholder.svg?height=300&width=300' },
 ]
 
 export default function ProductsPage() {
@@ -25,7 +26,7 @@ export default function ProductsPage() {
   const totalPages = Math.ceil(products.length / productsPerPage)
 
   return (
-    <div className="container mx-auto px-4 py-8">
+    <div className="main-content container mx-auto px-4 py-8">
       <SEO 
         title="Our Products"
         description="Browse our collection of high-quality t-shirts"

@@ -26,7 +26,7 @@ export default function Home() {
         <GoogleReviews />
         <InstagramFeed />
       </main>
-      <Footer />
+      {/* <Footer /> */}
     </div>
   )
 }

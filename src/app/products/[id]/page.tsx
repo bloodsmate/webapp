@@ -17,7 +17,7 @@ const products = [
     sizes: ['XS', 'S', 'M', 'L', 'XL', 'XXL'],
     stock: 10
   },
-  { id: 2, name: 'Vintage Black Tee', price: 29.99, images: ['/placeholder.svg?height=600&width=600'], description: 'A sleek black t-shirt with a vintage feel.', sizes: ['XS', 'S', 'M', 'L', 'XL', 'XXL'], stock: 5 },
+  { id: 2, name: 'Vintage Black Tee', price: 29.99, images: ['https://res.cloudinary.com/midefulness/image/upload/v1657441707/cld-sample-5.jpg', 'https://res.cloudinary.com/midefulness/image/upload/v1657441707/cld-sample-5.jpg', 'https://res.cloudinary.com/midefulness/image/upload/v1657441707/cld-sample-5.jpg', 'https://res.cloudinary.com/midefulness/image/upload/v1657441706/cld-sample-4.jpg'], description: 'A sleek black t-shirt with a vintage feel.', sizes: ['XS', 'S', 'M', 'L', 'XL', 'XXL'], stock: 5 },
   { id: 3, name: 'Graphic Print Tee', price: 34.99, images: ['/placeholder.svg?height=600&width=600'], description: 'Express yourself with our unique graphic print design.', sizes: ['XS', 'S', 'M', 'L', 'XL', 'XXL'], stock: 20 },
   { id: 4, name: 'Striped Navy Tee', price: 27.99, images: ['/placeholder.svg?height=600&width=600'], description: 'Classic navy stripes for a nautical-inspired look.', sizes: ['XS', 'S', 'M', 'L', 'XL', 'XXL'], stock: 2 },
   { id: 5, name: 'Heather Gray Tee', price: 26.99, images: ['/placeholder.svg?height=600&width=600'], description: 'Soft and comfortable heather gray t-shirt for everyday wear.', sizes: ['XS', 'S', 'M', 'L', 'XL', 'XXL'], stock: 0 },
@@ -32,7 +32,7 @@ export default function ProductPage({ params }: { params: { id: string } }) {
   }
 
   return (
-    <div className="container mx-auto px-4 py-8">
+    <div className="main-content container mx-auto px-4 py-8">
       <ProductDetails product={product} />
     </div>
   )

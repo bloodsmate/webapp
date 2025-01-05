@@ -6,9 +6,10 @@ import { motion } from 'framer-motion'
 import { Star, ChevronLeft, ChevronRight } from 'lucide-react'
 
 const reviews = [
-  { id: 1, name: 'John Doe', rating: 5, text: 'Great quality t-shirts! Will definitely buy again.', avatar: '/placeholder.svg?height=50&width=50' },
-  { id: 2, name: 'Jane Smith', rating: 4, text: 'Love the designs, but sizing runs a bit small.', avatar: '/placeholder.svg?height=50&width=50' },
-  { id: 3, name: 'Mike Johnson', rating: 5, text: 'Excellent customer service and fast shipping!', avatar: '/placeholder.svg?height=50&width=50' },
+  { id: 1, name: 'John Doe', rating: 5, text: 'Great quality t-shirts! Will definitely buy again.', avatar: 'https://res.cloudinary.com/midefulness/image/upload/v1657441705/cld-sample.jpg' },
+  { id: 2, name: 'Jane Smith', rating: 4, text: 'Love the designs, but sizing runs a bit small.', avatar: 'https://res.cloudinary.com/midefulness/image/upload/v1657441705/cld-sample.jpg' },
+  { id: 3, name: 'Mike Johnson', rating: 5, text: 'Excellent customer service and fast shipping!', avatar: 'https://res.cloudinary.com/midefulness/image/upload/v1657441705/cld-sample.jpg' },
+  // { id: 3, name: 'Mike Johnson', rating: 5, text: 'Excellent customer service and fast shipping!', avatar: '/placeholder.svg?height=50&width=50' },
 ]
 
 export default function GoogleReviews() {

@@ -3,24 +3,44 @@
 import { useState } from 'react'
 import Image from 'next/image'
 import { motion } from 'framer-motion'
-import { X } from 'lucide-react'
+import { X, ChevronLeft, ChevronRight } from 'lucide-react'
 import { Button } from "../components/ui/button"
 import { RadioGroup, RadioGroupItem } from "../components/ui/radio-group"
 import { Label } from "../components/ui/label"
+import { useDispatch } from 'react-redux'
+import { Product } from '../data/products'
+import { addToCart } from '../redux/cartSlice'
 
-interface Product {
-  id: number
-  name: string
-  price: number
-  image: string
-  description: string
-  sizes: string[]
-  stock: number
+interface QuickViewProps {
+  product: Product
+  onClose: () => void
 }
 
-export default function QuickView({ product, onClose }: { product: Product, onClose: () => void; }) {
+export default function QuickView({ product, onClose }: QuickViewProps) {
   const [selectedSize, setSelectedSize] = useState('')
-  const sizes = ['XS', 'S', 'M', 'L', 'XL']
+  const [currentImageIndex, setCurrentImageIndex] = useState(0)
+  const dispatch = useDispatch()
+
+  const handleAddToCart = () => {
+    if (selectedSize) {
+      dispatch(addToCart({
+        id: product.id,
+        name: product.name,
+        price: product.price,
+        quantity: 1,
+        size: selectedSize
+      }))
+      onClose()
+    }
+  }
+
+  const nextImage = () => {
+    setCurrentImageIndex((prevIndex) => (prevIndex + 1) % product.images.length)
+  }
+
+  const prevImage = () => {
+    setCurrentImageIndex((prevIndex) => (prevIndex - 1 + product.images.length) % product.images.length)
+  }
 
   return (
     <motion.div
@@ -28,8 +48,15 @@ export default function QuickView({ product, onClose }: { product: Product, onCl
       animate={{ opacity: 1 }}
       exit={{ opacity: 0 }}
       className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50"
+      onClick={onClose}
     >
-      <div className="bg-white rounded-lg p-8 max-w-2xl w-full relative">
+      <motion.div
+        initial={{ scale: 0.9, opacity: 0 }}
+        animate={{ scale: 1, opacity: 1 }}
+        exit={{ scale: 0.9, opacity: 0 }}
+        className="bg-white rounded-lg p-8 max-w-4xl w-full relative"
+        onClick={(e) => e.stopPropagation()}
+      >
         <button
           onClick={onClose}
           className="absolute top-4 right-4 text-gray-500 hover:text-gray-700"
@@ -37,22 +64,36 @@ export default function QuickView({ product, onClose }: { product: Product, onCl
           <X size={24} />
         </button>
         <div className="flex flex-col md:flex-row gap-8">
-          <div className="flex-1">
-            <Image
-              src={product.image}
-              alt={product.name}
-              width={300}
-              height={300}
-              className="w-full h-auto object-cover rounded-lg"
-            />
+          <div className="flex-1 relative">
+            <div className="relative aspect-square">
+              <Image
+                src={product.images[currentImageIndex]}
+                alt={product.name}
+                fill
+                className="object-cover rounded-lg"
+              />
+            </div>
+            <button
+              onClick={prevImage}
+              className="absolute left-2 top-1/2 transform -translate-y-1/2 bg-white bg-opacity-50 p-2 rounded-full"
+            >
+              <ChevronLeft size={24} />
+            </button>
+            <button
+              onClick={nextImage}
+              className="absolute right-2 top-1/2 transform -translate-y-1/2 bg-white bg-opacity-50 p-2 rounded-full"
+            >
+              <ChevronRight size={24} />
+            </button>
           </div>
           <div className="flex-1 space-y-4">
             <h2 className="text-2xl font-bold">{product.name}</h2>
             <p className="text-xl text-gray-600">${product.price.toFixed(2)}</p>
+            <p className="text-gray-600">{product.description}</p>
             <div>
               <h3 className="text-lg font-semibold mb-2">Select Size</h3>
               <RadioGroup onValueChange={setSelectedSize} className="flex flex-wrap gap-2">
-                {sizes.map((size) => (
+                {product.sizes.map((size) => (
                   <div key={size}>
                     <RadioGroupItem
                       value={size}
@@ -69,11 +110,12 @@ export default function QuickView({ product, onClose }: { product: Product, onCl
                 ))}
               </RadioGroup>
             </div>
-            <Button className="w-full">Add to Cart</Button>
+            <Button onClick={handleAddToCart} className="w-full" disabled={!selectedSize}>
+              Add to Cart
+            </Button>
           </div>
         </div>
-      </div>
+      </motion.div>
     </motion.div>
   )
 }
-
