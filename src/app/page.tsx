@@ -6,6 +6,7 @@ import Footer from './components/Footer'
 import GoogleReviews from './components/GoogleReviews'
 import InstagramFeed from './components/InstagramFeed'
 import SEO from './components/SEO'
+import SubscribeSection from './components/SubscribeSection'
 
 const Scene = dynamic(() => import('./components/Scene'), { ssr: false })
 
@@ -25,6 +26,7 @@ export default function Home() {
         <FeaturedProducts />
         <GoogleReviews />
         <InstagramFeed />
+        <SubscribeSection />
       </main>
       {/* <Footer /> */}
     </div>
