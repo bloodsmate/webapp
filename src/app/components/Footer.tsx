@@ -5,7 +5,7 @@ import { motion } from 'framer-motion'
 import { Facebook, Instagram, Twitter } from 'lucide-react'
 
 const Wave = () => (
-  <div className="absolute top-0 left-0 w-full overflow-hidden leading-[0] transform rotate-180">
+  <div className="absolute bottom-0 left-0 w-full overflow-hidden leading-[0] transform rotate-180">
     <svg
       data-name="Layer 1"
       xmlns="http://www.w3.org/2000/svg"
@@ -24,7 +24,6 @@ const Wave = () => (
 export default function Footer() {
   return (
     <footer className="bg-gray-800 text-white pt-20 pb-8 relative">
-      <Wave />
       <div className="container mx-auto px-4">
         <div className="grid grid-cols-1 md:grid-cols-3 gap-8">
           <motion.div
@@ -70,6 +69,7 @@ export default function Footer() {
         <div className="mt-8 pt-8 border-t border-gray-700 text-center text-gray-400">
           <p>&copy; 2023 TeeStartup. All rights reserved.</p>
         </div>
+        <Wave />
       </div>
     </footer>
   )
