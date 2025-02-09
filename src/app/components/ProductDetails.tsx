@@ -2,8 +2,9 @@
 
 import { useState } from 'react'
 import Image from 'next/image'
-import { useDispatch } from 'react-redux'
+import { useDispatch, useSelector } from 'react-redux'
 import { addToCart } from '../redux/cartSlice'
+import { addToWishlist, removeFromWishlist } from "../redux/wishlistSlice"
 import { toast } from '../hooks/use-toast'
 import { Button } from './ui/button'
 import {
@@ -13,7 +14,10 @@ import {
   AccordionTrigger,
 } from "./ui/accordion"
 import { Product } from '../data/products'
+import type { RootState } from "../redux/store"
 import { FaCcVisa, FaCcMastercard, FaPaypal } from 'react-icons/fa'
+import Waitlist from "./Waitlist"
+import { Heart } from "lucide-react"
 
 function SizeChart() {
   return (
@@ -112,7 +116,10 @@ function DeliveryAndReturns() {
 export default function ProductDetails({ product }: { product: Product }) {
   const [selectedSize, setSelectedSize] = useState('')
   const [mainImage, setMainImage] = useState(0)
+  const [outOfStock, setOutOfStock] = useState(false)
   const dispatch = useDispatch()
+  const wishlistItems = useSelector((state: RootState) => state.wishlist.items)
+  const isInWishlist = wishlistItems.some((item) => item.id === product.id)
 
   const handleAddToCart = () => {
     if (!selectedSize) {
@@ -149,110 +156,144 @@ export default function ProductDetails({ product }: { product: Product }) {
     })
   }
 
+  const handleWishlist = () => {
+    if (isInWishlist) {
+      dispatch(removeFromWishlist(product.id))
+      toast({
+        title: "Removed from wishlist",
+        description: `${product.name} has been removed from your wishlist.`,
+      })
+    } else {
+      dispatch(
+        addToWishlist({
+          id: product.id,
+          name: product.name,
+          price: product.price,
+          image: product.images[0],
+        }),
+      )
+      toast({
+        title: "Added to wishlist",
+        description: `${product.name} has been added to your wishlist.`,
+      })
+    }
+  }
+
   const discountedPrice = product.discountPercentage
     ? product.price * (1 - product.discountPercentage / 100)
     : product.price
 
-  return (
-    <div className="grid grid-cols-1 md:grid-cols-2 gap-8">
-      {/* Left Section - Images */}
-      <div className="space-y-4">
-        <div className="relative aspect-square">
-          <Image
-            src={product.images[mainImage]}
-            alt={product.name}
-            fill
-            className="object-cover rounded-lg"
-          />
-        </div>
-        <div className="flex space-x-2 overflow-x-auto">
-          {product.images.map((img, index) => (
-            <button
-              key={index}
-              onClick={() => setMainImage(index)}
-              className={`relative w-20 h-20 rounded-md overflow-hidden ${mainImage === index ? 'ring-2 ring-blue-500' : ''}`}
-            >
-              <Image src={img} alt={`${product.name} view ${index + 1}`} fill className="object-cover" />
-            </button>
-          ))}
-        </div>
-      </div>
-
-      {/* Right Section - Details */}
-      <div className="space-y-6">
-        <h1 className="text-3xl font-bold">{product.name}</h1>
-        <div className="flex items-baseline space-x-2">
-          <p className="text-2xl font-semibold text-blue-600">${discountedPrice.toFixed(2)}</p>
-          {product.discountPercentage && (
-            <>
-              <p className="text-lg text-gray-500 line-through">${product.price.toFixed(2)}</p>
-              <p className="text-lg font-semibold text-green-500">Save {product.discountPercentage}%</p>
-            </>
-          )}
-        </div>
-        <div>
-          <h3 className="text-lg font-bold mb-2">Select Size</h3>
-          <div className="flex flex-wrap gap-2">
-            {product.sizes.map((size, index) => (
+    return (
+      <div className="grid grid-cols-1 md:grid-cols-2 gap-8">
+        {/* Left Section - Images */}
+        <div className="space-y-4">
+          <div className="relative aspect-square">
+            <Image
+              src={product.images[mainImage]}
+              alt={product.name}
+              fill
+              className="object-cover rounded-lg"
+            />
+          </div>
+          <div className="flex space-x-2 overflow-x-auto">
+            {product.images.map((img, index) => (
               <button
-                key={size}
-                onClick={() => product.stock[index] > 0 && setSelectedSize(size)}
-                disabled={product.stock[index] === 0}
-                className={`relative flex items-center justify-center w-12 h-12 text-sm font-semibold border-2 rounded-md ${
-                  selectedSize === size ? 'border-blue-600 bg-blue-100' : 'border-gray-300'
-                } ${
-                  product.stock[index] === 0
-                    ? 'cursor-not-allowed opacity-50'
-                    : 'hover:border-blue-600'
-                }`}
+                key={index}
+                onClick={() => setMainImage(index)}
+                className={`relative w-20 h-20 rounded-md overflow-hidden ${mainImage === index ? 'ring-2 ring-blue-500' : ''}`}
               >
-                {size}
-                {product.stock[index] === 0 && (
-                  <span className="absolute inset-0 flex items-center justify-center text-red-600 text-lg font-bold">X</span>
-                )}
+                <Image src={img} alt={`${product.name} view ${index + 1}`} fill className="object-cover" />
               </button>
             ))}
           </div>
         </div>
-        <p className="text-gray-600">
-          {product.stock.reduce((sum, qty) => sum + qty, 0) > 0
-            ? 'In stock'
-            : 'Out of stock'}
-        </p>
-        <Button onClick={handleAddToCart} className="w-full">Add to Cart</Button>
-
-        <div className="flex items-center space-x-4 mt-6">
-          <span className="text-sm text-gray-500">We accept:</span>
-          <div className="flex space-x-2">
-            {/* Replace with your preferred icons */}
-            {/* <img src={FaCcVisa} alt="Visa" className="w-8 h-8" /> */}
-            <FaCcVisa size={40} color="blue" className="w-8 h-8" />
-            <FaCcMastercard size={40} className="w-8 h-8" />
-            {/* <img src="https://res.cloudinary.com/midefulness/image/upload/v1736096673/BloodsMate/mastercard-logo_vjdha2.png" alt="mastercard" className="h-8" /> */}
-            <img src="https://res.cloudinary.com/midefulness/image/upload/v1736096286/BloodsMate/koko-pay_d6id9w.png" alt="koko pay" className="h-8" />
+    
+        {/* Right Section - Details */}
+        <div className="space-y-6">
+          <h1 className="text-3xl font-bold">{product.name}</h1>
+          <div className="flex items-baseline space-x-2">
+            <p className="text-2xl font-semibold text-blue-600">${discountedPrice.toFixed(2)}</p>
+            {product.discountPercentage && (
+              <>
+                <p className="text-lg text-gray-500 line-through">${product.price.toFixed(2)}</p>
+                <p className="text-lg font-semibold text-green-500">Save {product.discountPercentage}%</p>
+              </>
+            )}
           </div>
+          <div>
+            <h3 className="text-lg font-bold mb-2">Select Size</h3>
+            <div className="flex flex-wrap gap-2">
+              {product.sizes.map((size, index) => {
+                const isOutOfStock = product.stock[index] === 0;
+    
+                return (
+                  <button
+                    key={size}
+                    onClick={() => {
+                      if (isOutOfStock) {
+                        setSelectedSize(size);
+                        setOutOfStock(true); // Trigger the out-of-stock condition
+                      } else {
+                        setSelectedSize(size);
+                        setOutOfStock(false); // Reset out-of-stock condition
+                      }
+                    }}
+                    // disabled={isOutOfStock}
+                    className={`relative flex items-center justify-center w-12 h-12 text-sm font-semibold border-2 rounded-md ${
+                      selectedSize === size ? 'border-blue-600 bg-blue-100' : 'border-gray-300'
+                    } ${isOutOfStock ? 'opacity-50 cursor-not-allowed' : 'hover:border-blue-600'}`}
+                  >
+                    {size}
+                    {isOutOfStock && (
+                      <span className="absolute inset-0 flex items-center justify-center text-red-600 text-lg font-bold">X</span>
+                    )}
+                  </button>
+                );
+              })}
+            </div>
+          </div>
+    
+          {/* Add to Cart and Wishlist Buttons */}
+          <div className="flex space-x-2">
+            <Button onClick={handleAddToCart} className="flex-grow" disabled={outOfStock}>
+              {outOfStock ? "Out of Stock" : "Add to Cart"}
+            </Button>
+            <Button onClick={handleWishlist} variant="outline">
+              <Heart className={`w-6 h-6 ${isInWishlist ? "fill-red-500 text-red-500" : ""}`} />
+            </Button>
+          </div>
+    
+          {/* Show Waitlist if Out of Stock */}
+          {outOfStock && <Waitlist productId={product.id} productName={product.name} size={selectedSize} />}
+    
+          <div className="flex items-center space-x-4 mt-6">
+            <span className="text-sm text-gray-500">We accept:</span>
+            <div className="flex space-x-2">
+              <FaCcVisa size={40} color="blue" className="w-8 h-8" />
+              <FaCcMastercard size={40} className="w-8 h-8" />
+              <img src="https://res.cloudinary.com/midefulness/image/upload/v1736096286/BloodsMate/koko-pay_d6id9w.png" alt="koko pay" className="h-8" />
+            </div>
+          </div>
+    
+          <Accordion type="single" collapsible className="w-full mt-6">
+            <AccordionItem value="description">
+              <AccordionTrigger>Product Details</AccordionTrigger>
+              <AccordionContent>
+                {product.description}
+              </AccordionContent>
+            </AccordionItem>
+            <AccordionItem value="size-chart">
+              <AccordionTrigger>Size Chart</AccordionTrigger>
+              <AccordionContent>
+                <p>Refer to our size chart to pick the perfect fit.</p>
+              </AccordionContent>
+            </AccordionItem>
+          </Accordion>
+    
+          <SizeChart />
+          <PaymentOptions />
+          <DeliveryAndReturns />
         </div>
-
-        <Accordion type="single" collapsible className="w-full mt-6">
-          <AccordionItem value="description">
-            <AccordionTrigger>Product Details</AccordionTrigger>
-            <AccordionContent>
-              {product.description}
-            </AccordionContent>
-          </AccordionItem>
-          <AccordionItem value="size-chart">
-            <AccordionTrigger>Size Chart</AccordionTrigger>
-            <AccordionContent>
-              {/* Include size chart details here */}
-              <p>Refer to our size chart to pick the perfect fit.</p>
-            </AccordionContent>
-          </AccordionItem>
-        </Accordion>
-
-        <SizeChart />
-        <PaymentOptions />
-        <DeliveryAndReturns />
       </div>
-    </div>
-  )
+    )    
 }

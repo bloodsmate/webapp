@@ -26,7 +26,7 @@ export const products: Product[] = [
     ],
     description: 'A timeless classic white t-shirt that goes with everything. Made from 100% organic cotton for ultimate comfort and sustainability.',
     productDetails: 'A timeless classic white t-shirt that goes with everything. Made from 100% organic cotton for ultimate comfort and sustainability.',
-    sizes: ['XS', 'S', 'M', 'L', 'XL', 'XXL'],
+    sizes: ['XS', 'S', 'M', 'L', 'XL', '2XL'],
     stock: [0,0,1,3,4,10],
     inStock: true,
     gender: 'Unisex',
