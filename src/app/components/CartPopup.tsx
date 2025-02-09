@@ -2,67 +2,70 @@
 
 import { useSelector } from 'react-redux'
 import { motion } from 'framer-motion'
-import { X } from 'lucide-react'
+import { ShoppingBag, X } from 'lucide-react'
 import { Button } from './ui/button'
 import { RootState } from '../redux/store'
 import Link from 'next/link'
+import Image from "next/image"
 
 interface CartPopupProps {
+  isOpen: boolean
   onClose: () => void
 }
 
-export default function CartPopup({ onClose }: CartPopupProps) {
+export default function CartPopup({ isOpen, onClose }: CartPopupProps) {
   const cartItems = useSelector((state: RootState) => state.cart.items)
 
   const total = cartItems.reduce((sum, item) => sum + item.price * item.quantity, 0)
 
+  if (!isOpen) return null
+
   return (
     <motion.div
-      initial={{ opacity: 0 }}
-      animate={{ opacity: 1 }}
-      exit={{ opacity: 0 }}
-      className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50"
-      onClick={onClose}
+      initial={{ opacity: 0, y: -20 }}
+      animate={{ opacity: 1, y: 0 }}
+      exit={{ opacity: 0, y: -20 }}
+      className="fixed top-16 right-5 w-96 bg-white rounded-lg shadow-xl z-50 overflow-hidden border"
     >
-      <motion.div
-        initial={{ scale: 0.9, opacity: 0 }}
-        animate={{ scale: 1, opacity: 1 }}
-        exit={{ scale: 0.9, opacity: 0 }}
-        className="bg-white rounded-lg p-8 max-w-md w-full relative"
-        onClick={(e) => e.stopPropagation()}
-      >
-        <button
-          onClick={onClose}
-          className="absolute top-4 right-4 text-gray-500 hover:text-gray-700"
-        >
-          <X size={24} />
-        </button>
-        <h2 className="text-2xl font-bold mb-4">Your Cart</h2>
+      <div className="p-4 border-b">
+        <div className="flex justify-between items-center">
+          <h2 className="text-lg font-semibold">Your Cart</h2>
+          <button onClick={onClose} className="text-gray-500 hover:text-gray-700">
+            <X size={24} />
+          </button>
+        </div>
+      </div>
+      <div className="max-h-96 overflow-y-auto">
         {cartItems.length === 0 ? (
-          <p>Your cart is empty.</p>
+          <p className="p-4 text-center text-gray-500">Your cart is empty.</p>
         ) : (
-          <>
-            <ul className="space-y-4 mb-4">
-              {cartItems.map((item) => (
-                <li key={`${item.id}-${item.size}`} className="flex justify-between items-center">
-                  <span>{item.name} ({item.size}) x{item.quantity}</span>
-                  <span>${(item.price * item.quantity).toFixed(2)}</span>
-                </li>
-              ))}
-            </ul>
-            <div className="flex justify-between items-center font-bold mb-4">
-              <span>Total:</span>
-              <span>${total.toFixed(2)}</span>
-            </div>
-            <Link href="/cart">
-              <Button className="w-full" onClick={onClose}>
-                View Cart
-              </Button>
-            </Link>
-          </>
+          <ul className="divide-y">
+            {cartItems.map((item) => (
+              <li key={`${item.id}-${item.size}`} className="flex p-4 hover:bg-gray-50">
+                <Image src={item.image || "/placeholder.svg"} alt={item.name} width={80} height={80} className="h-20 w-20 object-cover" />
+                <div className="ml-4 flex-1">
+                  <div className="flex justify-between text-base font-medium text-gray-900">
+                    <h3>{item.name}</h3>
+                    <p>${(item.price * item.quantity).toFixed(2)}</p>
+                  </div>
+                  <p className="text-sm text-gray-500">Qty: {item.quantity}</p>
+                </div>
+              </li>
+            ))}
+          </ul>
         )}
-      </motion.div>
+      </div>
+      <div className="p-4 border-t">
+        <div className="flex justify-between text-lg font-semibold">
+          <p>Subtotal</p>
+          <p>${total.toFixed(2)}</p>
+        </div>
+        <Link href="/cart">
+          <Button className="w-full mt-4" onClick={onClose}>
+            <ShoppingBag className="mr-2 h-4 w-4" /> View Cart
+          </Button>
+        </Link>
+      </div>
     </motion.div>
   )
 }
-

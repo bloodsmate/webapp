@@ -139,7 +139,8 @@ export default function ProductDetails({ product }: { product: Product }) {
       name: product.name,
       price: product.price,
       quantity: 1,
-      size: selectedSize
+      size: selectedSize,
+      image: product.images[0]
     }))
 
     toast({

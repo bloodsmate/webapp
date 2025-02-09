@@ -8,27 +8,24 @@ import { Input } from '../components/ui/input'
 import { Button } from "../components/ui/button"
 
 export default function LoginPage() {
-  const [email, setEmail] = useState('')
-  const [password, setPassword] = useState('')
-  const [errors, setErrors] = useState({ email: '', password: '' })
+  const [email, setEmail] = useState("")
+  const [password, setPassword] = useState("")
+  const [errors, setErrors] = useState({ email: "", password: "" })
 
   const validateForm = () => {
     let isValid = true
-    const newErrors = { email: '', password: '' }
+    const newErrors = { email: "", password: "" }
 
     if (!email) {
-      newErrors.email = 'Email is required'
+      newErrors.email = "Email is required"
       isValid = false
     } else if (!/\S+@\S+\.\S+/.test(email)) {
-      newErrors.email = 'Email is invalid'
+      newErrors.email = "Email is invalid"
       isValid = false
     }
 
     if (!password) {
-      newErrors.password = 'Password is required'
-      isValid = false
-    } else if (password.length < 6) {
-      newErrors.password = 'Password must be at least 6 characters'
+      newErrors.password = "Password is required"
       isValid = false
     }
 
@@ -40,7 +37,7 @@ export default function LoginPage() {
     e.preventDefault()
     if (validateForm()) {
       // Here you would typically handle the login logic
-      console.log('Login attempt with:', { email, password })
+      console.log("Login attempt with:", { email, password })
       toast({
         title: "Login Successful",
         description: "You have successfully logged in.",
@@ -49,39 +46,65 @@ export default function LoginPage() {
   }
 
   return (
-    <div className="main-content container mx-auto px-4 py-8">
-      <div className="max-w-md mx-auto">
-        <h1 className="text-3xl font-bold mb-6">Login</h1>
-        <form onSubmit={handleSubmit} className="space-y-4">
-          <div>
-            <Label htmlFor="email">Email</Label>
-            <Input
-              id="email"
-              type="email"
-              value={email}
-              onChange={(e) => setEmail(e.target.value)}
-              className={errors.email ? 'border-red-500' : ''}
-            />
-            {errors.email && <p className="text-red-500 text-sm mt-1">{errors.email}</p>}
+    <div className="min-h-screen flex items-center justify-center bg-gray-100 py-12 px-4 sm:px-6 lg:px-8">
+      <div className="max-w-md w-full space-y-8">
+        <div>
+          <h2 className="mt-6 text-center text-3xl font-extrabold text-gray-900">Sign in to your account</h2>
+        </div>
+        <form className="mt-8 space-y-6" onSubmit={handleSubmit}>
+          <div className="rounded-md shadow-sm -space-y-px">
+            <div>
+              <Label htmlFor="email-address" className="sr-only">
+                Email address
+              </Label>
+              <Input
+                id="email-address"
+                name="email"
+                type="email"
+                autoComplete="email"
+                required
+                className="appearance-none rounded-none relative block w-full px-3 py-2 border border-gray-300 placeholder-gray-500 text-gray-900 rounded-t-md focus:outline-none focus:ring-indigo-500 focus:border-indigo-500 focus:z-10 sm:text-sm"
+                placeholder="Email address"
+                value={email}
+                onChange={(e) => setEmail(e.target.value)}
+              />
+              {errors.email && <p className="text-red-500 text-xs mt-1">{errors.email}</p>}
+            </div>
+            <div>
+              <Label htmlFor="password" className="sr-only">
+                Password
+              </Label>
+              <Input
+                id="password"
+                name="password"
+                type="password"
+                autoComplete="current-password"
+                required
+                className="appearance-none rounded-none relative block w-full px-3 py-2 border border-gray-300 placeholder-gray-500 text-gray-900 rounded-b-md focus:outline-none focus:ring-indigo-500 focus:border-indigo-500 focus:z-10 sm:text-sm"
+                placeholder="Password"
+                value={password}
+                onChange={(e) => setPassword(e.target.value)}
+              />
+              {errors.password && <p className="text-red-500 text-xs mt-1">{errors.password}</p>}
+            </div>
           </div>
+
           <div>
-            <Label htmlFor="password">Password</Label>
-            <Input
-              id="password"
-              type="password"
-              value={password}
-              onChange={(e) => setPassword(e.target.value)}
-              className={errors.password ? 'border-red-500' : ''}
-            />
-            {errors.password && <p className="text-red-500 text-sm mt-1">{errors.password}</p>}
+            <Button
+              type="submit"
+              className="group relative w-full flex justify-center py-2 px-4 border border-transparent text-sm font-medium rounded-md text-white bg-indigo-600 hover:bg-indigo-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-indigo-500"
+            >
+              Sign in
+            </Button>
           </div>
-          <Button type="submit" className="w-full">Login</Button>
         </form>
-        <p className="mt-4 text-center">
-          Don't have an account? <Link href="/signup" className="text-blue-600 hover:underline">Sign up</Link>
+        <p className="mt-2 text-center text-sm text-gray-600">
+          Don't have an account?{" "}
+          <Link href="/signup" className="font-medium text-indigo-600 hover:text-indigo-500">
+            Sign up
+          </Link>
         </p>
       </div>
     </div>
   )
 }
-

@@ -7,6 +7,8 @@ import GoogleReviews from './components/GoogleReviews'
 import InstagramFeed from './components/InstagramFeed'
 import SEO from './components/SEO'
 import SubscribeSection from './components/SubscribeSection'
+import ShopTheLook from './components/ShopTheLook'
+import HeartPulse from './components/HeartPulse'
 
 const Scene = dynamic(() => import('./components/Scene'), { ssr: false })
 
@@ -23,9 +25,11 @@ export default function Home() {
           <Scene />
         </Suspense> */}
         <Hero />
+        <HeartPulse />
         <FeaturedProducts />
         <GoogleReviews />
         <InstagramFeed />
+        <ShopTheLook />
         <SubscribeSection />
       </main>
       {/* <Footer /> */}
