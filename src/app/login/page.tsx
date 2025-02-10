@@ -1,16 +1,35 @@
 'use client'
 
-import { useState } from 'react'
+import { useState, useRef, useEffect } from 'react'
 import Link from 'next/link'
 import { toast } from '../hooks/use-toast'
 import { Label } from '../components/ui/label'
 import { Input } from '../components/ui/input'
 import { Button } from "../components/ui/button"
 
+declare global {
+  interface Window {
+    turnstile: any
+  }
+}
+
 export default function LoginPage() {
   const [email, setEmail] = useState("")
   const [password, setPassword] = useState("")
   const [errors, setErrors] = useState({ email: "", password: "" })
+  const [turnstileToken, setTurnstileToken] = useState("")
+  const turnstileRef = useRef<HTMLDivElement>(null)
+
+  useEffect(() => {
+    if (typeof window.turnstile !== "undefined" && turnstileRef.current) {
+      window.turnstile.render(turnstileRef.current, {
+        sitekey: "YOUR_TURNSTILE_SITE_KEY",
+        callback: (token: string) => {
+          setTurnstileToken(token)
+        },
+      })
+    }
+  }, [])
 
   const validateForm = () => {
     let isValid = true
@@ -29,6 +48,15 @@ export default function LoginPage() {
       isValid = false
     }
 
+    if (!turnstileToken) {
+      toast({
+        title: "Error",
+        description: "Please complete the Cloudflare verification.",
+        variant: "destructive",
+      })
+      isValid = false
+    }
+
     setErrors(newErrors)
     return isValid
   }
@@ -37,7 +65,7 @@ export default function LoginPage() {
     e.preventDefault()
     if (validateForm()) {
       // Here you would typically handle the login logic
-      console.log("Login attempt with:", { email, password })
+      console.log("Login attempt with:", { email, password, turnstileToken })
       toast({
         title: "Login Successful",
         description: "You have successfully logged in.",
@@ -89,6 +117,8 @@ export default function LoginPage() {
             </div>
           </div>
 
+          <div ref={turnstileRef} className="flex justify-center"></div>
+
           <div>
             <Button
               type="submit"
@@ -108,3 +138,4 @@ export default function LoginPage() {
     </div>
   )
 }
+

@@ -1,6 +1,6 @@
 'use client'
 
-import { useState } from 'react'
+import { useState, useEffect } from 'react'
 import Image from 'next/image'
 import { motion } from 'framer-motion'
 import { Star, ChevronLeft, ChevronRight } from 'lucide-react'
@@ -9,11 +9,22 @@ const reviews = [
   { id: 1, name: 'John Doe', rating: 5, text: 'Great quality t-shirts! Will definitely buy again.', avatar: 'https://res.cloudinary.com/midefulness/image/upload/v1657441705/cld-sample.jpg' },
   { id: 2, name: 'Jane Smith', rating: 4, text: 'Love the designs, but sizing runs a bit small.', avatar: 'https://res.cloudinary.com/midefulness/image/upload/v1657441705/cld-sample.jpg' },
   { id: 3, name: 'Mike Johnson', rating: 5, text: 'Excellent customer service and fast shipping!', avatar: 'https://res.cloudinary.com/midefulness/image/upload/v1657441705/cld-sample.jpg' },
-  // { id: 3, name: 'Mike Johnson', rating: 5, text: 'Excellent customer service and fast shipping!', avatar: '/placeholder.svg?height=50&width=50' },
 ]
 
 export default function GoogleReviews() {
   const [currentReview, setCurrentReview] = useState(0)
+  const [isMobile, setIsMobile] = useState(false)
+
+  useEffect(() => {
+    const checkScreenSize = () => {
+      setIsMobile(window.innerWidth < 768)
+    }
+
+    checkScreenSize()
+    window.addEventListener('resize', checkScreenSize)
+
+    return () => window.removeEventListener('resize', checkScreenSize)
+  }, [])
 
   const nextReview = () => {
     setCurrentReview((prev) => (prev + 1) % reviews.length)
@@ -22,6 +33,16 @@ export default function GoogleReviews() {
   const prevReview = () => {
     setCurrentReview((prev) => (prev - 1 + reviews.length) % reviews.length)
   }
+
+  useEffect(() => {
+    if (isMobile) {
+      const interval = setInterval(() => {
+        nextReview()
+      }, 3000) // Change every 3 seconds
+
+      return () => clearInterval(interval)
+    }
+  }, [currentReview, isMobile])
 
   return (
     <section className="py-16 bg-gray-50">
@@ -61,18 +82,23 @@ export default function GoogleReviews() {
             </div>
             <p className="text-gray-600">{reviews[currentReview].text}</p>
           </motion.div>
-          <button
-            onClick={prevReview}
-            className="absolute left-0 top-1/2 transform -translate-y-1/2 -translate-x-12 bg-white rounded-full p-2 shadow-md"
-          >
-            <ChevronLeft className="w-6 h-6" />
-          </button>
-          <button
-            onClick={nextReview}
-            className="absolute right-0 top-1/2 transform -translate-y-1/2 translate-x-12 bg-white rounded-full p-2 shadow-md"
-          >
-            <ChevronRight className="w-6 h-6" />
-          </button>
+
+          {!isMobile && (
+            <>
+              <button
+                onClick={prevReview}
+                className="absolute left-0 top-1/2 transform -translate-y-1/2 -translate-x-12 bg-white rounded-full p-2 shadow-md"
+              >
+                <ChevronLeft className="w-6 h-6" />
+              </button>
+              <button
+                onClick={nextReview}
+                className="absolute right-0 top-1/2 transform -translate-y-1/2 translate-x-12 bg-white rounded-full p-2 shadow-md"
+              >
+                <ChevronRight className="w-6 h-6" />
+              </button>
+            </>
+          )}
         </div>
       </div>
     </section>

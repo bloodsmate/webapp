@@ -9,6 +9,8 @@ import { Toaster } from './components/ui/toaster';
 import BackToTopButton from './components/BackToTopButton';
 import SEO from './components/SEO';
 import Chatbot from './components/Chatbot';
+import WhatsAppButton from './components/WhatsAppButton';
+import type React from "react"
 
 const geistSans = localFont({
   src: "./fonts/GeistVF.woff",
@@ -33,8 +35,11 @@ export default function RootLayout({
 }>) {
   return (
     <html lang="en" className="scroll-smooth">
+      <head>
+        <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no" />
+      </head>
       <body
-        className={`${geistSans.variable} ${geistMono.variable} antialiased flex flex-col min-h-screen`}
+        className={`${geistSans.variable} ${geistMono.variable} antialiased flex flex-col min-h-screen overflow-x-hidden`}
       >
         <SEO 
           title="BloodsMate"
@@ -48,12 +53,14 @@ export default function RootLayout({
           <BackToTopButton />
           <Toaster />
           <Chatbot />
+          <WhatsAppButton />
         </Providers>
 
         <Script
           src="https://www.payhere.lk/lib/payhere.js"
           strategy="lazyOnload"
         />
+        <Script src="https://challenges.cloudflare.com/turnstile/v0/api.js" async defer />
       </body>
     </html>
   );

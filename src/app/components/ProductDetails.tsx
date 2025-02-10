@@ -241,7 +241,7 @@ export default function ProductDetails({ product }: { product: Product }) {
                     // disabled={isOutOfStock}
                     className={`relative flex items-center justify-center w-12 h-12 text-sm font-semibold border-2 rounded-md ${
                       selectedSize === size ? 'border-blue-600 bg-blue-100' : 'border-gray-300'
-                    } ${isOutOfStock ? 'opacity-50 cursor-not-allowed' : 'hover:border-blue-600'}`}
+                    } ${isOutOfStock ? 'opacity-50' : 'hover:border-blue-600'}`}
                   >
                     {size}
                     {isOutOfStock && (
@@ -282,12 +282,12 @@ export default function ProductDetails({ product }: { product: Product }) {
                 {product.description}
               </AccordionContent>
             </AccordionItem>
-            <AccordionItem value="size-chart">
+            {/* <AccordionItem value="size-chart">
               <AccordionTrigger>Size Chart</AccordionTrigger>
               <AccordionContent>
                 <p>Refer to our size chart to pick the perfect fit.</p>
               </AccordionContent>
-            </AccordionItem>
+            </AccordionItem> */}
           </Accordion>
     
           <SizeChart />
