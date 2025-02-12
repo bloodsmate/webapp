@@ -1,6 +1,6 @@
 'use client'
 
-import { useState } from 'react'
+import { useState, useEffect } from 'react'
 import Image from 'next/image'
 import { useDispatch, useSelector } from 'react-redux'
 import { addToCart } from '../redux/cartSlice'
@@ -18,6 +18,7 @@ import type { RootState } from "../redux/store"
 import { FaCcVisa, FaCcMastercard, FaPaypal } from 'react-icons/fa'
 import Waitlist from "./Waitlist"
 import { Heart } from "lucide-react"
+import Loader from "./Loader"
 
 function SizeChart() {
   return (
@@ -120,6 +121,16 @@ export default function ProductDetails({ product }: { product: Product }) {
   const dispatch = useDispatch()
   const wishlistItems = useSelector((state: RootState) => state.wishlist.items)
   const isInWishlist = wishlistItems.some((item) => item.id === product.id)
+  const [isLoading, setIsLoading] = useState(true)
+
+  useEffect(() => {
+    // Simulate loading delay
+    const timer = setTimeout(() => {
+      setIsLoading(false)
+    }, 3000)
+
+    return () => clearTimeout(timer)
+  }, [])
 
   const handleAddToCart = () => {
     if (!selectedSize) {
@@ -185,6 +196,12 @@ export default function ProductDetails({ product }: { product: Product }) {
 
     return (
       <div className="grid grid-cols-1 md:grid-cols-2 gap-8">
+        {isLoading ? (
+        <div className="col-span-2 flex justify-center items-center h-96">
+          <Loader size="large" />
+        </div>
+      ) : (
+        <>
         {/* Left Section - Images */}
         <div className="space-y-4">
           <div className="relative aspect-square">
@@ -294,6 +311,8 @@ export default function ProductDetails({ product }: { product: Product }) {
           <PaymentOptions />
           <DeliveryAndReturns />
         </div>
+        </>
+      )}
       </div>
     )    
 }

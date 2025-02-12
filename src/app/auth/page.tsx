@@ -10,6 +10,8 @@ import Image from 'next/image'
 import { logo_black_url } from '../data/constants'
 import { motion } from 'framer-motion'
 import { FaEye, FaEyeSlash } from 'react-icons/fa'
+import { userSignIn, userRegister } from '../api/userApiCalls'
+import { userLogin, userRegistration } from '../types/user'
 
 export default function AuthPage() {
   const [isLogin, setIsLogin] = useState(true)
@@ -45,14 +47,71 @@ export default function AuthPage() {
     return isValid
   }
 
-  const handleSubmit = (e: React.FormEvent) => {
+  const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault()
+
     if (validateForm()) {
-      toast({
-        title: isLogin ? "Login Successful" : "Signup Successful",
-        description: isLogin ? "You have successfully logged in." : "You have successfully signed up.",
-        variant: "success",
-      })
+      if(isLogin) {
+        const userData:userLogin = {
+          email: email,
+          password: password,
+        }
+        
+        try {
+          const { data: loginData, loading, error } = await userSignIn(userData);
+          console.log(loginData)
+
+          if(!error){
+            toast({
+              title: "Login Successful",
+              description: "You have successfully logged in.",
+              variant: "success",
+            })
+          }else {
+            toast({
+              title: "Login Unsuccessful",
+              description: "Invalid credentials. Please try again.",
+              variant: "destructive",
+            })
+          }
+        }catch(error) {
+          toast({
+            title: "Login Unsuccessful",
+            variant: "destructive",
+          })
+        }
+      } else {
+        const userData:userRegistration = {
+          name: name,
+          email: email,
+          password: password,
+        }
+
+        try {
+          const { data: registerData, loading, error } = await userRegister(userData);
+          console.log(registerData)
+
+          if(!error) {
+            toast({
+              title: "Signup Successful",
+              description: "You have successfully signed up.",
+              variant: "success",
+            })
+          }else {
+            toast({
+              title: "Signup Unsuccessful",
+              description: "Something went wrong. Please try again.",
+              variant: "destructive",
+            })
+          }
+        }catch(error) {
+          toast({
+            title: "Signup Unsuccessful",
+            variant: "destructive",
+          })
+        }
+      }
+      
     }
   }
 

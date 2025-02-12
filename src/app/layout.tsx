@@ -3,13 +3,8 @@ import localFont from "next/font/local";
 import Script from "next/script";
 import "./globals.css";
 import { Providers } from './providers'; 
-import Navbar from './components/Navbar';
-import Footer from './components/Footer';
 import { Toaster } from './components/ui/toaster'; 
-import BackToTopButton from './components/BackToTopButton';
 import SEO from './components/SEO';
-import Chatbot from './components/Chatbot';
-import WhatsAppButton from './components/WhatsAppButton';
 import type React from "react"
 import { ThemeProvider } from "./components/ThemeProvider"
 import ClientLayout from "./ClientLayout";
@@ -48,15 +43,6 @@ export default function RootLayout({
           description="Quality T-shirts for every style"
           canonical="/"
         />
-        {/* <Providers>
-          <Navbar />
-          <main>{children}</main>
-          <Footer />
-          <BackToTopButton />
-          <Toaster />
-          <Chatbot />
-          <WhatsAppButton />
-        </Providers> */}
         <ThemeProvider attribute="class" defaultTheme="system" enableSystem>
           <Providers>
             <ClientLayout>{children}</ClientLayout>

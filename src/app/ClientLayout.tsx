@@ -10,7 +10,7 @@ import WhatsAppButton from './components/WhatsAppButton';
 
 export default function ClientLayout({ children }: { children: React.ReactNode }) {
   const pathname = usePathname()
-  const isAuthPage = pathname === "/login" || pathname === "/signup"
+  const isAuthPage = pathname === "/login" || pathname === "/auth"
 
   return (
     <>
