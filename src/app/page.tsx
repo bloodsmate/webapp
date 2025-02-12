@@ -18,7 +18,7 @@ export default function Home() {
       <main className="flex-grow">
         <SEO 
           title="Home"
-          description="Welcome to TeeStartup - Quality T-shirts for every style"
+          description="Welcome to Bloodsmate - Quality T-shirts for every style"
           canonical="/"
         />
         {/* <Suspense fallback={<div>Loading...</div>}>

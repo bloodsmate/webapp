@@ -2,37 +2,26 @@
 
 import { useState } from 'react'
 import Link from 'next/link'
-import { Button } from "../components/ui/button"
-import { Input } from "../components/ui/input"
-import { Label } from "../components/ui/label"
 import { toast } from '../hooks/use-toast'
+import { Label } from '../components/ui/label'
+import { Input } from '../components/ui/input'
+import { Button } from "../components/ui/button"
+import Image from 'next/image'
+import { logo_black_url } from '../data/constants'
+import { motion } from 'framer-motion'
+import { FaEye, FaEyeSlash } from 'react-icons/fa'
 
-export default function SignupPage() {
-  const [name, setName] = useState("")
+export default function AuthPage() {
+  const [isLogin, setIsLogin] = useState(true)
   const [email, setEmail] = useState("")
   const [password, setPassword] = useState("")
-  const [address, setAddress] = useState("")
-  const [city, setCity] = useState("")
-  const [country, setCountry] = useState("")
-  const [zipCode, setZipCode] = useState("")
-  const [errors, setErrors] = useState({
-    name: "",
-    email: "",
-    password: "",
-    address: "",
-    city: "",
-    country: "",
-    zipCode: "",
-  })
+  const [name, setName] = useState("")
+  const [errors, setErrors] = useState({ email: "", password: "", name: "" })
+  const [showPassword, setShowPassword] = useState(false)
 
   const validateForm = () => {
     let isValid = true
-    const newErrors = { name: "", email: "", password: "", address: "", city: "", country: "", zipCode: "" }
-
-    if (!name) {
-      newErrors.name = "Name is required"
-      isValid = false
-    }
+    const newErrors = { email: "", password: "", name: "" }
 
     if (!email) {
       newErrors.email = "Email is required"
@@ -45,28 +34,10 @@ export default function SignupPage() {
     if (!password) {
       newErrors.password = "Password is required"
       isValid = false
-    } else if (password.length < 6) {
-      newErrors.password = "Password must be at least 6 characters"
-      isValid = false
     }
 
-    if (!address) {
-      newErrors.address = "Address is required"
-      isValid = false
-    }
-
-    if (!city) {
-      newErrors.city = "City is required"
-      isValid = false
-    }
-
-    if (!country) {
-      newErrors.country = "Country is required"
-      isValid = false
-    }
-
-    if (!zipCode) {
-      newErrors.zipCode = "Zip Code is required"
+    if (!isLogin && !name) {
+      newErrors.name = "Name is required"
       isValid = false
     }
 
@@ -77,155 +48,105 @@ export default function SignupPage() {
   const handleSubmit = (e: React.FormEvent) => {
     e.preventDefault()
     if (validateForm()) {
-      // Here you would typically handle the signup logic
-      console.log("Signup attempt with:", { name, email, password, address, city, country, zipCode })
       toast({
-        title: "Sign Up Successful",
-        description: "Your account has been created successfully.",
+        title: isLogin ? "Login Successful" : "Signup Successful",
+        description: isLogin ? "You have successfully logged in." : "You have successfully signed up.",
+        variant: "success",
       })
     }
   }
 
   return (
-    <div className="min-h-screen flex items-center justify-center bg-gray-100 py-12 px-4 sm:px-6 lg:px-8">
-      <div className="max-w-md w-full space-y-8">
-        <div>
-          <h2 className="mt-6 text-center text-3xl font-extrabold text-gray-900">Create your account</h2>
-        </div>
-        <form className="mt-8 space-y-6" onSubmit={handleSubmit}>
-          <div className="rounded-md shadow-sm -space-y-px">
-            <div>
-              <Label htmlFor="name" className="sr-only">
-                Full Name
-              </Label>
-              <Input
-                id="name"
-                name="name"
-                type="text"
-                required
-                className="appearance-none rounded-none relative block w-full px-3 py-2 border border-gray-300 placeholder-gray-500 text-gray-900 rounded-t-md focus:outline-none focus:ring-indigo-500 focus:border-indigo-500 focus:z-10 sm:text-sm"
-                placeholder="Full Name"
-                value={name}
-                onChange={(e) => setName(e.target.value)}
-              />
-              {errors.name && <p className="text-red-500 text-xs mt-1">{errors.name}</p>}
-            </div>
-            <div>
-              <Label htmlFor="email-address" className="sr-only">
-                Email address
-              </Label>
-              <Input
-                id="email-address"
-                name="email"
-                type="email"
-                autoComplete="email"
-                required
-                className="appearance-none rounded-none relative block w-full px-3 py-2 border border-gray-300 placeholder-gray-500 text-gray-900 focus:outline-none focus:ring-indigo-500 focus:border-indigo-500 focus:z-10 sm:text-sm"
-                placeholder="Email address"
-                value={email}
-                onChange={(e) => setEmail(e.target.value)}
-              />
-              {errors.email && <p className="text-red-500 text-xs mt-1">{errors.email}</p>}
-            </div>
-            <div>
-              <Label htmlFor="password" className="sr-only">
-                Password
-              </Label>
-              <Input
-                id="password"
-                name="password"
-                type="password"
-                autoComplete="new-password"
-                required
-                className="appearance-none rounded-none relative block w-full px-3 py-2 border border-gray-300 placeholder-gray-500 text-gray-900 focus:outline-none focus:ring-indigo-500 focus:border-indigo-500 focus:z-10 sm:text-sm"
-                placeholder="Password"
-                value={password}
-                onChange={(e) => setPassword(e.target.value)}
-              />
-              {errors.password && <p className="text-red-500 text-xs mt-1">{errors.password}</p>}
-            </div>
-            <div>
-              <Label htmlFor="address" className="sr-only">
-                Address
-              </Label>
-              <Input
-                id="address"
-                name="address"
-                type="text"
-                required
-                className="appearance-none rounded-none relative block w-full px-3 py-2 border border-gray-300 placeholder-gray-500 text-gray-900 focus:outline-none focus:ring-indigo-500 focus:border-indigo-500 focus:z-10 sm:text-sm"
-                placeholder="Address"
-                value={address}
-                onChange={(e) => setAddress(e.target.value)}
-              />
-              {errors.address && <p className="text-red-500 text-xs mt-1">{errors.address}</p>}
-            </div>
-            <div>
-              <Label htmlFor="city" className="sr-only">
-                City
-              </Label>
-              <Input
-                id="city"
-                name="city"
-                type="text"
-                required
-                className="appearance-none rounded-none relative block w-full px-3 py-2 border border-gray-300 placeholder-gray-500 text-gray-900 focus:outline-none focus:ring-indigo-500 focus:border-indigo-500 focus:z-10 sm:text-sm"
-                placeholder="City"
-                value={city}
-                onChange={(e) => setCity(e.target.value)}
-              />
-              {errors.city && <p className="text-red-500 text-xs mt-1">{errors.city}</p>}
-            </div>
-            <div>
-              <Label htmlFor="country" className="sr-only">
-                Country
-              </Label>
-              <Input
-                id="country"
-                name="country"
-                type="text"
-                required
-                className="appearance-none rounded-none relative block w-full px-3 py-2 border border-gray-300 placeholder-gray-500 text-gray-900 focus:outline-none focus:ring-indigo-500 focus:border-indigo-500 focus:z-10 sm:text-sm"
-                placeholder="Country"
-                value={country}
-                onChange={(e) => setCountry(e.target.value)}
-              />
-              {errors.country && <p className="text-red-500 text-xs mt-1">{errors.country}</p>}
-            </div>
-            <div>
-              <Label htmlFor="zipCode" className="sr-only">
-                Zip Code
-              </Label>
-              <Input
-                id="zipCode"
-                name="zipCode"
-                type="text"
-                required
-                className="appearance-none rounded-none relative block w-full px-3 py-2 border border-gray-300 placeholder-gray-500 text-gray-900 rounded-b-md focus:outline-none focus:ring-indigo-500 focus:border-indigo-500 focus:z-10 sm:text-sm"
-                placeholder="Zip Code"
-                value={zipCode}
-                onChange={(e) => setZipCode(e.target.value)}
-              />
-              {errors.zipCode && <p className="text-red-500 text-xs mt-1">{errors.zipCode}</p>}
-            </div>
+    <div className="min-h-screen flex items-center justify-center bg-gray-100 overflow-hidden">
+      <div className="p-8 relative min-h-screen min-w-full sm:w-10/12 md:w-8/12 lg:w-7/12 xl:w-6/12 bg-white flex rounded-xl shadow-lg">
+
+        {/* Left Section (Form Container) */}
+        <div className={`w-full sm:w-1/2 flex flex-col justify-center items-start px-2 md:px-32 xl:px-48 py-16 transition-transform duration-500 ease-in-out ${isLogin ? 'order-1' : 'order-2'}`}>
+          {/* Back Button */}
+          <Link href="/" className="absolute top-4 left-4 p-2 rounded-full hover:bg-gray-200 transition duration-300">
+            <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" strokeWidth="2" stroke="currentColor" className="w-6 h-6">
+              <path strokeLinecap="round" strokeLinejoin="round" d="M15 19l-7-7 7-7" />
+            </svg>
+          </Link>
+
+          <div className="mb-6">
+            <Image src={logo_black_url} alt="Logo" width={150} height={100} />
           </div>
 
-          <div>
-            <Button
-              type="submit"
-              className="group relative w-full flex justify-center py-2 px-4 border border-transparent text-sm font-medium rounded-md text-white bg-indigo-600 hover:bg-indigo-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-indigo-500"
-            >
-              Sign up
-            </Button>
-          </div>
-        </form>
-        <p className="mt-2 text-center text-sm text-gray-600">
-          Already have an account?{" "}
-          <Link href="/login" className="font-medium text-indigo-600 hover:text-indigo-500">
-            Sign in
-          </Link>
-        </p>
+          {/* Login Form */}
+          <motion.div
+            initial={{ opacity: 0, x: 50 }}
+            animate={isLogin ? { opacity: 1, x: 0 } : { opacity: 0, x: -50 }}
+            transition={{ duration: 0.5 }}
+            className={`${isLogin ? "block" : "hidden"} w-full`}
+          >
+            <h2 className="text-3xl font-bold text-gray-900 mb-4">Get Started</h2>
+            <p className="text-gray-600 mb-6">Welcome back - Login to your account</p>
+            <form onSubmit={handleSubmit} className="space-y-6">
+              <div>
+                <Label htmlFor="email">Email</Label>
+                <Input id="email" name="email" type="email" required placeholder="Enter your email" value={email} onChange={(e) => setEmail(e.target.value)} />
+                {errors.email && <p className="text-red-500 text-xs mt-1">{errors.email}</p>}
+              </div>
+              <div>
+                <Label htmlFor="password">Password</Label>
+                <div className="relative">
+                  <Input id="password" name="password" type={showPassword ? "text" : "password"} required placeholder="Enter your password" value={password} onChange={(e) => setPassword(e.target.value)} />
+                  <button type="button" onClick={() => setShowPassword(!showPassword)} className="absolute right-3 top-3 text-gray-500">
+                    {showPassword ? <FaEye /> : <FaEyeSlash />}
+                  </button>
+                </div>
+                {errors.password && <p className="text-red-500 text-xs mt-1">{errors.password}</p>}
+              </div>
+              <Button type="submit" className="w-full bg-[#1A1A1A] text-white font-bold py-3 px-4 rounded">Sign In</Button>
+            </form>
+          </motion.div>
+
+          {/* Signup Form */}
+          <motion.div
+            initial={{ opacity: 0, x: 50 }}
+            animate={!isLogin ? { opacity: 1, x: 0 } : { opacity: 0, x: 50 }}
+            transition={{ duration: 0.5 }}
+            className={`${!isLogin ? "block" : "hidden"} w-full`}
+          >
+            <h2 className="text-3xl font-bold text-gray-900 mb-4">Create Account</h2>
+            <p className="text-gray-600 mb-6">Sign up to get started</p>
+            <form onSubmit={handleSubmit} className="space-y-6">
+              <div>
+                <Label htmlFor="name">Name</Label>
+                <Input id="name" name="name" type="text" required placeholder="Enter your name" value={name} onChange={(e) => setName(e.target.value)} />
+                {errors.name && <p className="text-red-500 text-xs mt-1">{errors.name}</p>}
+              </div>
+              <div>
+                <Label htmlFor="email">Email</Label>
+                <Input id="email" name="email" type="email" required placeholder="Enter your email" value={email} onChange={(e) => setEmail(e.target.value)} />
+                {errors.email && <p className="text-red-500 text-xs mt-1">{errors.email}</p>}
+              </div>
+              <div>
+                <Label htmlFor="password">Password</Label>
+                <div className="relative">
+                  <Input id="password" name="password" type={showPassword ? "text" : "password"} required placeholder="Enter your password" value={password} onChange={(e) => setPassword(e.target.value)} />
+                  <button type="button" onClick={() => setShowPassword(!showPassword)} className="absolute right-3 top-3 text-gray-500">
+                    {showPassword ? <FaEye /> : <FaEyeSlash />}
+                  </button>
+                </div>
+                {errors.password && <p className="text-red-500 text-xs mt-1">{errors.password}</p>}
+              </div>
+              <Button type="submit" className="w-full bg-[#1A1A1A] text-white font-bold py-3 px-4 rounded">Sign Up</Button>
+            </form>
+          </motion.div>
+
+          <p className="text-sm text-gray-600 mt-4">
+            {isLogin ? "Don't have an account? " : "Already have an account? "}
+            <button onClick={() => setIsLogin(!isLogin)} className="text-gray-900 font-medium">{isLogin ? "Sign Up" : "Log in"}</button>
+          </p>
+        </div>
+
+        {/* Right Section (Image or Content) */}
+        <div className={`hidden sm:block w-1/2 bg-black text-white flex flex-col justify-center items-center p-8 rounded-xl ${isLogin ? 'order-2' : 'order-1'}`}>
+          <h2 className="text-3xl font-bold">{isLogin ? "Enter the Future of Payments" : "Welcome Aboard"}</h2>
+        </div>
       </div>
     </div>
   )
-}
+} 

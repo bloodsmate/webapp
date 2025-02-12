@@ -11,6 +11,8 @@ import SEO from './components/SEO';
 import Chatbot from './components/Chatbot';
 import WhatsAppButton from './components/WhatsAppButton';
 import type React from "react"
+import { ThemeProvider } from "./components/ThemeProvider"
+import ClientLayout from "./ClientLayout";
 
 const geistSans = localFont({
   src: "./fonts/GeistVF.woff",
@@ -46,7 +48,7 @@ export default function RootLayout({
           description="Quality T-shirts for every style"
           canonical="/"
         />
-        <Providers>
+        {/* <Providers>
           <Navbar />
           <main>{children}</main>
           <Footer />
@@ -54,7 +56,13 @@ export default function RootLayout({
           <Toaster />
           <Chatbot />
           <WhatsAppButton />
-        </Providers>
+        </Providers> */}
+        <ThemeProvider attribute="class" defaultTheme="system" enableSystem>
+          <Providers>
+            <ClientLayout>{children}</ClientLayout>
+            <Toaster />
+          </Providers>
+        </ThemeProvider>
 
         <Script
           src="https://www.payhere.lk/lib/payhere.js"

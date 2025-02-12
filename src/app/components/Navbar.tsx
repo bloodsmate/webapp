@@ -9,6 +9,8 @@ import { motion, useScroll, useMotionValueEvent, AnimatePresence } from 'framer-
 import { RootState } from '../redux/store'
 import { smoothScroll } from '../utils/smoothScroll'
 import CartPopup from './CartPopup'
+import Image from "next/image";
+import { logo_black_url } from '../data/constants'
 
 export default function Navbar() {
   const [isMenuOpen, setIsMenuOpen] = useState(false)
@@ -41,7 +43,7 @@ export default function Navbar() {
         <div className="container mx-auto px-4">
           <div className="flex justify-between items-center py-4">
             <Link href="/" className="text-2xl font-bold text-gray-800">
-              TeeStartup
+              <Image src={logo_black_url} alt="Logo" width={150} height={100} />
             </Link>
             <div className="hidden md:flex items-center space-x-6">
               <button onClick={() => handleScroll('featured')} className="text-gray-600 hover:text-gray-800">Featured</button>

@@ -6,6 +6,8 @@ import { toast } from '../hooks/use-toast'
 import { Label } from '../components/ui/label'
 import { Input } from '../components/ui/input'
 import { Button } from "../components/ui/button"
+import Image from 'next/image'
+import { logo_black_url } from '../data/constants'
 
 declare global {
   interface Window {
@@ -20,16 +22,16 @@ export default function LoginPage() {
   const [turnstileToken, setTurnstileToken] = useState("")
   const turnstileRef = useRef<HTMLDivElement>(null)
 
-  useEffect(() => {
-    if (typeof window.turnstile !== "undefined" && turnstileRef.current) {
-      window.turnstile.render(turnstileRef.current, {
-        sitekey: "YOUR_TURNSTILE_SITE_KEY",
-        callback: (token: string) => {
-          setTurnstileToken(token)
-        },
-      })
-    }
-  }, [])
+  // useEffect(() => {
+  //   if (typeof window.turnstile !== "undefined" && turnstileRef.current) {
+  //     window.turnstile.render(turnstileRef.current, {
+  //       sitekey: "YOUR_TURNSTILE_SITE_KEY",
+  //       callback: (token: string) => {
+  //         setTurnstileToken(token)
+  //       },
+  //     })
+  //   }
+  // }, [])
 
   const validateForm = () => {
     let isValid = true
@@ -48,14 +50,14 @@ export default function LoginPage() {
       isValid = false
     }
 
-    if (!turnstileToken) {
-      toast({
-        title: "Error",
-        description: "Please complete the Cloudflare verification.",
-        variant: "destructive",
-      })
-      isValid = false
-    }
+    // if (!turnstileToken) {
+    //   toast({
+    //     title: "Error",
+    //     description: "Please complete the Cloudflare verification.",
+    //     variant: "destructive",
+    //   })
+    //   isValid = false
+    // }
 
     setErrors(newErrors)
     return isValid
@@ -64,78 +66,88 @@ export default function LoginPage() {
   const handleSubmit = (e: React.FormEvent) => {
     e.preventDefault()
     if (validateForm()) {
-      // Here you would typically handle the login logic
       console.log("Login attempt with:", { email, password, turnstileToken })
       toast({
         title: "Login Successful",
         description: "You have successfully logged in.",
+        variant: "success",
       })
     }
   }
 
   return (
-    <div className="min-h-screen flex items-center justify-center bg-gray-100 py-12 px-4 sm:px-6 lg:px-8">
-      <div className="max-w-md w-full space-y-8">
-        <div>
-          <h2 className="mt-6 text-center text-3xl font-extrabold text-gray-900">Sign in to your account</h2>
-        </div>
-        <form className="mt-8 space-y-6" onSubmit={handleSubmit}>
-          <div className="rounded-md shadow-sm -space-y-px">
+    <div className="min-h-screen flex items-center justify-center bg-gray-100 overflow-hidden">
+      <div className="p-8 min-h-screen min-w-full bg-white flex">
+        {/* Left Section (Form) */}
+        <div className="w-1/2 bg-white px-32 xl:40 2xl:px-48 py-16 flex flex-col justify-center relative">
+          {/* Back Button */}
+          <Link href="/" className="absolute top-4 left-4 p-2 rounded-full hover:bg-gray-200 transition duration-300">
+            <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" strokeWidth="2" stroke="currentColor" className="w-6 h-6">
+              <path strokeLinecap="round" strokeLinejoin="round" d="M15 19l-7-7 7-7" />
+            </svg>
+          </Link>
+
+          <div className="mb-6">
+            <Image src={logo_black_url} alt="Logo" width={150} height={100} />
+          </div>
+
+          <h2 className="text-3xl font-bold text-gray-900 mb-4">Get Started</h2>
+          <p className="text-gray-600 mb-6">Welcome - Let's create your account</p>
+
+          <form onSubmit={handleSubmit} className="space-y-6">
             <div>
-              <Label htmlFor="email-address" className="sr-only">
-                Email address
-              </Label>
+              <Label htmlFor="email">Email</Label>
               <Input
-                id="email-address"
+                id="email"
                 name="email"
                 type="email"
-                autoComplete="email"
                 required
-                className="appearance-none rounded-none relative block w-full px-3 py-2 border border-gray-300 placeholder-gray-500 text-gray-900 rounded-t-md focus:outline-none focus:ring-indigo-500 focus:border-indigo-500 focus:z-10 sm:text-sm"
-                placeholder="Email address"
+                placeholder="Enter your email"
                 value={email}
                 onChange={(e) => setEmail(e.target.value)}
               />
               {errors.email && <p className="text-red-500 text-xs mt-1">{errors.email}</p>}
             </div>
+
             <div>
-              <Label htmlFor="password" className="sr-only">
-                Password
-              </Label>
+              <Label htmlFor="password">Password</Label>
               <Input
                 id="password"
                 name="password"
                 type="password"
-                autoComplete="current-password"
                 required
-                className="appearance-none rounded-none relative block w-full px-3 py-2 border border-gray-300 placeholder-gray-500 text-gray-900 rounded-b-md focus:outline-none focus:ring-indigo-500 focus:border-indigo-500 focus:z-10 sm:text-sm"
-                placeholder="Password"
+                placeholder="Enter your password"
                 value={password}
                 onChange={(e) => setPassword(e.target.value)}
               />
               {errors.password && <p className="text-red-500 text-xs mt-1">{errors.password}</p>}
             </div>
-          </div>
 
-          <div ref={turnstileRef} className="flex justify-center"></div>
+            <div ref={turnstileRef} className="flex justify-center"></div>
 
-          <div>
-            <Button
-              type="submit"
-              className="group relative w-full flex justify-center py-2 px-4 border border-transparent text-sm font-medium rounded-md text-white bg-indigo-600 hover:bg-indigo-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-indigo-500"
-            >
-              Sign in
+            {/* Button with Shine Effect */}
+            <Button type="submit" className="w-full bg-[#1A1A1A] text-white font-bold py-3 px-4 rounded">
+              Sign In
             </Button>
+          </form>
+
+          <p className="text-sm text-gray-600 mt-4">
+            Already have an account? <Link href="/login" className="text-gray-900 font-medium">Log in</Link>
+          </p>
+        </div>
+
+        {/* Right Section */}
+        <div className="w-1/2 bg-black text-white flex flex-col justify-center items-center p-8 relative shadow-lg rounded-2xl">
+          <h2 className="text-3xl font-bold">Enter the Future of Payments, today</h2>
+          <div className="absolute bottom-6 right-6">
+            <Image src="https://res.cloudinary.com/midefulness/image/upload/v1739366195/BloodsMate/Untitled_design_5_fqgcxa.png" 
+              alt="Card Preview" 
+              width={200} 
+              height={150} 
+              />
           </div>
-        </form>
-        <p className="mt-2 text-center text-sm text-gray-600">
-          Don't have an account?{" "}
-          <Link href="/signup" className="font-medium text-indigo-600 hover:text-indigo-500">
-            Sign up
-          </Link>
-        </p>
+        </div>
       </div>
     </div>
   )
 }
-
