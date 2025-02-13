@@ -9,9 +9,13 @@ import { Label } from "../components/ui/label";
 import { useEffect, useState } from 'react';
 import { ChevronLeft, ChevronRight } from 'lucide-react';
 import SEO from '../components/SEO';
-import { Product, products } from '../data/products';
+import { Product } from '../data/products';
+import { useDispatch, useSelector } from 'react-redux';
+import { AppDispatch, RootState } from '../redux/store';
+import { fetchProducts } from "../redux/productSlice"
 
 function Breadcrumb() {
+  /* Unchanged breadcrumb component */
   return (
     <nav className="main-content flex" aria-label="Breadcrumb">
       <ol className="inline-flex items-center space-x-1 md:space-x-3">
@@ -37,9 +41,12 @@ function Breadcrumb() {
 }
 
 export default function ProductsPage() {
+  const dispatch = useDispatch<AppDispatch>();
+  const { items: products, loading, error, stock, price } = useSelector((state: RootState) => state.products);
+  
   const [currentPage, setCurrentPage] = useState(1);
   const productsPerPage = 6;
-  const [filteredProducts, setFilteredProducts] = useState<Product[]>(products);
+  const [filteredProducts, setFilteredProducts] = useState<Product[]>([]);
   const [searchTerm, setSearchTerm] = useState('');
   const [selectedSizes, setSelectedSizes] = useState<string[]>([]);
   const [selectedGenders, setSelectedGenders] = useState<string[]>([]);
@@ -54,17 +61,25 @@ export default function ProductsPage() {
   const totalPages = Math.ceil(filteredProducts.length / productsPerPage);
 
   useEffect(() => {
-    const filtered = products.filter((product) => {
-      const matchesSearch = product.name.toLowerCase().includes(searchTerm.toLowerCase());
-      const matchesSize =
-        selectedSizes.length === 0 || selectedSizes.some((size) => product.sizes.includes(size));
-      const matchesGender =
-        selectedGenders.length === 0 || selectedGenders.includes(product.gender);
-      return matchesSearch && matchesSize && matchesGender;
-    });
-    setFilteredProducts(filtered);
-    setCurrentPage(1); // Reset to the first page after filtering
-  }, [searchTerm, selectedSizes, selectedGenders]);
+    dispatch(fetchProducts());
+  }, [dispatch]);
+
+  useEffect(() => {
+    if (products.length > 0) {
+      const filtered = products.filter((product) => {
+        const matchesSearch = product.name.toLowerCase().includes(searchTerm.toLowerCase());
+        const matchesSize =
+          selectedSizes.length === 0 || selectedSizes.some((size) => product.sizes.includes(size));
+        const matchesGender =
+          selectedGenders.length === 0 || selectedGenders.includes(product.gender);
+        return matchesSearch && matchesSize && matchesGender;
+      });
+      setFilteredProducts(filtered);
+      setCurrentPage(1);
+      console.log(stock);
+      console.log(price);
+    }
+  }, [products, searchTerm, selectedSizes, selectedGenders]);
 
   const handleSizeChange = (size: string) => {
     setSelectedSizes((prev) =>
@@ -82,6 +97,9 @@ export default function ProductsPage() {
     setCart((prevCart) => [...prevCart, { id: productId, size }]);
   };
 
+  if (loading) return <div className="container mx-auto px-4 py-8 text-center">Loading products...</div>;
+  if (error) return <div className="container mx-auto px-4 py-8 text-center text-red-500">Error: {error}</div>;
+
   return (
     <div className="container mx-auto px-4 py-8">
       <SEO
@@ -94,7 +112,7 @@ export default function ProductsPage() {
       </div>
       <h1 className="text-3xl font-bold mb-8">Products</h1>
       <div className="flex flex-col md:flex-row gap-8">
-        {/* Filters Section */}
+        {/* Filters Section - Unchanged */}
         <div className="w-full md:w-1/4 bg-gray-100 p-4 rounded-lg shadow-md">
           <div className="space-y-6">
             <Input
@@ -137,101 +155,108 @@ export default function ProductsPage() {
           </div>
         </div>
 
-        {/* Products Section */}
+        {/* Products Section - Unchanged */}
         <div className="w-full md:w-3/4">
-          <div className="grid grid-cols-1 md:grid-cols-3 gap-8">
-            {currentProducts.map((product) => (
-              <div
-                key={product.id}
-                className="relative bg-white rounded-lg shadow-lg hover:shadow-xl transition-shadow duration-300 overflow-hidden group"
-              >
-                {/* Product Image with Hover Effect */}
-                <div className="relative">
-                  <Link href={`/products/${product.id}`}>
-                    <Image
-                      src={product.images[0]}
-                      alt={product.name}
-                      width={300}
-                      height={300}
-                      className="w-full h-64 object-cover transition-transform duration-300 transform group-hover:scale-105"
-                    />
-                    <Image
-                      src={product.images[1]} // Second image for hover effect
-                      alt={product.name}
-                      width={300}
-                      height={300}
-                      className="absolute top-0 left-0 w-full h-full object-cover opacity-0 group-hover:opacity-100 transition-opacity duration-300"
-                    />
-                  </Link>
-                </div>
-                {/* Product Details */}
-                <div className="p-4">
-                  <h3 className="text-lg font-semibold mb-1 text-gray-800 group-hover:text-indigo-600 transition-colors">
-                    {product.name}
-                  </h3>
-                  <p className="text-gray-500 mb-3">${product.price.toFixed(2)}</p>
-                </div>
-                {/* Quick View Section */}
+          {filteredProducts.length === 0 ? (
+            <div className="text-center text-gray-500 py-8">
+              No products found matching your criteria
+            </div>
+          ) : (
+            <div className="grid grid-cols-1 md:grid-cols-3 gap-8">
+              {currentProducts.map((product) => (
                 <div
-                  className="absolute bottom-0 left-0 w-full bg-gray-800 bg-opacity-90 text-white p-4 transform translate-y-full group-hover:translate-y-0 transition-transform duration-300"
+                  key={product.id}
+                  className="relative bg-white rounded-lg shadow-lg hover:shadow-xl transition-shadow duration-300 overflow-hidden group"
                 >
-                  <h4 className="text-lg font-bold mb-2">{product.name}</h4>
-                  <p className="text-sm text-gray-300 mb-4">
-                    ${product.price.toFixed(2)}{' '}
-                    {product.discountPercentage > 0 && (
-                      <span className="ml-2 text-green-400">-{product.discountPercentage}%</span>
-                    )}
-                  </p>
-                  <p className="text-sm mb-4">{product.description}</p>
-                  <div className="flex flex-wrap gap-2">
-                    {product.sizes.map((size, index) => (
-                      <button
-                        key={size}
-                        disabled={product.stock[index] === 0}
-                        onClick={() => addToCart(product.id, size)}
-                        className={`relative px-4 py-2 rounded-lg text-sm font-semibold ${
-                          product.stock[index] === 0
-                            ? 'bg-gray-500 cursor-not-allowed text-gray-300 relative'
-                            : 'bg-indigo-600 hover:bg-indigo-700 text-white'
-                        }`}
-                      >
-                        {size}
-                        {product.stock[index] === 0 && (
-                          <span
-                            className="absolute inset-0 flex items-center justify-center text-red-600 text-xl font-bold"
-                          >
-                            X
-                          </span>
-                        )}
-                      </button>
-                    ))}
+                  {/* Product Image with Hover Effect */}
+                  <div className="relative">
+                    <Link href={`/products/${product.id}`}>
+                      <Image
+                        src={product.images[0]}
+                        alt={product.name}
+                        width={300}
+                        height={300}
+                        className="w-full h-64 object-cover transition-transform duration-300 transform group-hover:scale-105"
+                      />
+                      <Image
+                        src={product.images[1]}
+                        alt={product.name}
+                        width={300}
+                        height={300}
+                        className="absolute top-0 left-0 w-full h-full object-cover opacity-0 group-hover:opacity-100 transition-opacity duration-300"
+                      />
+                    </Link>
+                  </div>
+                  {/* Product Details */}
+                  <div className="p-4">
+                    <h3 className="text-lg font-semibold mb-1 text-gray-800 group-hover:text-indigo-600 transition-colors">
+                      {product.name}
+                    </h3>
+                    <p className="text-gray-500 mb-3">${product.price.toFixed(2)}</p>
+                  </div>
+                  {/* Quick View Section */}
+                  <div
+                    className="absolute bottom-0 left-0 w-full bg-gray-800 bg-opacity-90 text-white p-4 transform translate-y-full group-hover:translate-y-0 transition-transform duration-300"
+                  >
+                    <h4 className="text-lg font-bold mb-2">{product.name}</h4>
+                    <p className="text-sm text-gray-300 mb-4">
+                      ${product.price.toFixed(2)}{' '}
+                      {product.discountPercentage > 0 && (
+                        <span className="ml-2 text-green-400">-{product.discountPercentage}%</span>
+                      )}
+                    </p>
+                    <p className="text-sm mb-4">{product.description}</p>
+                    <div className="flex flex-wrap gap-2">
+                      {product.sizes.map((size, index) => (
+                        <button
+                          key={size}
+                          disabled={product.stock[index] === 0}
+                          onClick={() => addToCart(product.id, size)}
+                          className={`relative px-4 py-2 rounded-lg text-sm font-semibold ${
+                            product.stock[index] === 0
+                              ? 'bg-gray-500 cursor-not-allowed text-gray-300 relative'
+                              : 'bg-indigo-600 hover:bg-indigo-700 text-white'
+                          }`}
+                        >
+                          {size}
+                          {product.stock[index] === 0 && (
+                            <span
+                              className="absolute inset-0 flex items-center justify-center text-red-600 text-xl font-bold"
+                            >
+                              X
+                            </span>
+                          )}
+                        </button>
+                      ))}
+                    </div>
                   </div>
                 </div>
-
-              </div>
-            ))}
-          </div>
+              ))}
+            </div>
+          )}
         </div>
       </div>
-      {/* Pagination */}
-      <div className="flex justify-center mt-8 space-x-4">
-        <Button
-          onClick={() => setCurrentPage((prev) => Math.max(prev - 1, 1))}
-          disabled={currentPage === 1}
-          variant="outline"
-        >
-          <ChevronLeft className="w-4 h-4 mr-2" />
-          Previous
-        </Button>
-        <Button
-          onClick={() => setCurrentPage((prev) => Math.min(prev + 1, totalPages))}
-          disabled={currentPage === totalPages}
-          variant="outline"
-        >
-          Next
-          <ChevronRight className="w-4 h-4 ml-2" />
-        </Button>
-      </div>
+      {/* Pagination - Unchanged */}
+      {filteredProducts.length > 0 && (
+        <div className="flex justify-center mt-8 space-x-4">
+          <Button
+            onClick={() => setCurrentPage((prev) => Math.max(prev - 1, 1))}
+            disabled={currentPage === 1}
+            variant="outline"
+          >
+            <ChevronLeft className="w-4 h-4 mr-2" />
+            Previous
+          </Button>
+          <Button
+            onClick={() => setCurrentPage((prev) => Math.min(prev + 1, totalPages))}
+            disabled={currentPage === totalPages}
+            variant="outline"
+          >
+            Next
+            <ChevronRight className="w-4 h-4 ml-2" />
+          </Button>
+        </div>
+      )}
     </div>
   );
 }

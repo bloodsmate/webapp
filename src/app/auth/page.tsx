@@ -1,7 +1,8 @@
 'use client'
 
-import { useState } from 'react'
+import { useState, useEffect } from 'react'
 import Link from 'next/link'
+import { useRouter } from "next/navigation"
 import { toast } from '../hooks/use-toast'
 import { Label } from '../components/ui/label'
 import { Input } from '../components/ui/input'
@@ -12,6 +13,9 @@ import { motion } from 'framer-motion'
 import { FaEye, FaEyeSlash } from 'react-icons/fa'
 import { userSignIn, userRegister } from '../api/userApiCalls'
 import { userLogin, userRegistration } from '../types/user'
+import { useDispatch, useSelector } from "react-redux"
+import { login } from "../redux/authSlice"
+import type { AppDispatch, RootState } from "../redux/store"
 
 export default function AuthPage() {
   const [isLogin, setIsLogin] = useState(true)
@@ -20,6 +24,17 @@ export default function AuthPage() {
   const [name, setName] = useState("")
   const [errors, setErrors] = useState({ email: "", password: "", name: "" })
   const [showPassword, setShowPassword] = useState(false)
+  const dispatch = useDispatch<AppDispatch>()
+  const { user, loading, error, isAuthenticated } = useSelector((state: RootState) => state.auth)
+  const router = useRouter()
+
+  useEffect(() => {
+    console.log(user);
+    if (isAuthenticated) {
+      console.log("Is Authenticated: ", isAuthenticated);
+      // router.push("/")
+    }
+  }, [isAuthenticated, router])
 
   const validateForm = () => {
     let isValid = true
@@ -52,34 +67,21 @@ export default function AuthPage() {
 
     if (validateForm()) {
       if(isLogin) {
-        const userData:userLogin = {
-          email: email,
-          password: password,
-        }
-        
         try {
-          const { data: loginData, loading, error } = await userSignIn(userData);
-          console.log(loginData)
-
-          if(!error){
-            toast({
-              title: "Login Successful",
-              description: "You have successfully logged in.",
-              variant: "success",
-            })
-          }else {
-            toast({
-              title: "Login Unsuccessful",
-              description: "Invalid credentials. Please try again.",
-              variant: "destructive",
-            })
-          }
-        }catch(error) {
+          await dispatch(login({ email, password })).unwrap()
           toast({
-            title: "Login Unsuccessful",
+            title: "Login Successful",
+            description: "You have successfully logged in.",
+            variant: "success",
+          })
+        } catch (error) {
+          toast({
+            title: "Login Failed",
+            description: error as string,
             variant: "destructive",
           })
         }
+
       } else {
         const userData:userRegistration = {
           name: name,
