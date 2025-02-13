@@ -6,7 +6,7 @@ export enum OrderStatus {
     CANCELLED = 'CANCELLED'
 }
   
-  export interface OrderItem {
+export interface OrderItem {
     id: number;
     name: string;
     size: string;
@@ -14,7 +14,7 @@ export enum OrderStatus {
     price: number;
   }
   
-  export interface Order {
+export interface Order {
     id: string;
     userId: string;
     items: OrderItem[];

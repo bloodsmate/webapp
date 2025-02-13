@@ -1,12 +1,13 @@
 import type { Metadata } from "next";
 import localFont from "next/font/local";
+import Script from "next/script";
 import "./globals.css";
-import { Providers } from './providers' 
-import Navbar from './components/Navbar'
-import Footer from './components/Footer'
-import { Toaster } from './components/ui/toaster' 
-import BackToTopButton from './components/BackToTopButton'
-import SEO from './components/SEO'
+import { Providers } from './providers'; 
+import { Toaster } from './components/ui/toaster'; 
+import SEO from './components/SEO';
+import type React from "react"
+import { ThemeProvider } from "./components/ThemeProvider"
+import ClientLayout from "./ClientLayout";
 
 const geistSans = localFont({
   src: "./fonts/GeistVF.woff",
@@ -31,21 +32,29 @@ export default function RootLayout({
 }>) {
   return (
     <html lang="en" className="scroll-smooth">
+      <head>
+        <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no" />
+      </head>
       <body
-        className={`${geistSans.variable} ${geistMono.variable} antialiased flex flex-col min-h-screen`}
+        className={`${geistSans.variable} ${geistMono.variable} antialiased flex flex-col min-h-screen overflow-x-hidden`}
       >
         <SEO 
           title="BloodsMate"
           description="Quality T-shirts for every style"
           canonical="/"
         />
-        <Providers>
-          <Navbar />
-          <main>{children}</main>
-          <Footer />
-          <BackToTopButton />
-          <Toaster />
-        </Providers>
+        <ThemeProvider attribute="class" defaultTheme="system" enableSystem>
+          <Providers>
+            <ClientLayout>{children}</ClientLayout>
+            <Toaster />
+          </Providers>
+        </ThemeProvider>
+
+        <Script
+          src="https://www.payhere.lk/lib/payhere.js"
+          strategy="lazyOnload"
+        />
+        <Script src="https://challenges.cloudflare.com/turnstile/v0/api.js" async defer />
       </body>
     </html>
   );

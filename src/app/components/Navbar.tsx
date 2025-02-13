@@ -1,15 +1,16 @@
 'use client'
 
 import Link from 'next/link'
-import { useState, useEffect } from 'react'
+import { useState } from 'react'
 import { useSelector } from 'react-redux'
 import { ShoppingCart, User, Menu, X } from 'lucide-react'
-import { Button } from './ui/button' 
+import { Button } from './ui/button'
 import { motion, useScroll, useMotionValueEvent, AnimatePresence } from 'framer-motion'
-import { RootState } from '../redux/store' 
-import Image from 'next/image'
+import { RootState } from '../redux/store'
 import { smoothScroll } from '../utils/smoothScroll'
 import CartPopup from './CartPopup'
+import Image from "next/image";
+import { logo_black_url } from '../data/constants'
 
 export default function Navbar() {
   const [isMenuOpen, setIsMenuOpen] = useState(false)
@@ -42,14 +43,17 @@ export default function Navbar() {
         <div className="container mx-auto px-4">
           <div className="flex justify-between items-center py-4">
             <Link href="/" className="text-2xl font-bold text-gray-800">
-              TeeStartup
+              <Image src={logo_black_url} alt="Logo" width={150} height={100} />
             </Link>
             <div className="hidden md:flex items-center space-x-6">
               <button onClick={() => handleScroll('featured')} className="text-gray-600 hover:text-gray-800">Featured</button>
               <Link href="/products" className="text-gray-600 hover:text-gray-800">Products</Link>
               <Link href="/about" className="text-gray-600 hover:text-gray-800">About</Link>
               <Link href="/contact" className="text-gray-600 hover:text-gray-800">Contact</Link>
-              <button onClick={() => setIsCartOpen(true)} className="text-gray-600 hover:text-gray-800 relative">
+              <button 
+                onClick={() => setIsCartOpen((prev) => !prev)} 
+                className="text-gray-600 hover:text-gray-800 relative"
+              >
                 <ShoppingCart className="w-6 h-6" />
                 {totalItems > 0 && (
                   <span className="absolute -top-2 -right-2 bg-red-500 text-white rounded-full w-5 h-5 flex items-center justify-center text-xs">
@@ -100,8 +104,9 @@ export default function Navbar() {
           </AnimatePresence>
         </div>
       </motion.nav>
+      
       <AnimatePresence>
-        {isCartOpen && <CartPopup onClose={() => setIsCartOpen(false)} />}
+        {isCartOpen && <CartPopup isOpen={isCartOpen} onClose={() => setIsCartOpen(false)} />}
       </AnimatePresence>
     </>
   )

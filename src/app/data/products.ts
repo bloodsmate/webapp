@@ -5,8 +5,10 @@ export interface Product {
   discountPercentage?: number;
   images: string[];
   description: string;
+  productDetails: string;
   sizes: string[];
-  stock: number;
+  stock: number[];
+  inStock: boolean;
   gender: 'Men' | 'Women' | 'Unisex';
   category: string;
 }
@@ -19,12 +21,14 @@ export const products: Product[] = [
     discountPercentage: 10,
     images: [
       'https://res.cloudinary.com/midefulness/image/upload/v1657441707/cld-sample-5.jpg',
-      'https://res.cloudinary.com/midefulness/image/upload/v1657441707/cld-sample-5.jpg',
+      'https://res.cloudinary.com/midefulness/image/upload/v1657441705/cld-sample.jpg',
       'https://res.cloudinary.com/midefulness/image/upload/v1657441707/cld-sample-5.jpg',
     ],
     description: 'A timeless classic white t-shirt that goes with everything. Made from 100% organic cotton for ultimate comfort and sustainability.',
-    sizes: ['XS', 'S', 'M', 'L', 'XL', 'XXL'],
-    stock: 50,
+    productDetails: 'A timeless classic white t-shirt that goes with everything. Made from 100% organic cotton for ultimate comfort and sustainability.',
+    sizes: ['XS', 'S', 'M', 'L', 'XL', '2XL'],
+    stock: [0,0,1,3,4,10],
+    inStock: true,
     gender: 'Unisex',
     category: 'T-Shirts',
   },
@@ -34,12 +38,14 @@ export const products: Product[] = [
     price: 29.99,
     images: [
       'https://res.cloudinary.com/midefulness/image/upload/v1657441707/cld-sample-5.jpg',
-      'https://res.cloudinary.com/midefulness/image/upload/v1657441707/cld-sample-5.jpg',
+      'https://res.cloudinary.com/midefulness/image/upload/v1657441705/cld-sample.jpg',
       'https://res.cloudinary.com/midefulness/image/upload/v1657441707/cld-sample-5.jpg',
     ],
     description: 'A sleek black t-shirt with a vintage feel. Perfect for any casual occasion.',
+    productDetails: 'A sleek black t-shirt with a vintage feel. Perfect for any casual occasion.',
     sizes: ['XS', 'S', 'M', 'L', 'XL', 'XXL'],
-    stock: 40,
+    stock: [10,20,1,3,4,10],
+    inStock: true,
     gender: 'Unisex',
     category: 'T-Shirts',
   },
@@ -49,13 +55,15 @@ export const products: Product[] = [
     price: 34.99,
     discountPercentage: 15,
     images: [
-      '/placeholder.svg?height=600&width=400&text=Graphic+Front',
+      'https://res.cloudinary.com/midefulness/image/upload/v1657441705/cld-sample.jpg',
       '/placeholder.svg?height=600&width=400&text=Graphic+Back',
       '/placeholder.svg?height=600&width=400&text=Graphic+Side',
     ],
     description: 'Express yourself with our unique graphic print design. Made with eco-friendly inks.',
+    productDetails: 'Express yourself with our unique graphic print design. Made with eco-friendly inks.',
     sizes: ['S', 'M', 'L', 'XL'],
-    stock: 30,
+    stock: [0,2,1,3],
+    inStock: true,
     gender: 'Women',
     category: 'Graphic Tees',
   },
@@ -69,8 +77,10 @@ export const products: Product[] = [
       '/placeholder.svg?height=600&width=400&text=Striped+Side',
     ],
     description: 'Classic navy stripes for a nautical-inspired look. Perfect for summer days.',
+    productDetails: 'Classic navy stripes for a nautical-inspired look. Perfect for summer days.',
     sizes: ['XS', 'S', 'M', 'L', 'XL'],
-    stock: 35,
+    stock: [10,10,1,3,4],
+    inStock: true,
     gender: 'Men',
     category: 'T-Shirts',
   },
@@ -84,8 +94,10 @@ export const products: Product[] = [
       '/placeholder.svg?height=600&width=400&text=Gray+Side',
     ],
     description: 'Soft and comfortable heather gray t-shirt for everyday wear. Versatile and stylish.',
+    productDetails: 'Soft and comfortable heather gray t-shirt for everyday wear. Versatile and stylish.',
     sizes: ['S', 'M', 'L', 'XL', 'XXL'],
-    stock: 45,
+    stock: [0,0,1,3,10],
+    inStock: true,
     gender: 'Unisex',
     category: 'T-Shirts',
   },
@@ -100,9 +112,29 @@ export const products: Product[] = [
       '/placeholder.svg?height=600&width=400&text=Neon+Side',
     ],
     description: 'Stand out from the crowd with this bold neon green tee. Perfect for parties and festivals.',
+    productDetails: 'Stand out from the crowd with this bold neon green tee. Perfect for parties and festivals.',
     sizes: ['XS', 'S', 'M', 'L'],
-    stock: 25,
+    stock: [1,3,4,10],
+    inStock: true,
     gender: 'Unisex',
+    category: 'T-Shirts',
+  },
+  {
+    id: 7,
+    name: 'Neon Ladies Green Tee',
+    price: 31.99,
+    discountPercentage: 5,
+    images: [
+      '/placeholder.svg?height=600&width=400&text=Neon+Front',
+      '/placeholder.svg?height=600&width=400&text=Neon+Back',
+      '/placeholder.svg?height=600&width=400&text=Neon+Side',
+    ],
+    description: 'Stand out from the crowd with this bold neon green tee. Perfect for parties and festivals.',
+    productDetails: 'Stand out from the crowd with this bold neon green tee. Perfect for parties and festivals.',
+    sizes: ['XS', 'S', 'M', 'L'],
+    stock: [2,3,4,10],
+    inStock: true,
+    gender: 'Women',
     category: 'T-Shirts',
   },
 ];

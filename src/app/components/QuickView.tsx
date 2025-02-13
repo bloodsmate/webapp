@@ -28,7 +28,8 @@ export default function QuickView({ product, onClose }: QuickViewProps) {
         name: product.name,
         price: product.price,
         quantity: 1,
-        size: selectedSize
+        size: selectedSize,
+        image: product.images[0]
       }))
       onClose()
     }

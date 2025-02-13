@@ -2,7 +2,7 @@
 
 import Link from 'next/link'
 import { motion } from 'framer-motion'
-import { Facebook, Instagram, Twitter } from 'lucide-react'
+import { Facebook, Instagram, Twitter, InstagramIcon as Tiktok } from 'lucide-react'
 
 const Wave = () => (
   <div className="absolute bottom-0 left-0 w-full overflow-hidden leading-[0] transform rotate-180">
@@ -63,11 +63,28 @@ export default function Footer() {
               <a href="#" className="text-gray-400 hover:text-white transition-colors">
                 <Twitter className="w-6 h-6" />
               </a>
+              <a href="#" className="text-gray-400 hover:text-white transition-colors">
+                <Tiktok className="w-6 h-6" />
+              </a>
+            </div>
+          </motion.div>
+          <motion.div
+            initial={{ opacity: 0, y: 20 }}
+            animate={{ opacity: 1, y: 0 }}
+            transition={{ duration: 0.5, delay: 0.2 }}
+          >
+            <div>
+              <h4 className="text-lg font-semibold mb-4">Payment Methods</h4>
+              <div className="flex space-x-4">
+                <img src="/visa.svg" alt="Visa" className="h-8" />
+                <img src="/mastercard.svg" alt="Mastercard" className="h-8" />
+                <img src="/paypal.svg" alt="PayPal" className="h-8" />
+              </div>
             </div>
           </motion.div>
         </div>
         <div className="mt-8 pt-8 border-t border-gray-700 text-center text-gray-400">
-          <p>&copy; 2023 TeeStartup. All rights reserved.</p>
+          <p>&copy; 2025 BloodsMate. All rights reserved.</p>
         </div>
         <Wave />
       </div>
