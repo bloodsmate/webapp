@@ -1,5 +1,6 @@
 import { createSlice, createAsyncThunk } from "@reduxjs/toolkit"
 import * as api from "../api/apiClient"
+import { AxiosError } from "axios"
 
 interface AuthState {
   user: {
@@ -27,9 +28,17 @@ export const login = createAsyncThunk(
       const data = await api.login(credentials.email, credentials.password)
       localStorage.setItem("authToken", data.token)
       return data.user
-    } catch (error: unknown) {
-      return rejectWithValue(error.response?.data?.message)
-    }
+    } catch (error) {
+        let errorMessage = "An unknown error occurred"
+  
+        if (error instanceof AxiosError) {
+          errorMessage = error.response?.data?.message || "An error occurred during login"
+        } else if (error instanceof Error) {
+          errorMessage = error.message
+        }
+  
+        return rejectWithValue(errorMessage)
+      }
   },
 )
 

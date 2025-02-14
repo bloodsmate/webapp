@@ -1,3 +1,8 @@
+export interface Stock {
+  size: string;
+  quantity: number;
+}
+
 export interface Product {
   id: number;
   name: string;
@@ -7,7 +12,7 @@ export interface Product {
   description: string;
   productDetails: string;
   sizes: string[];
-  stock: number[];
+  stock: Stock;
   inStock: boolean;
   gender: 'Men' | 'Women' | 'Unisex';
   category: string;
