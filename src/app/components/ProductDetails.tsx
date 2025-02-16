@@ -16,18 +16,21 @@ import {
   AccordionItem,
   AccordionTrigger,
 } from "@/app/components/ui/accordion";
-import type { RootState } from "../redux/store"
-import { FaCcVisa, FaCcMastercard, FaPaypal } from 'react-icons/fa'
-import Loader from "./Loader"
+import type { RootState } from "../redux/store";
+import { FaCcVisa, FaCcMastercard } from "react-icons/fa";
+import Loader from "./Loader";
+import sizeChartImage from "@/app/assets/bloodsmate_size_chart.png";
 
 function SizeChart() {
   return (
     <Accordion type="single" collapsible className="w-full">
       <AccordionItem value="size-chart">
-        <AccordionTrigger>Size Chart</AccordionTrigger>
+        <AccordionTrigger className="text-lg font-semibold">
+          Size Chart
+        </AccordionTrigger>
         <AccordionContent>
-          <div className="space-y-4">
-            <div className="overflow-x-auto">
+          <div className="space-y-4 w-full">
+            <div className="overflow-x-auto w-full">
               <table className="min-w-full bg-white border border-gray-300">
                 <thead>
                   <tr>
@@ -60,77 +63,84 @@ function SizeChart() {
                 </tbody>
               </table>
             </div>
-            <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+            <div className="grid grid-cols-1 gap-4 w-full">
               <Image
-                src="../assests/bloodsmate_size_chart.png"
+                src={sizeChartImage}
                 alt="Chest Measurement"
-                width={300}
+                width={600}
                 height={300}
-                className="rounded-lg"
-              />
-              <Image
-                src="/placeholder.svg?height=300&width=300&text=Length+Measurement"
-                alt="Length Measurement"
-                width={300}
-                height={300}
-                className="rounded-lg"
+                className="rounded-lg w-full"
               />
             </div>
           </div>
         </AccordionContent>
       </AccordionItem>
     </Accordion>
-  )
+  );
 }
 
 function PaymentOptions() {
   return (
     <Accordion type="single" collapsible className="w-full">
       <AccordionItem value="payment-options">
-        <AccordionTrigger>Payment Options</AccordionTrigger>
+        <AccordionTrigger className="text-lg font-semibold">
+          Payment Options
+        </AccordionTrigger>
         <AccordionContent>
-          <ul className="list-disc list-inside space-y-1">
+          <ul className="list-disc list-inside space-y-2">
             <li>Credit/Debit Card</li>
             <li>PayPal</li>
             <li>KOKO Pay (3 months installment)</li>
           </ul>
+          <div className="flex items-center space-x-4 mt-4">
+            <FaCcVisa size={32} className="text-blue-900" />
+            <FaCcMastercard size={32} className="text-red-600" />
+            <img
+              src="https://res.cloudinary.com/midefulness/image/upload/v1736096286/BloodsMate/koko-pay_d6id9w.png"
+              alt="koko pay"
+              className="h-8"
+            />
+          </div>
         </AccordionContent>
       </AccordionItem>
     </Accordion>
-  )
+  );
 }
 
 function DeliveryAndReturns() {
   return (
     <Accordion type="single" collapsible className="w-full">
       <AccordionItem value="delivery-returns">
-        <AccordionTrigger>Delivery & Returns</AccordionTrigger>
+        <AccordionTrigger className="text-lg font-semibold">
+          Delivery & Returns
+        </AccordionTrigger>
         <AccordionContent>
           <p className="mb-2">Free standard delivery on orders over $50</p>
           <p>Easy returns within 30 days</p>
         </AccordionContent>
       </AccordionItem>
     </Accordion>
-  )
+  );
 }
 
 export default function ProductDetails({ product }: { product: Product }) {
   const [selectedSize, setSelectedSize] = useState<string>("");
   const [mainImage, setMainImage] = useState<number>(0);
   const [outOfStock, setOutOfStock] = useState<boolean>(false);
+  const [isLoading, setIsLoading] = useState(true);
+  const [joinedWaitlist, setJoinedWaitlist] = useState<boolean>(false);
   const dispatch = useDispatch();
-  const wishlistItems = useSelector((state: any) => state.wishlist.items);
-  const isInWishlist = wishlistItems.some((item: any) => item.id === product.id);
-  const [isLoading, setIsLoading] = useState(true)
+  const wishlistItems = useSelector((state: RootState) => state.wishlist.items);
+  const isInWishlist = wishlistItems.some((item) => item.id === product.id);
 
   useEffect(() => {
     // Simulate loading delay
     const timer = setTimeout(() => {
-      setIsLoading(false)
-    }, 3000)
+      setIsLoading(false);
+    }, 1000);
 
-    return () => clearTimeout(timer)
-  }, [])
+    return () => clearTimeout(timer);
+  }, []);
 
   const handleAddToCart = () => {
     if (!selectedSize) {
@@ -171,20 +181,20 @@ export default function ProductDetails({ product }: { product: Product }) {
 
   const handleWishlist = () => {
     if (isInWishlist) {
-      // dispatch(removeFromWishlist(product.id));
+      dispatch(removeFromWishlist(product.id));
       toast({
         title: "Removed from wishlist",
         description: `${product.name} has been removed from your wishlist.`,
       });
     } else {
-      // dispatch(
-      //   addToWishlist({
-      //     id: product.id,
-      //     name: product.name,
-      //     price: product.price,
-      //     image: product.images[0],
-      //   })
-      // );
+      dispatch(
+        addToWishlist({
+          id: product.id,
+          name: product.name,
+          price: product.price,
+          image: product.images[0],
+        })
+      );
       toast({
         title: "Added to wishlist",
         description: `${product.name} has been added to your wishlist.`,
@@ -192,148 +202,173 @@ export default function ProductDetails({ product }: { product: Product }) {
     }
   };
 
+  const handleJoinWaitlist = (email: string) => {
+    // Simulate joining the waitlist
+    setTimeout(() => {
+      setJoinedWaitlist(true);
+      toast({
+        title: "Joined Waitlist",
+        description: `You have joined the waitlist for ${product.name} (${selectedSize}). We will notify you when it's back in stock.`,
+      });
+    }, 1000);
+  };
+
   const discountedPrice = product.discountPercentage
     ? product.price * (1 - product.discountPercentage / 100)
     : product.price;
 
   return (
-    <div className="grid grid-cols-1 md:grid-cols-2 gap-8">
+    <div className="grid grid-cols-1 md:grid-cols-2 gap-8 max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
       {isLoading ? (
         <div className="col-span-2 flex justify-center items-center h-96">
           <Loader size="large" />
         </div>
       ) : (
         <>
-      {/* Left Section - Images */}
-      <div className="space-y-4">
-        <div className="relative aspect-square">
-          <Image
-            src={product.images[mainImage]}
-            alt={product.name}
-            fill
-            className="object-cover rounded-lg"
-          />
-        </div>
-        <div className="flex space-x-2 overflow-x-auto">
-          {product.images.map((img, index) => (
-            <button
-              key={index}
-              onClick={() => setMainImage(index)}
-              className={`relative w-20 h-20 rounded-md overflow-hidden ${
-                mainImage === index ? "ring-2 ring-blue-500" : ""
-              }`}
-            >
+          {/* Left Section - Images */}
+          <div className="space-y-4">
+            <div className="relative aspect-square">
               <Image
-                src={img}
-                alt={`${product.name} view ${index + 1}`}
+                src={product.images[mainImage]}
+                alt={product.name}
                 fill
-                className="object-cover"
+                className="object-cover rounded-lg"
               />
-            </button>
-          ))}
-        </div>
-      </div>
-
-      {/* Right Section - Details */}
-      <div className="space-y-6">
-        <h1 className="text-3xl font-bold">{product.name}</h1>
-        <div className="flex items-baseline space-x-2">
-          <p className="text-2xl font-semibold text-blue-600">
-            ${discountedPrice.toFixed(2)}
-          </p>
-          {product.discountPercentage && (
-            <>
-              <p className="text-lg text-gray-500 line-through">
-                ${product.price.toFixed(2)}
-              </p>
-              <p className="text-lg font-semibold text-green-500">
-                Save {product.discountPercentage}%
-              </p>
-            </>
-          )}
-        </div>
-        <div>
-          <h3 className="text-lg font-bold mb-2">Select Size</h3>
-          <div className="flex flex-wrap gap-2">
-            {product.sizes.map((size, index) => {
-              const stockItem = product.stock.find((item) => item.size === size);
-              const isOutOfStock = !stockItem || stockItem.quantity === 0;
-
-              return (
+            </div>
+            <div className="flex space-x-2 overflow-x-auto">
+              {product.images.map((img, index) => (
                 <button
-                  key={size}
-                  onClick={() => {
-                    setSelectedSize(size);
-                    setOutOfStock(isOutOfStock);
-                  }}
-                  className={`relative flex items-center justify-center w-12 h-12 text-sm font-semibold border-2 rounded-md ${
-                    selectedSize === size
-                      ? "border-blue-600 bg-blue-100"
-                      : "border-gray-300"
-                  } ${isOutOfStock ? "opacity-50" : "hover:border-blue-600"}`}
-                  disabled={isOutOfStock}
+                  key={index}
+                  onClick={() => setMainImage(index)}
+                  className={`relative w-20 h-20 rounded-md overflow-hidden ${
+                    mainImage === index ? "ring-2 ring-blue-500" : ""
+                  }`}
                 >
-                  {size}
-                  {isOutOfStock && (
-                    <span className="absolute inset-0 flex items-center justify-center text-red-600 text-lg font-bold">
-                      X
-                    </span>
-                  )}
+                  <Image
+                    src={img}
+                    alt={`${product.name} view ${index + 1}`}
+                    fill
+                    className="object-cover"
+                  />
                 </button>
-              );
-            })}
+              ))}
+            </div>
           </div>
-        </div>
 
-        {/* Add to Cart and Wishlist Buttons */}
-        <div className="flex space-x-2">
-          <Button
-            onClick={handleAddToCart}
-            className="flex-grow"
-            disabled={outOfStock}
-          >
-            {outOfStock ? "Out of Stock" : "Add to Cart"}
-          </Button>
-          <Button onClick={handleWishlist} variant="outline">
-            <Heart
-              className={`w-6 h-6 ${
-                isInWishlist ? "fill-red-500 text-red-500" : ""
-              }`}
-            />
-          </Button>
-        </div>
+          {/* Right Section - Details */}
+          <div className="space-y-6">
+            <h1 className="text-3xl font-bold">{product.name}</h1>
+            <div className="flex items-baseline space-x-2">
+              <p className="text-2xl font-semibold text-blue-600">
+                ${discountedPrice.toFixed(2)}
+              </p>
+              {product.discountPercentage && (
+                <>
+                  <p className="text-lg text-gray-500 line-through">
+                    ${product.price.toFixed(2)}
+                  </p>
+                  <p className="text-lg font-semibold text-green-500">
+                    Save {product.discountPercentage}%
+                  </p>
+                </>
+              )}
+            </div>
+            <div>
+              <h3 className="text-lg font-bold mb-2">Select Size</h3>
+              <div className="flex flex-wrap gap-2">
+                {product.sizes.map((size, index) => {
+                  const stockItem = product.stock.find((item) => item.size === size);
+                  const isOutOfStock = !stockItem || stockItem.quantity === 0;
 
-        {/* Show Waitlist if Out of Stock */}
-        {outOfStock && (
-          <Waitlist
-            productId={product.id}
-            productName={product.name}
-            size={selectedSize}
-          />
-        )}
+                  return (
+                    <button
+                      key={size}
+                      onClick={() => {
+                        setSelectedSize(size);
+                        setOutOfStock(isOutOfStock);
+                      }}
+                      className={`relative flex items-center justify-center w-12 h-12 text-sm font-semibold border-2 rounded-md ${
+                        selectedSize === size
+                          ? "border-blue-600 bg-blue-100"
+                          : "border-gray-300"
+                      } ${isOutOfStock ? "opacity-50" : "hover:border-blue-600"}`}
+                      // disabled={isOutOfStock}
+                    >
+                      {size}
+                      {isOutOfStock && (
+                        <span className="absolute inset-0 flex items-center justify-center text-red-600 text-lg font-bold">
+                          X
+                        </span>
+                      )}
+                    </button>
+                  );
+                })}
+              </div>
+            </div>
 
-        <div className="flex items-center space-x-4 mt-6">
-          <span className="text-sm text-gray-500">We accept:</span>
-          <div className="flex space-x-2">
-            <img
-              src="https://res.cloudinary.com/midefulness/image/upload/v1736096286/BloodsMate/koko-pay_d6id9w.png"
-              alt="koko pay"
-              className="h-8"
-            />
+            {/* Add to Cart and Wishlist Buttons */}
+            <div className="flex space-x-2">
+              <Button
+                onClick={handleAddToCart}
+                className="flex-grow"
+                disabled={outOfStock}
+              >
+                {outOfStock ? "Out of Stock" : "Add to Cart"}
+              </Button>
+              <Button onClick={handleWishlist} variant="outline">
+                <Heart
+                  className={`w-6 h-6 ${
+                    isInWishlist ? "fill-red-500 text-red-500" : ""
+                  }`}
+                />
+              </Button>
+            </div>
+
+            {/* Show Waitlist if Out of Stock */}
+            {outOfStock && !joinedWaitlist && (
+              <Waitlist
+                productId={product.id}
+                productName={product.name}
+                size={selectedSize}
+                onJoinWaitlist={handleJoinWaitlist}
+              />
+            )}
+
+            {joinedWaitlist && (
+              <p className="text-green-600">
+                You have joined the waitlist for this product. We will notify you when it's back in stock.
+              </p>
+            )}
+
+            <div className="flex items-center space-x-4 mt-6">
+              <span className="text-sm text-gray-500">We accept:</span>
+              <div className="flex space-x-2">
+                <FaCcVisa size={32} className="text-blue-900" />
+                <FaCcMastercard size={32} className="text-red-600" />
+                <img
+                  src="https://res.cloudinary.com/midefulness/image/upload/v1736096286/BloodsMate/koko-pay_d6id9w.png"
+                  alt="koko pay"
+                  className="h-8"
+                />
+              </div>
+            </div>
+
+            {/* Accordion Section */}
+            <div className="space-y-4 mt-6">
+              <Accordion type="single" collapsible className="w-full">
+                <AccordionItem value="description">
+                  <AccordionTrigger className="text-lg font-semibold">
+                    Product Details
+                  </AccordionTrigger>
+                  <AccordionContent>{product.description}</AccordionContent>
+                </AccordionItem>
+              </Accordion>
+              <SizeChart />
+              <PaymentOptions />
+              <DeliveryAndReturns />
+            </div>
           </div>
-        </div>
-
-        <Accordion type="single" collapsible className="w-full mt-6">
-          <AccordionItem value="description">
-            <AccordionTrigger>Product Details</AccordionTrigger>
-            <AccordionContent>{product.description}</AccordionContent>
-          </AccordionItem>
-        </Accordion>
-        <SizeChart />
-        <PaymentOptions />
-        <DeliveryAndReturns />
-      </div>
-      </>
+        </>
       )}
     </div>
   );

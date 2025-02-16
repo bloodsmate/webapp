@@ -1,1 +1,2 @@
 export const logo_black_url = "https://res.cloudinary.com/midefulness/image/upload/v1739346565/BloodsMate/Group_12_tjkrss.png"
+export const logo_white_url = "https://res.cloudinary.com/midefulness/image/upload/v1739346566/BloodsMate/Group_13_mgerta.png"

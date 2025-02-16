@@ -12,7 +12,8 @@ import QuickView from "@/app/components/QuickView";
 import { useDispatch, useSelector } from "react-redux";
 import { AppDispatch, RootState } from "../../redux/store";
 import { fetchProduct } from "../../redux/productSlice";
-import Loader from "@/app/components/Loader"; // Ensure this component exists
+import Loader from "@/app/components/Loader";
+import YouMightAlsoLike from "@/app/components/YouMightAlsoLike";
 
 function Breadcrumb({ product }: { product: Product }) {
   return (
@@ -116,38 +117,37 @@ export default function ProductPage({ params }: { params: { id: string } }) {
     setIsLoading(false);
   }, [dispatch, params.id]);
 
-  // if (loading) {
-  //   return (
-  //     <div className="container mx-auto px-4 py-8 flex justify-center items-center h-96">
-  //       <Loader size="large" /> {/* Ensure this component exists */}
-  //     </div>
-  //   );
-  // }
-
-  // if (error) {
-  //   return (
-  //     <div className="container mx-auto px-4 py-8 text-center text-red-500">
-  //       Error: {error}
-  //     </div>
-  //   );
-  // }
-
-  // if (!productData) {
-  //   notFound(); // Redirect to 404 page only after confirming the product is not found
-  // }
-
-  return !isLoading ? (
-    <div className="container mx-auto px-4 py-8">
-      <Breadcrumb product={product} />
-      <div className="mt-8">
-        <ProductDetails product={product} />
+  if (isLoading) {
+    return (
+      <div className="container mx-auto px-4 py-8 flex justify-center items-center h-96">
+        <Loader size="large" /> {/* Ensure this component exists */}
       </div>
-      <div className="mt-8 space-y-6"></div>
-      <SubscribeSection />
-    </div>
-  ) : (
-    <div>Loading
+    );
+  }
 
-    </div>
-  );
+  if (error) {
+    return (
+      <div className="container mx-auto px-4 py-8 text-center text-red-500">
+        Error: {error}
+      </div>
+    );
+  }
+
+  if (!productData) {
+    notFound(); // Redirect to 404 page only after confirming the product is not found
+  }
+
+  return (
+    <>
+      <div className="container mx-auto px-4 py-8">
+        <Breadcrumb product={product} />
+        <div className="mt-8">
+          <ProductDetails product={product} />
+        </div>
+        <div className="mt-8 space-y-6"></div>
+        {/* <YouMightAlsoLike currentProductId={product.id} /> */}
+      </div>
+      <SubscribeSection />
+    </>
+    )
 }
