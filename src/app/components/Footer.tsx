@@ -16,34 +16,31 @@ const Wave = () => {
 
   useEffect(() => {
     if (wave1Ref.current && wave2Ref.current && wave3Ref.current) {
-      // Wave 1 Animation
+      // Wave 1 Animation (Fastest)
       gsap.to(wave1Ref.current, {
-        x: '25%',
-        y: '-10px',
-        duration: 4,
+        y: '-=20', // Move up and down by 20px
+        duration: 2, // Faster animation
         repeat: -1,
         yoyo: true,
-        ease: 'power1.inOut',
+        ease: 'sine.inOut',
       });
 
-      // Wave 2 Animation
+      // Wave 2 Animation (Medium speed)
       gsap.to(wave2Ref.current, {
-        x: '50%',
-        y: '-5px',
-        duration: 6,
+        y: '-=15', // Move up and down by 15px
+        duration: 3, // Medium speed
         repeat: -1,
         yoyo: true,
-        ease: 'power1.inOut',
+        ease: 'sine.inOut',
       });
 
-      // Wave 3 Animation
+      // Wave 3 Animation (Slowest)
       gsap.to(wave3Ref.current, {
-        x: '75%',
-        y: '-15px',
-        duration: 8,
+        y: '-=10', // Move up and down by 10px
+        duration: 4, // Slowest animation
         repeat: -1,
         yoyo: true,
-        ease: 'power1.inOut',
+        ease: 'sine.inOut',
       });
     }
   }, []);
