@@ -14,7 +14,7 @@ import { useDispatch, useSelector } from 'react-redux';
 import { AppDispatch, RootState } from '../redux/store';
 import { fetchProducts } from "../redux/productSlice";
 import { addToCart } from '../redux/cartSlice';
-import { toast } from '../hooks/use-toast'
+import { toast } from '../hooks/use-toast';
 
 function Breadcrumb() {
   /* Unchanged breadcrumb component */
@@ -68,14 +68,12 @@ export default function ProductsPage() {
   const [searchTerm, setSearchTerm] = useState('');
   const [selectedSizes, setSelectedSizes] = useState<string[]>([]);
   const [selectedGenders, setSelectedGenders] = useState<string[]>([]);
-  const [selectedAvailability, setSelectedAvailability] = useState<boolean | null>(null); // New filter
-  const [selectedSize, setSelectedSize] = useState<string | null>(null); // Track selected size for add to cart
+  const [selectedAvailability, setSelectedAvailability] = useState<boolean | null>(null);
+  const [selectedSizesByProduct, setSelectedSizesByProduct] = useState<Map<number, string>>(new Map());
 
-  // Hardcoded sizes and genders
   const allSizes = ['XS', 'S', 'M', 'L', 'XL', '2XL'];
   const allGenders = ['Male', 'Female', 'Unisex'];
 
-  // Use a ref to track the main image for each product
   const mainImageRef = useRef<Map<number, string>>(new Map());
 
   const indexOfLastProduct = currentPage * productsPerPage;
@@ -96,7 +94,7 @@ export default function ProductsPage() {
         const matchesGender =
           selectedGenders.length === 0 || selectedGenders.includes(product.gender);
         const matchesAvailability =
-          selectedAvailability === null || product.isStock === (selectedAvailability ? 1 : 0);
+          selectedAvailability === null || product.inStock === (selectedAvailability ? true : false);
         return matchesSearch && matchesSize && matchesGender && matchesAvailability;
       });
       setFilteredProducts(filtered);
@@ -122,12 +120,21 @@ export default function ProductsPage() {
     );
   };
 
-  const getStockQuantity = (product: Product, size: string) => {
-    const stockItem = product.stock.find(item => item.size === size);
+  const getStockQuantity = (product: Product, size: string): number => {
+    const stockItem = product.stock.find((item: Stock) => item.size === size);
     return stockItem ? stockItem.quantity : 0;
   };
 
+  const handleSizeSelection = (productId: number, size: string) => {
+    setSelectedSizesByProduct((prev) => new Map(prev).set(productId, size));
+  };
+
+  const getSelectedSizeForProduct = (productId: number) => {
+    return selectedSizesByProduct.get(productId) || null;
+  };
+
   const handleAddToCart = (product: Product) => {
+    const selectedSize = getSelectedSizeForProduct(product.id);
     if (!selectedSize) {
       toast({
         title: "Size not selected",
@@ -142,7 +149,7 @@ export default function ProductsPage() {
       price: product.price,
       quantity: 1,
       size: selectedSize,
-      image: mainImageRef.current.get(product.id) || product.images[0] // Use the selected image or default to the first image
+      image: mainImageRef.current.get(product.id) || product.images[0]
     }));
     toast({
       title: "Added to cart",
@@ -164,72 +171,83 @@ export default function ProductsPage() {
         <Breadcrumb />
       </div>
       <h1 className="text-3xl font-bold mb-8">Products</h1>
-      <div className="flex flex-col md:flex-row gap-8">
-        {/* Filters Section - Updated Design */}
-        <div className="w-full md:w-1/4 bg-white p-4 rounded-lg shadow-md border border-gray-200">
-          <div className="space-y-6">
+      <div className="flex flex-col md:flex-row gap-8 ">
+        {/* Filters Section - Modern Design */}
+        <div className="w-full md:w-1/4 bg-white p-6 rounded-lg shadow-lg border border-gray-100 overflow-hidden filters-section">
+          <div className="space-y-8">
             {/* Search Input */}
             <div>
+              <h3 className="text-lg font-semibold mb-4">Search</h3>
               <Input
                 type="search"
                 placeholder="Search products..."
                 value={searchTerm}
                 onChange={(e) => setSearchTerm(e.target.value)}
-                className="border-gray-300 focus:border-gray-900 focus:ring-gray-900 rounded-lg"
+                className="border-gray-200 focus:border-gray-900 focus:ring-gray-900 rounded-lg"
               />
             </div>
             {/* Size Filter */}
             <div>
-              <h3 className="font-semibold mb-2">Size</h3>
-              <div className="grid grid-cols-3 gap-2">
+              <h3 className="text-lg font-semibold mb-4">Size</h3>
+              <div className="grid grid-cols-3 gap-3">
                 {allSizes.map((size) => (
-                  <div key={size} className="flex items-center space-x-2">
-                    <Checkbox
-                      id={`size-${size}`}
-                      checked={selectedSizes.includes(size)}
-                      onCheckedChange={() => handleSizeChange(size)}
-                    />
-                    <Label htmlFor={`size-${size}`}>{size}</Label>
-                  </div>
+                  <button
+                    key={size}
+                    onClick={() => handleSizeChange(size)}
+                    className={`px-4 py-2 rounded-lg text-sm font-semibold transition-colors ${
+                      selectedSizes.includes(size)
+                        ? 'bg-gray-900 text-white'
+                        : 'bg-gray-100 hover:bg-gray-200 text-gray-700'
+                    }`}
+                  >
+                    {size}
+                  </button>
                 ))}
               </div>
             </div>
             {/* Gender Filter */}
             <div>
-              <h3 className="font-semibold mb-2">Gender</h3>
-              <div className="grid grid-cols-2 gap-2">
+              <h3 className="text-lg font-semibold mb-4">Gender</h3>
+              <div className="grid grid-cols-2 gap-3">
                 {allGenders.map((gender) => (
-                  <div key={gender} className="flex items-center space-x-2">
-                    <Checkbox
-                      id={`gender-${gender}`}
-                      checked={selectedGenders.includes(gender)}
-                      onCheckedChange={() => handleGenderChange(gender)}
-                    />
-                    <Label htmlFor={`gender-${gender}`}>{gender}</Label>
-                  </div>
+                  <button
+                    key={gender}
+                    onClick={() => handleGenderChange(gender)}
+                    className={`px-4 py-2 rounded-lg text-sm font-semibold transition-colors ${
+                      selectedGenders.includes(gender)
+                        ? 'bg-gray-900 text-white'
+                        : 'bg-gray-100 hover:bg-gray-200 text-gray-700'
+                    }`}
+                  >
+                    {gender}
+                  </button>
                 ))}
               </div>
             </div>
             {/* Availability Filter */}
             <div>
-              <h3 className="font-semibold mb-2">Availability</h3>
-              <div className="grid grid-cols-2 gap-2">
-                <div className="flex items-center space-x-2">
-                  <Checkbox
-                    id="availability-in-stock"
-                    checked={selectedAvailability === true}
-                    onCheckedChange={() => handleAvailabilityChange(true)}
-                  />
-                  <Label htmlFor="availability-in-stock">In Stock</Label>
-                </div>
-                <div className="flex items-center space-x-2">
-                  <Checkbox
-                    id="availability-out-of-stock"
-                    checked={selectedAvailability === false}
-                    onCheckedChange={() => handleAvailabilityChange(false)}
-                  />
-                  <Label htmlFor="availability-out-of-stock">Out of Stock</Label>
-                </div>
+              <h3 className="text-lg font-semibold mb-4">Availability</h3>
+              <div className="grid grid-cols-2 gap-3">
+                <button
+                  onClick={() => handleAvailabilityChange(true)}
+                  className={`px-4 py-2 rounded-lg text-sm font-semibold transition-colors ${
+                    selectedAvailability === true
+                      ? 'bg-gray-900 text-white'
+                      : 'bg-gray-100 hover:bg-gray-200 text-gray-700'
+                  }`}
+                >
+                  In Stock
+                </button>
+                <button
+                  onClick={() => handleAvailabilityChange(false)}
+                  className={`px-4 py-2 rounded-lg text-sm font-semibold transition-colors ${
+                    selectedAvailability === false
+                      ? 'bg-gray-900 text-white'
+                      : 'bg-gray-100 hover:bg-gray-200 text-gray-700'
+                  }`}
+                >
+                  Out of Stock
+                </button>
               </div>
             </div>
           </div>
@@ -244,18 +262,18 @@ export default function ProductsPage() {
           ) : (
             <div className="grid grid-cols-1 md:grid-cols-3 gap-8">
               {currentProducts.map((product) => {
-                // Get the main image for this product from the ref
                 const mainImage = mainImageRef.current.get(product.id) || product.images[0];
+                const selectedSize = getSelectedSizeForProduct(product.id);
 
                 return (
                   <div
                     key={product.id}
                     className="relative bg-white rounded-lg shadow-lg hover:shadow-xl transition-shadow duration-300 overflow-hidden group"
-                    style={{ minHeight: '500px' }} // Increased height
+                    style={{ minHeight: '500px' }}
                   >
                     {/* Product Image with Hover Effect */}
                     <div className="relative">
-                      <Link href={`/products/${product.id}`}>
+                      <Link href={`/products/${product.id}`} prefetch={false} >
                         <Image
                           src={mainImage}
                           alt={product.name}
@@ -271,17 +289,14 @@ export default function ProductsPage() {
                         {product.name}
                       </h3>
                       <div className="flex items-center gap-2 mb-3">
-                        {/* Display discounted price */}
                         <p className="text-gray-500 font-semibold">
-                          LKR{(product.price * (1 - (product.discountPercentage || 0) / 100)).toFixed(2)}
+                          LKR {(product.price * (1 - (product.discountPercentage || 0) / 100)).toFixed(2)}
                         </p>
-                        {/* Display original price with strikethrough if there's a discount */}
                         {product.discountPercentage > 0 && (
                           <p className="text-sm text-gray-400 line-through">
-                            LKR{product.price.toFixed(2)}
+                            LKR {product.price.toFixed(2)}
                           </p>
                         )}
-                        {/* Display discount percentage */}
                         {product.discountPercentage > 0 && (
                           <span className="ml-2 text-green-400 font-semibold">
                             {product.discountPercentage}%
@@ -296,17 +311,14 @@ export default function ProductsPage() {
                       <h4 className="text-lg font-bold mb-2">{product.name}</h4>
                       {/* Price Section */}
                       <div className="flex items-center gap-2 mb-4">
-                        {/* Display discounted price */}
                         <p className="text-sm text-gray-300 font-semibold">
-                          LKR{(product.price * (1 - (product.discountPercentage || 0) / 100)).toFixed(2)}
+                          LKR {(product.price * (1 - (product.discountPercentage || 0) / 100)).toFixed(2)}
                         </p>
-                        {/* Display original price with strikethrough if there's a discount */}
                         {product.discountPercentage > 0 && (
                           <p className="text-sm text-gray-400 line-through">
-                            LKR{product.price.toFixed(2)}
+                            LKR {product.price.toFixed(2)}
                           </p>
                         )}
-                        {/* Display discount percentage */}
                         {product.discountPercentage > 0 && (
                           <span className="ml-2 text-green-400 text-sm font-semibold">
                             {product.discountPercentage}%
@@ -320,8 +332,8 @@ export default function ProductsPage() {
                             key={index}
                             className="w-16 h-16 cursor-pointer border-2 border-transparent hover:border-gray-900 rounded-lg overflow-hidden"
                             onClick={() => {
-                              mainImageRef.current.set(product.id, image); // Update the main image for this product
-                              setSelectedSize(null); // Reset selected size when changing image
+                              mainImageRef.current.set(product.id, image);
+                              setSelectedSizesByProduct((prev) => new Map(prev).set(product.id, null));
                             }}
                           >
                             <Image
@@ -339,7 +351,7 @@ export default function ProductsPage() {
                         {product.sizes.map((size) => (
                           <button
                             key={size}
-                            onClick={() => setSelectedSize(size)}
+                            onClick={() => handleSizeSelection(product.id, size)}
                             className={`relative px-4 py-2 rounded-lg text-sm font-semibold ${
                               getStockQuantity(product, size) === 0
                                 ? 'bg-gray-500 cursor-not-allowed text-gray-300 relative'

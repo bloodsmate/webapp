@@ -11,7 +11,7 @@ import Chatbot from "./components/Chatbot";
 import WhatsAppButton from './components/WhatsAppButton';
 import { checkAuth } from "./redux/authSlice"
 import type { AppDispatch } from "./redux/store"
-import { webSocketService } from "./services/websocket"
+// import { webSocketService } from "./services/websocket"
 
 export default function ClientLayout({ children }: { children: React.ReactNode }) {
   const pathname = usePathname()
@@ -21,11 +21,11 @@ export default function ClientLayout({ children }: { children: React.ReactNode }
 
   useEffect(() => {
     dispatch(checkAuth())
-    webSocketService.init(dispatch)
+    // webSocketService.init(dispatch)
 
-    return () => {
-      webSocketService.close()
-    }
+    // return () => {
+    //   webSocketService.close()
+    // }
   }, [dispatch])
 
   return (
