@@ -7,25 +7,14 @@ import { Button } from '@/app/components/ui/button';
 import { toast } from '@/app/hooks/use-toast';
 import { AppDispatch, RootState } from '@/app/redux/store';
 import { useSelector, useDispatch } from 'react-redux';
-import { checkAuth } from "@/app/redux/authSlice"
-import { addToCart, removeFromCart, updateQuantity } from '@/app/redux/cartSlice'; // Import cart actions
+import { addToCart, removeFromCart, updateQuantity } from '@/app/redux/cartSlice';
+import { createAsyncThunk } from '@reduxjs/toolkit';
+// import { updateCartItemQuantity, removeCartItem } from '@/app/api/cart'; // Example API functions
 
 export default function CartPage() {
-  const { user, loading, error, isAuthenticated } = useSelector((state: RootState) => state.auth);
-  const dispatch = useDispatch<AppDispatch>()
-
+  const dispatch = useDispatch<AppDispatch>();
   const cartItems = useSelector((state: RootState) => state.cart.items);
-  const [isCartOpen, setIsCartOpen] = useState(false); // State to control cart visibility
-
-  const token = localStorage.getItem("authToken")
-
-  // useEffect(() => {
-  //   console.log(user);
-  //   if (isAuthenticated) {
-  //     console.log("Is Authenticated: ", isAuthenticated);
-  //     // router.push("/")
-  //   }
-  // }, [isAuthenticated, router])
+  const [isCartOpen, setIsCartOpen] = useState(false);
 
   // Automatically open the cart when items are added
   useEffect(() => {
@@ -34,34 +23,8 @@ export default function CartPage() {
     }
   }, [cartItems]);
 
-  // Save cart to the server if the user is logged in
-  // useEffect(() => {
-  //   if (token && cartItems.length > 0) {
-  //     dispatch(checkAuth())
-  //     addToCart
-  //   }
-  // }, [cartItems, dispatch]);
-
-  // const saveCartToServer = async (items: any[]) => {
-  //   try {
-  //     const response = await fetch('/api/cart/save', {
-  //       method: 'POST',
-  //       headers: {
-  //         'Content-Type': 'application/json',
-  //         Authorization: `Bearer ${session?.user?.accessToken}`,
-  //       },
-  //       body: JSON.stringify({ userId: session.user.id, items }),
-  //     });
-
-  //     if (!response.ok) {
-  //       throw new Error('Failed to save cart');
-  //     }
-  //   } catch (error) {
-  //     console.error('Error saving cart:', error);
-  //   }
-  // };
-
-  const handleUpdateQuantity = (id: number, newQuantity: number) => {
+  // Update quantity in the database
+  const handleUpdateQuantity = async (id: number, size: string, newQuantity: number) => {
     if (newQuantity < 1) {
       toast({
         title: 'Invalid quantity',
@@ -70,34 +33,63 @@ export default function CartPage() {
       });
       return;
     }
-    // dispatch(updateQuantity({ id, quantity: newQuantity }));
+
+    try {
+      // Update quantity in the database
+      // await updateCartItemQuantity(id, size, newQuantity);
+
+      // Update quantity in the Redux store
+      dispatch(updateQuantity({ id, size, quantity: newQuantity }));
+    } catch (error) {
+      toast({
+        title: 'Error updating quantity',
+        description: 'Failed to update the quantity in the database.',
+        variant: 'destructive',
+      });
+    }
   };
 
-  const handleRemoveItem = (id: number, size:string) => {
-    dispatch(removeFromCart(id, size));
-    toast({
-      title: 'Item removed',
-      description: 'The item has been removed from your cart.',
-    });
+  // Remove item from the database
+  const handleRemoveItem = async (id: number, size: string) => {
+    try {
+      // Remove item from the database
+      // await removeCartItem(id, size);
+
+      // Remove item from the Redux store
+      dispatch(removeFromCart({ id, size }));
+
+      toast({
+        title: 'Item removed',
+        description: 'The item has been removed from your cart.',
+      });
+    } catch (error) {
+      toast({
+        title: 'Error removing item',
+        description: 'Failed to remove the item from the database.',
+        variant: 'destructive',
+      });
+    }
   };
 
   // Calculate totals
-  const subtotal = cartItems.reduce((sum, item) => sum + item.price * item.quantity, 0);
-  const discount = 5.0; // Example discount
-  const deliveryFee = 10.0; // Example delivery fee
+  const subtotal = cartItems.reduce((sum, item) => sum + (item.price * item.quantity), 0);
+  const afterDiscount = cartItems.reduce((sum, item) => sum + (item.discountPrice > 0 ? item.discountPrice : item.price) * item.quantity, 0);
+  // const subtotal = cartItems.reduce((sum, item) => sum + (item.discountPrice > 0 ? item.discountPrice : item.price) * item.quantity, 0);
+  const discount = subtotal - afterDiscount
+  const deliveryFee = 5.00; // Example delivery fee
   const total = subtotal - discount + deliveryFee;
 
   return (
     <div className="min-h-screen main-content container mx-auto px-4 py-8">
       <h1 className="text-3xl font-bold mb-8">Your Cart</h1>
       {cartItems.length === 0 ? (
-        <p>Your cart is empty.</p>
+        <p className="text-gray-600">Your cart is empty.</p>
       ) : (
         <>
           <div className="space-y-4">
             {cartItems.map((item) => (
               <div
-                key={item.id}
+                key={`${item.id}-${item.size}`}
                 className="flex flex-col md:flex-row items-center justify-between border-b pb-4"
               >
                 <div className="flex items-center space-x-4">
@@ -110,14 +102,22 @@ export default function CartPage() {
                   />
                   <div>
                     <h3 className="text-lg font-semibold">{item.name}</h3>
-                    <p className="text-gray-600">LKR{item.price.toFixed(2)}</p>
+                    <p className="text-gray-600">Size: {item.size}</p>
+                    <p className="text-gray-600">
+                      LKR{(item.discountPrice > 0 ? (item.discountPrice * item.quantity).toFixed(2) : (item.price * item.quantity).toFixed(2))}
+                    </p>
+                    {item.discountPrice > 0 && (
+                      <p className="text-gray-400 line-through">
+                        LKR{(item.price * item.quantity).toFixed(2)}
+                      </p>
+                    )}
                   </div>
                 </div>
                 <div className="flex items-center space-x-2 mt-4 md:mt-0">
                   <Button
                     variant="outline"
                     size="sm"
-                    onClick={() => handleUpdateQuantity(item.id, item.quantity - 1)}
+                    onClick={() => handleUpdateQuantity(item.id, item.size, item.quantity - 1)}
                   >
                     -
                   </Button>
@@ -125,7 +125,7 @@ export default function CartPage() {
                   <Button
                     variant="outline"
                     size="sm"
-                    onClick={() => handleUpdateQuantity(item.id, item.quantity + 1)}
+                    onClick={() => handleUpdateQuantity(item.id, item.size, item.quantity + 1)}
                   >
                     +
                   </Button>

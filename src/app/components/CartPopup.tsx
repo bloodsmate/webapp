@@ -46,7 +46,7 @@ export default function CartPopup({ isOpen, onClose }: CartPopupProps) {
                 <div className="ml-4 flex-1">
                   <div className="flex justify-between text-base font-medium text-gray-900">
                     <h3>{item.name}</h3>
-                    <p>${(item.price * item.quantity).toFixed(2)}</p>
+                    <p>LKR{(item.discountPrice == 0 ? (item.price * item.quantity).toFixed(2) : (item.discountPrice * item.quantity).toFixed(2))}</p>
                   </div>
                   <p className="text-sm text-gray-500">Qty: {item.quantity}</p>
                 </div>
