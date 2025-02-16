@@ -145,7 +145,7 @@ export default function ProductPage({ params }: { params: { id: string } }) {
           <ProductDetails product={product} />
         </div>
         <div className="mt-8 space-y-6"></div>
-        {/* <YouMightAlsoLike currentProductId={product.id} /> */}
+        <YouMightAlsoLike currentProductId={product.id} />
       </div>
       <SubscribeSection />
     </>

@@ -4,8 +4,6 @@ import Image from 'next/image';
 import Link from 'next/link';
 import { Button } from "../components/ui/button";
 import { Input } from "../components/ui/input";
-import { Checkbox } from "../components/ui/checkbox";
-import { Label } from "../components/ui/label";
 import { useEffect, useState, useRef } from 'react';
 import { ChevronLeft, ChevronRight } from 'lucide-react';
 import SEO from '../components/SEO';
@@ -149,7 +147,8 @@ export default function ProductsPage() {
       price: product.price,
       quantity: 1,
       size: selectedSize,
-      image: mainImageRef.current.get(product.id) || product.images[0]
+      image: mainImageRef.current.get(product.id) || product.images[0],
+      discountPrice: (product.discountPercentage && product.discountPercentage > 0) ? discountedPrice(product) : 0,
     }));
     toast({
       title: "Added to cart",
@@ -159,6 +158,10 @@ export default function ProductsPage() {
 
   if (loading) return <Loader />;
   if (error) return <div className="container mx-auto px-4 py-8 text-center text-red-500">Error: {error}</div>;
+
+  const discountedPrice = (product) => product.discountPercentage
+    ? (product.price * (1 - product.discountPercentage / 100)).toFixed(2)
+    : product.price;
 
   return (
     <div className="container mx-auto px-4 py-8">
@@ -289,18 +292,16 @@ export default function ProductsPage() {
                         {product.name}
                       </h3>
                       <div className="flex items-center gap-2 mb-3">
-                        <p className="text-gray-500 font-semibold">
-                          LKR {(product.price * (1 - (product.discountPercentage || 0) / 100)).toFixed(2)}
-                        </p>
-                        {product.discountPercentage > 0 && (
-                          <p className="text-sm text-gray-400 line-through">
-                            LKR {product.price.toFixed(2)}
-                          </p>
-                        )}
-                        {product.discountPercentage > 0 && (
-                          <span className="ml-2 text-green-400 font-semibold">
-                            {product.discountPercentage}%
-                          </span>
+                        {product.discountPercentage && product.discountPercentage > 0 ? (
+                          <>
+                            <p className="text-base md:text-lg text-gray-500 font-semibold">
+                              LKR {(product.price * (1 - product.discountPercentage / 100)).toFixed(2)}
+                            </p>
+                            <p className="text-sm md:text-base text-gray-400 line-through">LKR {product.price.toFixed(2)}</p>
+                            <span className="text-base md:text-lg ml-2 text-green-400 font-semibold">Save {product.discountPercentage}%</span>
+                          </>
+                        ) : (
+                          <p className="text-base md:text-lg text-gray-500 font-semibold">LKR {product.price.toFixed(2)}</p>
                         )}
                       </div>
                     </div>
@@ -311,18 +312,16 @@ export default function ProductsPage() {
                       <h4 className="text-lg font-bold mb-2">{product.name}</h4>
                       {/* Price Section */}
                       <div className="flex items-center gap-2 mb-4">
-                        <p className="text-sm text-gray-300 font-semibold">
-                          LKR {(product.price * (1 - (product.discountPercentage || 0) / 100)).toFixed(2)}
-                        </p>
-                        {product.discountPercentage > 0 && (
-                          <p className="text-sm text-gray-400 line-through">
-                            LKR {product.price.toFixed(2)}
-                          </p>
-                        )}
-                        {product.discountPercentage > 0 && (
-                          <span className="ml-2 text-green-400 text-sm font-semibold">
-                            {product.discountPercentage}%
-                          </span>
+                        {product.discountPercentage && product.discountPercentage > 0 ? (
+                          <>
+                            <p className="text-gray-300 font-semibold">
+                              LKR {(product.price * (1 - product.discountPercentage / 100)).toFixed(2)}
+                            </p>
+                            <p className="text-sm text-gray-400 line-through">LKR {product.price.toFixed(2)}</p>
+                            <span className="ml-2 text-green-400 font-semibold">Save {product.discountPercentage}%</span>
+                          </>
+                        ) : (
+                          <p className="text-gray-300 font-semibold">LKR {product.price.toFixed(2)}</p>
                         )}
                       </div>
                       {/* Image Slider */}

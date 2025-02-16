@@ -170,6 +170,7 @@ export default function ProductDetails({ product }: { product: Product }) {
         quantity: 1,
         size: selectedSize,
         image: product.images[0],
+        discountPrice: Number((product.discountPercentage && product.discountPercentage > 0) ? discountedPrice : 0),
       })
     );
 
@@ -214,7 +215,7 @@ export default function ProductDetails({ product }: { product: Product }) {
   };
 
   const discountedPrice = product.discountPercentage
-    ? product.price * (1 - product.discountPercentage / 100)
+    ? (product.price * (1 - product.discountPercentage / 100)).toFixed(2)
     : product.price;
 
   return (
@@ -260,7 +261,7 @@ export default function ProductDetails({ product }: { product: Product }) {
             <h1 className="text-3xl font-bold">{product.name}</h1>
             <div className="flex items-baseline space-x-2">
               <p className="text-2xl font-semibold text-blue-600">
-                ${discountedPrice.toFixed(2)}
+                ${discountedPrice}
               </p>
               {product.discountPercentage && (
                 <>

@@ -58,7 +58,7 @@ export default function CartPopup({ isOpen, onClose }: CartPopupProps) {
       <div className="p-4 border-t">
         <div className="flex justify-between text-lg font-semibold">
           <p>Subtotal</p>
-          <p>${total.toFixed(2)}</p>
+          <p>LKR{total.toFixed(2)}</p>
         </div>
         <Link href="/cart">
           <Button className="w-full mt-4" onClick={onClose}>

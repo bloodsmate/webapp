@@ -29,7 +29,8 @@ export default function QuickView({ product, onClose }: QuickViewProps) {
         price: product.price,
         quantity: 1,
         size: selectedSize,
-        image: product.images[0]
+        image: product.images[0],
+        discountPrice: Number((product.discountPercentage && product.discountPercentage > 0) ? discountedPrice : 0),
       }))
       onClose()
     }
@@ -42,6 +43,10 @@ export default function QuickView({ product, onClose }: QuickViewProps) {
   const prevImage = () => {
     setCurrentImageIndex((prevIndex) => (prevIndex - 1 + product.images.length) % product.images.length)
   }
+
+  const discountedPrice = product.discountPercentage
+    ? (product.price * (1 - product.discountPercentage / 100)).toFixed(2)
+    : product.price;
 
   return (
     <motion.div
@@ -89,7 +94,24 @@ export default function QuickView({ product, onClose }: QuickViewProps) {
           </div>
           <div className="flex-1 space-y-4">
             <h2 className="text-2xl font-bold">{product.name}</h2>
-            <p className="text-xl text-gray-600">${product.price.toFixed(2)}</p>
+            {/* <p className="text-xl text-gray-600">${product.price.toFixed(2)}</p> */}
+            <div className="flex items-center gap-2 mb-3">
+              {product.discountPercentage && product.discountPercentage > 0 ? (
+                <>
+                  <p className="text-xl text-gray-600 font-semibold">
+                    LKR {discountedPrice}
+                  </p>
+                  <p className="text-gray-400 line-through">
+                    LKR {product.price.toFixed(2)}
+                  </p>
+                  <span className="ml-2 text-xl text-green-400 font-semibold">
+                    Save {product.discountPercentage}%
+                  </span>
+                </>
+                ) : (
+                  <p className="text-gray-500 font-semibold">LKR {product.price.toFixed(2)}</p>
+                )}
+            </div>
             <p className="text-gray-600">{product.description}</p>
             <div>
               <h3 className="text-lg font-semibold mb-2">Select Size</h3>

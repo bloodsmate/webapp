@@ -7,6 +7,7 @@ interface CartItem {
   quantity: number
   size: string
   image: string
+  discountPrice: number
 }
 
 interface CartState {
