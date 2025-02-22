@@ -1,6 +1,7 @@
 // src/app/layout.tsx
 import type { Metadata } from "next";
 import localFont from "next/font/local";
+import { Playfair_Display, Inter } from 'next/font/google';
 import Script from "next/script";
 import "./globals.css";
 import { Providers } from "./providers";
@@ -18,6 +19,18 @@ const geistMono = localFont({
   src: "./fonts/GeistMonoVF.woff",
   variable: "--font-geist-mono",
   weight: "100 900",
+});
+
+const playfair = Playfair_Display({ 
+  subsets: ['latin'], 
+  weight: ['400', '700'], 
+  variable: '--font-playfair' 
+});
+
+const inter = Inter({ 
+  subsets: ['latin'], 
+  weight: ['400', '500', '700'], 
+  variable: '--font-inter' 
 });
 
 export const metadata: Metadata = {
@@ -39,7 +52,7 @@ export default function RootLayout({
         />
       </head>
       <body
-        className={`${geistSans.variable} ${geistMono.variable} antialiased flex flex-col min-h-screen overflow-x-hidden`}
+        className={`${playfair.variable} ${inter.variable} ${geistSans.variable} ${geistMono.variable} antialiased flex flex-col min-h-screen overflow-x-hidden`}
       >
         <SEO
           title="BloodsMate"
