@@ -1,82 +1,158 @@
 'use client'
 
-import { useState } from 'react'
+import { useState, useEffect } from 'react'
 import Image from 'next/image'
 import Link from 'next/link'
 import { motion, AnimatePresence } from 'framer-motion'
 import { Button } from "./ui/button"
 import { ChevronLeft, ChevronRight } from 'lucide-react'
 import QuickView from './QuickView'
-import { Product, products } from '../data/products'
-
-const ITEMS_PER_PAGE = 3
+import { Product } from '../data/products'
+import { fetchProducts } from "../redux/productSlice";
+import { useDispatch, useSelector } from 'react-redux';
+import { AppDispatch, RootState } from '../redux/store';
 
 export default function FeaturedProducts() {
-  const [currentPage, setCurrentPage] = useState(1)
-  const [selectedProduct, setSelectedProduct] = useState<Product | null>(null)
-  const totalPages = Math.ceil(products.length / ITEMS_PER_PAGE)
+  const dispatch = useDispatch<AppDispatch>();
+  const { items: products, loading, error } = useSelector((state: RootState) => state.products);
 
-  const paginatedProducts = products.slice(
-    (currentPage - 1) * ITEMS_PER_PAGE,
-    currentPage * ITEMS_PER_PAGE
-  )
+  const [currentIndex, setCurrentIndex] = useState(0)
+  const [selectedProduct, setSelectedProduct] = useState<Product | null>(null)
+  const [itemsPerPage, setItemsPerPage] = useState(4) // Default number of items per page
+
+  useEffect(() => {
+    dispatch(fetchProducts());
+  }, [dispatch]);
+
+  // Adjust items per page based on screen size
+  useEffect(() => {
+    const handleResize = () => {
+      if (window.innerWidth < 640) {
+        setItemsPerPage(1)
+      } else if (window.innerWidth < 1024) {
+        setItemsPerPage(2)
+      } else if (window.innerWidth < 1400) {
+        setItemsPerPage(3)
+      } else {
+        setItemsPerPage(4) 
+      }
+    }
+
+    handleResize() // Set initial value
+    window.addEventListener('resize', handleResize)
+    return () => window.removeEventListener('resize', handleResize)
+  }, [])
+
+  const handleNext = () => {
+    setCurrentIndex((prev) => (prev + 1) % (products.length - itemsPerPage + 1))
+  }
+
+  const handlePrevious = () => {
+    setCurrentIndex((prev) => (prev - 1 + (products.length - itemsPerPage + 1)) % (products.length - itemsPerPage + 1))
+  }
+
+  const paginatedProducts = products.slice(currentIndex, currentIndex + itemsPerPage)
+
+  const discountedPrice = (product: Product) => {
+    return product.discountPercentage
+      ? (product.price * (1 - product.discountPercentage / 100)).toFixed(2)
+      : product.price
+  }
 
   return (
     <section id="featured" className="py-16 bg-gray-50">
       <div className="container mx-auto px-4">
-        <h2 className="text-3xl font-bold mb-8 text-center">Featured Products</h2>
-        <div className="grid grid-cols-1 md:grid-cols-3 gap-8">
-          {paginatedProducts.map((product, index) => (
-            <motion.div
-              key={product.id}
-              initial={{ opacity: 0, y: 50 }}
-              animate={{ opacity: 1, y: 0 }}
-              transition={{ duration: 0.5, delay: index * 0.1 }}
-              className="bg-white rounded-lg shadow-lg overflow-hidden transform transition duration-300 hover:scale-105"
-            >
-              <div 
-                className="relative h-64 cursor-pointer"
-                onClick={() => setSelectedProduct(product)}
+        <h2 className="text-3xl font-bold mb-8 text-center">Must-Have Styles</h2>
+
+        <div className="relative">
+          <button
+            onClick={handlePrevious}
+            className="absolute -left-4 sm:-left-12 top-1/2 transform -translate-y-1/2 bg-white/80 backdrop-blur-sm rounded-full p-2 shadow-lg hover:bg-white transition-colors z-10"
+          >
+            <ChevronLeft className="w-6 h-6 text-gray-900" />
+          </button>
+
+          <button
+            onClick={handleNext}
+            className="absolute -right-4 sm:-right-12 top-1/2 transform -translate-y-1/2 bg-white/80 backdrop-blur-sm rounded-full p-2 shadow-lg hover:bg-white transition-colors z-10"
+          >
+            <ChevronRight className="w-6 h-6 text-gray-900" />
+          </button>
+
+          <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 2xl:grid-cols-4 gap-8">
+            {paginatedProducts.map((product, index) => (
+              <motion.div
+                key={product.id}
+                initial={{ opacity: 0, y: 50 }}
+                animate={{ opacity: 1, y: 0 }}
+                transition={{ duration: 0.5, delay: index * 0.1 }}
+                className="bg-white shadow-lg overflow-hidden transform transition duration-300 hover:scale-105"
+                style={{ height: '620px' }}
               >
-                <Image
-                  src={product.images[0]}
-                  alt={product.name}
-                  fill
-                  className="object-cover"
-                />
-                <div className="absolute inset-0 bg-black bg-opacity-50 flex items-center justify-center opacity-0 hover:opacity-100 transition-opacity duration-300">
-                  <Button variant="secondary">Quick View</Button>
+                <div className="relative h-96">
+                  <Link href={`/products/${product.id}`} prefetch={false}>
+                    <Image
+                      src={product.images[0]}
+                      alt={product.name}
+                      fill
+                      className="object-cover"
+                    />
+                  </Link>
+
+                  {(product.discountPercentage > 0) && (
+                    <div className="absolute top-4 right-4 bg-red-600 text-white text-sm font-semibold px-3 py-1 rounded-full">
+                      Save {product.discountPercentage}%
+                    </div>
+                  )}
                 </div>
-              </div>
-              <div className="p-4">
-                <h3 className="text-xl font-semibold mb-2">{product.name}</h3>
-                <p className="text-gray-600 mb-4">${product.price.toFixed(2)}</p>
-                <Link href={`/products/${product.id}`}>
-                  <Button className="w-full">View Details</Button>
-                </Link>
-              </div>
-            </motion.div>
-          ))}
-        </div>
-        <div className="flex justify-center mt-8 space-x-4">
-          <Button
-            onClick={() => setCurrentPage(prev => Math.max(prev - 1, 1))}
-            disabled={currentPage === 1}
-            variant="outline"
-          >
-            <ChevronLeft className="w-4 h-4 mr-2" />
-            Previous
-          </Button>
-          <Button
-            onClick={() => setCurrentPage(prev => Math.min(prev + 1, totalPages))}
-            disabled={currentPage === totalPages}
-            variant="outline"
-          >
-            Next
-            <ChevronRight className="w-4 h-4 ml-2" />
-          </Button>
+
+                <div className="p-4 h-48 flex flex-col justify-between">
+                  <div>
+                    <h3 className="text-xl font-semibold mb-1 text-gray-800 group-hover:text-gray-900 transition-colors">
+                      {product.name}
+                    </h3>
+
+                    {product.color && (
+                      <p className="text-sm text-gray-500 mb-2">Color: {product.color}</p>
+                    )}
+
+                    <div className="flex items-center gap-2 mb-3">
+                      <span
+                        className={`text-sm font-semibold ${
+                          product.inStock ? 'text-green-600' : 'text-red-600'
+                        }`}
+                      >
+                        {product.inStock ? 'In Stock' : 'Out of Stock'}
+                      </span>
+                    </div>
+
+                    <div className="flex items-center gap-2 mb-3">
+                      {product.discountPercentage && product.discountPercentage > 0 ? (
+                        <>
+                          <p className="text-base md:text-lg text-gray-500 font-semibold">
+                            LKR {discountedPrice(product)}
+                          </p>
+                          <p className="text-sm md:text-base text-gray-400 line-through">LKR {product.price.toFixed(2)}</p>
+                        </>
+                      ) : (
+                        <p className="text-base md:text-lg text-gray-500 font-semibold">LKR {product.price.toFixed(2)}</p>
+                      )}
+                    </div>
+                  </div>
+
+                  <Button
+                    onClick={() => setSelectedProduct(product)}
+                    className="w-full bg-gray-900 hover:bg-gray-700 text-white font-semibold py-2 rounded-lg"
+                  >
+                    Quick View
+                  </Button>
+                </div>
+              </motion.div>
+            ))}
+          </div>
         </div>
       </div>
+
       <AnimatePresence>
         {selectedProduct && (
           <QuickView product={selectedProduct} onClose={() => setSelectedProduct(null)} />

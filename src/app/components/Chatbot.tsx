@@ -68,12 +68,12 @@ export default function Chatbot() {
   return (
     <>
       {!isOpen && (
-        <Button className="z-50 fixed bottom-16 right-4 rounded-full p-4" onClick={() => setIsOpen(true)}>
+        <Button className="z-40 fixed bottom-16 right-4 rounded-full p-4" onClick={() => setIsOpen(true)}>
           <MessageCircle size={24} />
         </Button>
       )}
       {isOpen && (
-        <div className="z-50 fixed bottom-20 right-4 w-80 bg-white rounded-lg shadow-xl overflow-hidden">
+        <div className="z-40 fixed bottom-20 right-4 w-80 bg-white rounded-lg shadow-xl overflow-hidden">
           <div className="bg-primary text-primary-foreground p-4 flex justify-between items-center">
             <h3 className="font-semibold">Chat with us</h3>
             <Button variant="ghost" size="icon" onClick={() => setIsOpen(false)}>

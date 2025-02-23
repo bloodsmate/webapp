@@ -15,6 +15,7 @@ export interface Product {
   images: string[];
   sizes: string[];
   stock: Stock[];
+  color: string;
   inStock: boolean;
   gender: "Men" | "Women" | "Unisex";
   category: string;

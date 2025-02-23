@@ -12,6 +12,7 @@ export interface Product {
   images: string[];
   sizes: string[];
   stock: Stock[];
+  color: string;
   inStock: boolean;
   gender: "Men" | "Women" | "Unisex";
   category: string;
@@ -27,6 +28,7 @@ export const products: Product[] = [
     "description": "A comfortable and stylish cotton t-shirt for everyday wear.",
     "price": 29.99,
     "discountPercentage": 10,
+    "color": "white",
     "images": ["https://res.cloudinary.com/midefulness/image/upload/v1739572241/BloodsMate/temp/ACH_5502_yhf279.jpg","https://res.cloudinary.com/midefulness/image/upload/v1739572240/BloodsMate/temp/ACH_5553_eigzq6.jpg","https://res.cloudinary.com/midefulness/image/upload/v1739572239/BloodsMate/temp/ACH_5509_n11ozi.jpg","https://res.cloudinary.com/midefulness/image/upload/v1739572239/BloodsMate/temp/ACH_5520_k4vjc2.jpg","https://res.cloudinary.com/midefulness/image/upload/v1739572237/BloodsMate/temp/ACH_5500_yowljw.jpg","https://res.cloudinary.com/midefulness/image/upload/v1739572235/BloodsMate/temp/ACH_5560_wpu9kp.jpg"],
     "sizes": [
         "S",
@@ -65,6 +67,7 @@ export const products: Product[] = [
     "description": "A comfortable and stylish cotton t-shirt for everyday wear.",
     "price": 19.99,
     "discountPercentage": 10,
+    "color": "white",
     "images": ["https://res.cloudinary.com/midefulness/image/upload/v1739572241/BloodsMate/temp/ACH_5502_yhf279.jpg","https://res.cloudinary.com/midefulness/image/upload/v1739572240/BloodsMate/temp/ACH_5553_eigzq6.jpg","https://res.cloudinary.com/midefulness/image/upload/v1739572239/BloodsMate/temp/ACH_5509_n11ozi.jpg","https://res.cloudinary.com/midefulness/image/upload/v1739572239/BloodsMate/temp/ACH_5520_k4vjc2.jpg","https://res.cloudinary.com/midefulness/image/upload/v1739572237/BloodsMate/temp/ACH_5500_yowljw.jpg","https://res.cloudinary.com/midefulness/image/upload/v1739572235/BloodsMate/temp/ACH_5560_wpu9kp.jpg"],
     "sizes": [
         "S",
@@ -103,6 +106,7 @@ export const products: Product[] = [
     "description": "A comfortable and stylish cotton t-shirt for everyday wear.",
     "price": 19.99,
     "discountPercentage": 10,
+    "color": "white",
     "images": ["https://res.cloudinary.com/midefulness/image/upload/v1739572241/BloodsMate/temp/ACH_5502_yhf279.jpg","https://res.cloudinary.com/midefulness/image/upload/v1739572240/BloodsMate/temp/ACH_5553_eigzq6.jpg","https://res.cloudinary.com/midefulness/image/upload/v1739572239/BloodsMate/temp/ACH_5509_n11ozi.jpg","https://res.cloudinary.com/midefulness/image/upload/v1739572239/BloodsMate/temp/ACH_5520_k4vjc2.jpg","https://res.cloudinary.com/midefulness/image/upload/v1739572237/BloodsMate/temp/ACH_5500_yowljw.jpg","https://res.cloudinary.com/midefulness/image/upload/v1739572235/BloodsMate/temp/ACH_5560_wpu9kp.jpg"],
     "sizes": [
         "S",

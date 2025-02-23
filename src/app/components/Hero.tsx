@@ -5,8 +5,7 @@ import Image from 'next/image';
 import { motion, AnimatePresence } from 'framer-motion';
 import { Button } from "@/app/components/ui/button";
 import { FaChevronLeft, FaChevronRight } from "react-icons/fa";
-
-// Fonts (Add these to your global CSS or Tailwind config)
+import { useRouter } from "next/navigation";
 import { Playfair_Display, Inter } from 'next/font/google';
 
 const playfair = Playfair_Display({ subsets: ['latin'], weight: ['400', '700'], variable: '--font-playfair' });
@@ -21,6 +20,8 @@ const shirts = [
 ];
 
 export default function Hero() {
+  const router = useRouter();
+
   const [currentIndex, setCurrentIndex] = useState(0);
 
   useEffect(() => {
@@ -62,10 +63,10 @@ export default function Hero() {
                 <Image
                   src={shirts[currentIndex].image}
                   alt="T-shirt Model"
-                  width={window.innerWidth < 1400 ? 500 : 900} // Adjust image size for mobile
-                  height={window.innerWidth < 1400 ? 600 : 1100} // Adjust image size for mobile
+                  width={window.innerWidth < 1400 ? 500 : 900}
+                  height={window.innerWidth < 1400 ? 600 : 1100}
                   className={window.innerWidth < 1400 ? "object-cover w-[80%] h-full self-center" : "object-cover w-full h-full"}
-                  priority={currentIndex === 0} // Prioritize the first image
+                  priority={currentIndex === 0}
                   loading={currentIndex === 0 ? "eager" : "lazy"} // Lazy load other images
                 />
               </motion.div>
@@ -87,9 +88,23 @@ export default function Hero() {
           <p className="text-lg md:text-xl mt-6 text-gray-600 font-inter font-medium max-w-md">
             Crafted with Premium Fabric for Unmatched Comfort
           </p>
-          <Button className="mt-8 bg-black text-white px-8 py-4 text-lg rounded-full shadow-lg hover:bg-gray-900 transition-all font-inter font-medium">
+          <motion.button
+            className="mt-8 bg-black text-white px-8 py-4 text-lg rounded-full shadow-lg border border-black font-inter font-medium relative overflow-hidden"
+            whileHover={{
+              backgroundColor: "#ffffff",
+              color: "#000000",
+              scale: 1.05,
+              transition: { duration: 0.3, ease: "easeInOut" },
+            }}
+            initial={{ backgroundColor: "#000000", color: "#ffffff" }}
+            onClick={() => router.push("/products")}
+          >
+            <motion.span
+              className="absolute inset-0 bg-white opacity-0"
+              whileHover={{ opacity: 0.1, transition: { duration: 0.3 } }}
+            />
             SHOP NOW
-          </Button>
+          </motion.button>
         </div>
       </div>
 

@@ -7,8 +7,9 @@ html {
 }
 
 body {
-  font-family: Arial, Helvetica, sans-serif;
+  /* font-family: Arial, Helvetica, sans-serif; */
   -webkit-overflow-scrolling: touch;
+  background-color: #FAFAFA;
 }
 
 /* Hide the scrollbar for a minimal look */
@@ -103,4 +104,130 @@ body::-webkit-scrollbar-thumb:hover {
   body {
     @apply bg-background text-foreground;
   }
+}
+
+/* Regular */
+@font-face {
+  font-family: 'SF Pro Display';
+  src: url('/assets/fonts/SFPRODISPLAYREGULAR.OTF') format('opentype');
+  font-weight: 400;
+  font-style: normal;
+  font-display: swap;
+}
+
+/* Medium */
+@font-face {
+  font-family: 'SF Pro Display';
+  src: url('/assets/fonts/SFPRODISPLAYMEDIUM.OTF') format('opentype');
+  font-weight: 500;
+  font-style: normal;
+  font-display: swap;
+}
+
+/* Bold */
+@font-face {
+  font-family: 'SF Pro Display';
+  src: url('/assets/fonts/SFPRODISPLAYBOLD.OTF') format('opentype');
+  font-weight: 700;
+  font-style: normal;
+  font-display: swap;
+}
+
+/* Black Italic */
+@font-face {
+  font-family: 'SF Pro Display';
+  src: url('/assets/fonts/SFPRODISPLAYBLACKITALIC.OTF') format('opentype');
+  font-weight: 900;
+  font-style: italic;
+  font-display: swap;
+}
+
+/* Heavy Italic */
+@font-face {
+  font-family: 'SF Pro Display';
+  src: url('/assets/fonts/SFPRODISPLAYHEAVYITALIC.OTF') format('opentype');
+  font-weight: 800;
+  font-style: italic;
+  font-display: swap;
+}
+
+/* Light Italic */
+@font-face {
+  font-family: 'SF Pro Display';
+  src: url('/assets/fonts/SFPRODISPLAYLIGHTITALIC.OTF') format('opentype');
+  font-weight: 300;
+  font-style: italic;
+  font-display: swap;
+}
+
+/* Semibold Italic */
+@font-face {
+  font-family: 'SF Pro Display';
+  src: url('/assets/fonts/SFPRODISPLAYSEMIBOLDITALIC.OTF') format('opentype');
+  font-weight: 600;
+  font-style: italic;
+  font-display: swap;
+}
+
+/* Thin Italic */
+@font-face {
+  font-family: 'SF Pro Display';
+  src: url('/assets/fonts/SFPRODISPLAYTHINITALIC.OTF') format('opentype');
+  font-weight: 100;
+  font-style: italic;
+  font-display: swap;
+}
+
+/* Ultralight Italic */
+@font-face {
+  font-family: 'SF Pro Display';
+  src: url('/assets/fonts/SFPRODISPLAYULTRALIGHTITALIC.OTF') format('opentype');
+  font-weight: 200;
+  font-style: italic;
+  font-display: swap;
+}
+
+body {
+  font-family: 'SF Pro Display', -apple-system, BlinkMacSystemFont, sans-serif;
+  font-weight: 400; /* Regular */
+}
+
+h1 {
+  font-family: 'SF Pro Display', -apple-system, BlinkMacSystemFont, sans-serif;
+  font-weight: 700; /* Bold */
+}
+
+.italic-text {
+  font-family: 'SF Pro Display', -apple-system, BlinkMacSystemFont, sans-serif;
+  font-weight: 400; /* Regular */
+  font-style: italic;
+}
+
+/* Hide default Swiper navigation */
+.swiper-button-next::after,
+.swiper-button-prev::after {
+  display: none;
+}
+
+/* Custom Navigation Arrows */
+.swiper-button-prev,
+.swiper-button-next {
+  position: absolute;
+  top: 10%;
+  transform: translateY(-10%);
+  width: 40px;
+  height: 40px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  cursor: pointer;
+  z-index: 10;
+}
+
+.swiper-button-prev {
+  left: 0;
+}
+
+.swiper-button-next {
+  right: 0;
 }
