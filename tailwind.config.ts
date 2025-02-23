@@ -9,6 +9,20 @@ const config: Config = {
   ],
   theme: {
   	extend: {
+		fontFamily: {
+			playfair: ['var(--font-playfair)'],
+			inter: ['var(--font-inter)'],
+			sans: ['SF Pro Display', '-apple-system', 'BlinkMacSystemFont', 'sans-serif'],
+		},
+		fontWeight: {
+			light: 300, // For Light Italic
+			normal: 400, // For Regular
+			medium: 500, // For Medium
+			semibold: 600, // For Semibold Italic
+			bold: 700, // For Bold
+			extrabold: 800, // For Heavy Italic
+			black: 900, // For Black Italic
+		},
   		colors: {
   			background: 'hsl(var(--background))',
   			foreground: 'hsl(var(--foreground))',

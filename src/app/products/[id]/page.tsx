@@ -1,63 +1,37 @@
-"use client"
+"use client";
 
-import { useState } from 'react'
-import Image from 'next/image'
-import Link from 'next/link'
-import { notFound } from 'next/navigation'
-import { Button } from "@/app/components/ui/button"
-import ProductDetails from '@/app/components/ProductDetails' 
-import { Input } from "@/app/components/ui/input"
-import { Product, products } from '@/app/data/products'
-import QuickView from '@/app/components/QuickView'
-// import { Breadcrumb, BreadcrumbItem, BreadcrumbLink } from '@/app/components/ui/breadcrumb'
+import { useState, useEffect } from "react";
+import Image from "next/image";
+import { Button } from "@/app/components/ui/button";
+import { Heart } from "lucide-react";
+import { Product } from "@/app/data/products";
+import { useDispatch, useSelector } from "react-redux";
+import { addToCart } from "@/app/redux/cartSlice";
+import { addToWishlist, removeFromWishlist } from "@/app/redux/wishlistSlice";
+import { toast } from "@/app/hooks/use-toast";
+import Waitlist from "@/app/components/Waitlist";
 import {
   Accordion,
   AccordionContent,
   AccordionItem,
   AccordionTrigger,
-} from "@/app/components/ui/accordion"
-
-function Breadcrumb({ product }: { product: Product }) {
-  return (
-    <nav className="main-content flex" aria-label="Breadcrumb">
-      <ol className="inline-flex items-center space-x-1 md:space-x-3">
-        <li className="inline-flex items-center">
-          <Link href="/" className="inline-flex items-center text-sm font-medium text-gray-700 hover:text-blue-600">
-            <svg className="w-3 h-3 mr-2.5" aria-hidden="true" xmlns="http://www.w3.org/2000/svg" fill="currentColor" viewBox="0 0 20 20">
-              <path d="m19.707 9.293-2-2-7-7a1 1 0 0 0-1.414 0l-7 7-2 2a1 1 0 0 0 1.414 1.414L2 10.414V18a2 2 0 0 0 2 2h3a1 1 0 0 0 1-1v-4a1 1 0 0 1 1-1h2a1 1 0 0 1 1 1v4a1 1 0 0 0 1 1h3a2 2 0 0 0 2-2v-7.586l.293.293a1 1 0 0 0 1.414-1.414Z"/>
-            </svg>
-            Home
-          </Link>
-        </li>
-        <li>
-          <div className="flex items-center">
-            <svg className="w-3 h-3 text-gray-400 mx-1" aria-hidden="true" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 6 10">
-              <path stroke="currentColor" strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="m1 9 4-4-4-4"/>
-            </svg>
-            <Link href="/products" className="ml-1 text-sm font-medium text-gray-700 hover:text-blue-600 md:ml-2">Products</Link>
-          </div>
-        </li>
-        <li aria-current="page">
-          <div className="flex items-center">
-            <svg className="w-3 h-3 text-gray-400 mx-1" aria-hidden="true" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 6 10">
-              <path stroke="currentColor" strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="m1 9 4-4-4-4"/>
-            </svg>
-            <span className="ml-1 text-sm font-medium text-gray-500 md:ml-2">{product.name}</span>
-          </div>
-        </li>
-      </ol>
-    </nav>
-  )
-}
+} from "@/app/components/ui/accordion";
+import type { RootState } from "@/app/redux/store";
+import { FaCcVisa, FaCcMastercard } from "react-icons/fa";
+import Loader from "@/app/components/Loader";
+import sizeChartImage from "@/app/assets/bloodsmate_size_chart.png";
+import ProductDetailsDescription from "@/app/components/ProductDetailsDescription";
 
 function SizeChart() {
   return (
     <Accordion type="single" collapsible className="w-full">
       <AccordionItem value="size-chart">
-        <AccordionTrigger>Size Chart</AccordionTrigger>
+        <AccordionTrigger className="text-lg font-semibold">
+          Size Chart
+        </AccordionTrigger>
         <AccordionContent>
-          <div className="space-y-4">
-            <div className="overflow-x-auto">
+          <div className="space-y-4 w-full">
+            <div className="overflow-x-auto w-full">
               <table className="min-w-full bg-white border border-gray-300">
                 <thead>
                   <tr>
@@ -90,128 +64,320 @@ function SizeChart() {
                 </tbody>
               </table>
             </div>
-            <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+            <div className="grid grid-cols-1 gap-4 w-full">
               <Image
-                src="/placeholder.svg?height=300&width=300&text=Chest+Measurement"
+                src={sizeChartImage}
                 alt="Chest Measurement"
-                width={300}
+                width={600}
                 height={300}
-                className="rounded-lg"
-              />
-              <Image
-                src="/placeholder.svg?height=300&width=300&text=Length+Measurement"
-                alt="Length Measurement"
-                width={300}
-                height={300}
-                className="rounded-lg"
+                className="rounded-lg w-full"
               />
             </div>
           </div>
         </AccordionContent>
       </AccordionItem>
     </Accordion>
-  )
+  );
 }
 
 function PaymentOptions() {
   return (
     <Accordion type="single" collapsible className="w-full">
       <AccordionItem value="payment-options">
-        <AccordionTrigger>Payment Options</AccordionTrigger>
+        <AccordionTrigger className="text-lg font-semibold">
+          Payment Options
+        </AccordionTrigger>
         <AccordionContent>
-          <ul className="list-disc list-inside space-y-1">
+          <ul className="list-disc list-inside space-y-2">
             <li>Credit/Debit Card</li>
             <li>PayPal</li>
             <li>KOKO Pay (3 months installment)</li>
           </ul>
+          <div className="flex items-center space-x-4 mt-4">
+            <FaCcVisa size={32} className="text-blue-900" />
+            <FaCcMastercard size={32} className="text-red-600" />
+            <img
+              src="https://res.cloudinary.com/midefulness/image/upload/v1736096286/BloodsMate/koko-pay_d6id9w.png"
+              alt="koko pay"
+              className="h-8"
+            />
+          </div>
         </AccordionContent>
       </AccordionItem>
     </Accordion>
-  )
+  );
 }
 
 function DeliveryAndReturns() {
   return (
     <Accordion type="single" collapsible className="w-full">
       <AccordionItem value="delivery-returns">
-        <AccordionTrigger>Delivery & Returns</AccordionTrigger>
+        <AccordionTrigger className="text-lg font-semibold">
+          Delivery & Returns
+        </AccordionTrigger>
         <AccordionContent>
-          <p className="mb-2">Free standard delivery on orders over $50</p>
+          <p className="mb-2">Free standard delivery on orders over LKR 14,000</p>
           <p>Easy returns within 30 days</p>
         </AccordionContent>
       </AccordionItem>
     </Accordion>
-  )
+  );
 }
 
-function SubscribeSection() {
-  return (
-    <div className="bg-gray-100 py-8 mt-12">
-      <div className="container mx-auto px-4">
-        <h3 className="text-2xl font-semibold mb-4 text-center">Subscribe for Updates</h3>
-        <form className="max-w-md mx-auto flex gap-2">
-          <Input type="email" placeholder="Enter your email" className="flex-grow" />
-          <Button type="submit">Subscribe</Button>
-        </form>
-      </div>
-    </div>
-  )
-}
+export default function ProductDetails({ product }: { product: Product }) {
+  const [selectedSize, setSelectedSize] = useState<string>("");
+  const [mainImage, setMainImage] = useState<number>(0);
+  const [outOfStock, setOutOfStock] = useState<boolean>(false);
+  const [isLoading, setIsLoading] = useState(true);
+  const [joinedWaitlist, setJoinedWaitlist] = useState<boolean>(false);
+  const dispatch = useDispatch();
+  const wishlistItems = useSelector((state: RootState) => state.wishlist.items);
+  const isInWishlist = wishlistItems.some((item) => item.id === product.id);
 
-function YouMightAlsoLike({ currentProductId }: { currentProductId: number }) {
-  const [selectedProduct, setSelectedProduct] = useState<Product | null>(null)
-  const relatedProducts = products.filter(p => p.id !== currentProductId).slice(0, 3)
+  useEffect(() => {
+    // Simulate loading delay
+    const timer = setTimeout(() => {
+      setIsLoading(false);
+    }, 1000);
+
+    return () => clearTimeout(timer);
+  }, []);
+
+  const handleAddToCart = () => {
+    if (!selectedSize) {
+      toast({
+        title: "Size not selected",
+        description: "Please select a size before adding to cart.",
+        variant: "destructive",
+      });
+      return;
+    }
+
+    const stockItem = product.stock.find((item) => item.size === selectedSize);
+    if (!stockItem || stockItem.quantity === 0) {
+      toast({
+        title: "Out of Stock",
+        description: `The selected size (${selectedSize}) is out of stock.`,
+        variant: "destructive",
+      });
+      return;
+    }
+
+    dispatch(
+      addToCart({
+        id: product.id,
+        name: product.name,
+        price: product.price,
+        quantity: 1,
+        size: selectedSize,
+        image: product.images[0],
+        discountPrice: Number((product.discountPercentage && product.discountPercentage > 0) ? discountedPrice : 0),
+      })
+    );
+
+    toast({
+      title: "Added to cart",
+      description: `${product.name} (${selectedSize}) has been added to your cart.`,
+    });
+  };
+
+  const handleWishlist = () => {
+    if (isInWishlist) {
+      dispatch(removeFromWishlist(product.id));
+      toast({
+        title: "Removed from wishlist",
+        description: `${product.name} has been removed from your wishlist.`,
+      });
+    } else {
+      dispatch(
+        addToWishlist({
+          id: product.id,
+          name: product.name,
+          price: product.price,
+          image: product.images[0],
+        })
+      );
+      toast({
+        title: "Added to wishlist",
+        description: `${product.name} has been added to your wishlist.`,
+      });
+    }
+  };
+
+  const handleJoinWaitlist = (email: string) => {
+    // Simulate joining the waitlist
+    setTimeout(() => {
+      setJoinedWaitlist(true);
+      toast({
+        title: "Joined Waitlist",
+        description: `You have joined the waitlist for ${product.name} (${selectedSize}). We will notify you when it's back in stock.`,
+      });
+    }, 1000);
+  };
+
+  const discountedPrice = product.discountPercentage
+    ? (product.price * (1 - product.discountPercentage / 100)).toFixed(2)
+    : product.price;
 
   return (
-    <div className="mt-12">
-      <h3 className="text-2xl font-semibold mb-4">You Might Also Like</h3>
-      <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
-        {relatedProducts.map((product) => (
-          <div key={product.id} className="border rounded-lg overflow-hidden">
-            <Image
-              src={product.images[0]}
-              alt={product.name}
-              width={300}
-              height={300}
-              className="w-full h-64 object-cover"
-            />
-            <div className="p-4">
-              <h4 className="font-semibold mb-2">{product.name}</h4>
-              <p className="text-gray-600 mb-2">${product.price.toFixed(2)}</p>
-              <Button onClick={() => setSelectedProduct(product)} variant="outline" className="w-full">
-                Quick View
-              </Button>
+    <div className="grid grid-cols-1 md:grid-cols-2 gap-8 max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+      {isLoading ? (
+        <div className="col-span-2 flex justify-center items-center h-96">
+          <Loader size="large" />
+        </div>
+      ) : (
+        <>
+          {/* Left Section - Images */}
+          <div className="space-y-4">
+            {/* Main Image - Full Screen Height on Large Devices */}
+            <div className="relative aspect-square lg:h-screen lg:max-h-[80vh]">
+              <Image
+                src={product.images[mainImage]}
+                alt={product.name}
+                fill
+                className="object-cover rounded-lg"
+                priority // Ensures the main image loads first
+              />
+            </div>
+
+            {/* Thumbnail Slider */}
+            <div className="flex space-x-2 overflow-x-auto py-2">
+              {product.images.map((img, index) => (
+                <button
+                  key={index}
+                  onClick={() => setMainImage(index)}
+                  className={`relative w-20 h-20 rounded-md overflow-hidden flex-shrink-0 ${
+                    mainImage === index ? "ring-2 ring-blue-500" : ""
+                  }`}
+                >
+                  <Image
+                    src={img}
+                    alt={`${product.name} view ${index + 1}`}
+                    fill
+                    className="object-cover"
+                    priority={index === 0} // Preload the first image
+                  />
+                </button>
+              ))}
             </div>
           </div>
-        ))}
-      </div>
-      {selectedProduct && (
-        <QuickView product={selectedProduct} onClose={() => setSelectedProduct(null)} />
+
+          {/* Right Section - Details */}
+          <div className="space-y-6">
+            <h1 className="text-3xl font-bold">{product.name}</h1>
+            <div className="flex items-baseline space-x-2">
+              <p className="text-2xl font-semibold text-blue-600">
+                LKR{discountedPrice}
+              </p>
+              {product.discountPercentage != 0 && (
+                <>
+                  <p className="text-lg text-gray-500 line-through">
+                    LKR{product.price.toFixed(2)}
+                  </p>
+                  <p className="text-lg font-semibold text-green-500">
+                    Save {product.discountPercentage}%
+                  </p>
+                </>
+              )}
+            </div>
+            <div>
+              <h3 className="text-lg font-bold mb-2">Select Size</h3>
+              <div className="flex flex-wrap gap-2">
+                {product.sizes.map((size, index) => {
+                  const stockItem = product.stock.find((item) => item.size === size);
+                  const isOutOfStock = !stockItem || stockItem.quantity === 0;
+
+                  return (
+                    <button
+                      key={size}
+                      onClick={() => {
+                        setSelectedSize(size);
+                        setOutOfStock(isOutOfStock);
+                      }}
+                      className={`relative flex items-center justify-center w-12 h-12 text-sm font-semibold border-2 rounded-md ${
+                        selectedSize === size
+                          ? "border-blue-600 bg-blue-100"
+                          : "border-gray-300"
+                      } ${isOutOfStock ? "opacity-50" : "hover:border-blue-600"}`}
+                    >
+                      {size}
+                      {isOutOfStock && (
+                        <span className="absolute inset-0 flex items-center justify-center text-red-600 text-lg font-bold">
+                          X
+                        </span>
+                      )}
+                    </button>
+                  );
+                })}
+              </div>
+            </div>
+
+            {/* Add to Cart and Wishlist Buttons */}
+            <div className="flex space-x-2">
+              <Button
+                onClick={handleAddToCart}
+                className="flex-grow"
+                disabled={outOfStock}
+              >
+                {outOfStock ? "Out of Stock" : "Add to Cart"}
+              </Button>
+              <Button onClick={handleWishlist} variant="outline">
+                <Heart
+                  className={`w-6 h-6 ${
+                    isInWishlist ? "fill-red-500 text-red-500" : ""
+                  }`}
+                />
+              </Button>
+            </div>
+
+            {/* Show Waitlist if Out of Stock */}
+            {outOfStock && !joinedWaitlist && (
+              <Waitlist
+                productId={product.id}
+                productName={product.name}
+                size={selectedSize}
+                onJoinWaitlist={handleJoinWaitlist}
+              />
+            )}
+
+            {joinedWaitlist && (
+              <p className="text-green-600">
+                You have joined the waitlist for this product. We will notify you when it's back in stock.
+              </p>
+            )}
+
+            <div className="flex items-center space-x-4 mt-6">
+              <span className="text-sm text-gray-500">We accept:</span>
+              <div className="flex space-x-2">
+                <FaCcVisa size={32} className="text-blue-900" />
+                <FaCcMastercard size={32} className="text-red-600" />
+                <img
+                  src="https://res.cloudinary.com/midefulness/image/upload/v1736096286/BloodsMate/koko-pay_d6id9w.png"
+                  alt="koko pay"
+                  className="h-8"
+                />
+              </div>
+            </div>
+
+            {/* Accordion Section */}
+            <div className="space-y-4 mt-6">
+              <Accordion type="single" collapsible className="w-full">
+                <AccordionItem value="description">
+                  <AccordionTrigger className="text-lg font-semibold">
+                    Product Details
+                  </AccordionTrigger>
+                  <AccordionContent>
+                    <ProductDetailsDescription product={product} />
+                  </AccordionContent>
+                </AccordionItem>
+              </Accordion>
+              <SizeChart />
+              <PaymentOptions />
+              <DeliveryAndReturns />
+            </div>
+          </div>
+        </>
       )}
     </div>
-  )
-}
-
-export default function ProductPage({ params }: { params: { id: string } }) {
-  const product = products.find(p => p.id === parseInt(params.id))
-
-  if (!product) {
-    notFound()
-  }
-
-  return (
-    <div className="container mx-auto px-4 py-8">
-      <Breadcrumb product={product} />
-      <div className="mt-8">
-        <ProductDetails product={product} />
-      </div>
-      <div className="mt-8 space-y-6">
-        <SizeChart />
-        <PaymentOptions />
-        <DeliveryAndReturns />
-      </div>
-      <YouMightAlsoLike currentProductId={product.id} />
-      <SubscribeSection />
-    </div>
-  )
+  );
 }

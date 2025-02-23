@@ -1,109 +1,143 @@
+export interface Stock {
+  size: string;
+  quantity: number;
+}
+
 export interface Product {
   id: number;
   name: string;
+  description: string;
   price: number;
   discountPercentage?: number;
   images: string[];
-  description: string;
   sizes: string[];
-  stock: number;
-  gender: 'Men' | 'Women' | 'Unisex';
+  stock: Stock[];
+  color: string;
+  inStock: boolean;
+  gender: "Men" | "Women" | "Unisex";
   category: string;
+  categoryId: number;
+  createdAt: string;
+  updatedAt: string;
 }
 
 export const products: Product[] = [
   {
-    id: 1,
-    name: 'Classic White Tee',
-    price: 24.99,
-    discountPercentage: 10,
-    images: [
-      'https://res.cloudinary.com/midefulness/image/upload/v1657441707/cld-sample-5.jpg',
-      'https://res.cloudinary.com/midefulness/image/upload/v1657441707/cld-sample-5.jpg',
-      'https://res.cloudinary.com/midefulness/image/upload/v1657441707/cld-sample-5.jpg',
+    "id": 2,
+    "name": "Classic Cotton T-Shirt",
+    "description": "A comfortable and stylish cotton t-shirt for everyday wear.",
+    "price": 29.99,
+    "discountPercentage": 10,
+    "color": "white",
+    "images": ["https://res.cloudinary.com/midefulness/image/upload/v1739572241/BloodsMate/temp/ACH_5502_yhf279.jpg","https://res.cloudinary.com/midefulness/image/upload/v1739572240/BloodsMate/temp/ACH_5553_eigzq6.jpg","https://res.cloudinary.com/midefulness/image/upload/v1739572239/BloodsMate/temp/ACH_5509_n11ozi.jpg","https://res.cloudinary.com/midefulness/image/upload/v1739572239/BloodsMate/temp/ACH_5520_k4vjc2.jpg","https://res.cloudinary.com/midefulness/image/upload/v1739572237/BloodsMate/temp/ACH_5500_yowljw.jpg","https://res.cloudinary.com/midefulness/image/upload/v1739572235/BloodsMate/temp/ACH_5560_wpu9kp.jpg"],
+    "sizes": [
+        "S",
+        "M",
+        "L",
+        "XL"
     ],
-    description: 'A timeless classic white t-shirt that goes with everything. Made from 100% organic cotton for ultimate comfort and sustainability.',
-    sizes: ['XS', 'S', 'M', 'L', 'XL', 'XXL'],
-    stock: 50,
-    gender: 'Unisex',
-    category: 'T-Shirts',
+    "stock": [
+        {
+            "size": "S",
+            "quantity": 0
+        },
+        {
+            "size": "M",
+            "quantity": 36
+        },
+        {
+            "size": "L",
+            "quantity": 30
+        },
+        {
+            "size": "XL",
+            "quantity": 10
+        }
+    ],
+    "inStock": true,
+    "gender": "Unisex",
+    "category": "T-Shirts",
+    "categoryId": 2,
+    "createdAt": "2025-02-11T07:34:23.000Z",
+    "updatedAt": "2025-02-13T21:34:47.000Z"
   },
   {
-    id: 2,
-    name: 'Vintage Black Tee',
-    price: 29.99,
-    images: [
-      'https://res.cloudinary.com/midefulness/image/upload/v1657441707/cld-sample-5.jpg',
-      'https://res.cloudinary.com/midefulness/image/upload/v1657441707/cld-sample-5.jpg',
-      'https://res.cloudinary.com/midefulness/image/upload/v1657441707/cld-sample-5.jpg',
+    "id": 3,
+    "name": "Classic Cotton T-Shirt",
+    "description": "A comfortable and stylish cotton t-shirt for everyday wear.",
+    "price": 19.99,
+    "discountPercentage": 10,
+    "color": "white",
+    "images": ["https://res.cloudinary.com/midefulness/image/upload/v1739572241/BloodsMate/temp/ACH_5502_yhf279.jpg","https://res.cloudinary.com/midefulness/image/upload/v1739572240/BloodsMate/temp/ACH_5553_eigzq6.jpg","https://res.cloudinary.com/midefulness/image/upload/v1739572239/BloodsMate/temp/ACH_5509_n11ozi.jpg","https://res.cloudinary.com/midefulness/image/upload/v1739572239/BloodsMate/temp/ACH_5520_k4vjc2.jpg","https://res.cloudinary.com/midefulness/image/upload/v1739572237/BloodsMate/temp/ACH_5500_yowljw.jpg","https://res.cloudinary.com/midefulness/image/upload/v1739572235/BloodsMate/temp/ACH_5560_wpu9kp.jpg"],
+    "sizes": [
+        "S",
+        "M",
+        "L",
+        "XL"
     ],
-    description: 'A sleek black t-shirt with a vintage feel. Perfect for any casual occasion.',
-    sizes: ['XS', 'S', 'M', 'L', 'XL', 'XXL'],
-    stock: 40,
-    gender: 'Unisex',
-    category: 'T-Shirts',
+    "stock": [
+        {
+            "size": "S",
+            "quantity": 0
+        },
+        {
+            "size": "M",
+            "quantity": 40
+        },
+        {
+            "size": "L",
+            "quantity": 30
+        },
+        {
+            "size": "XL",
+            "quantity": 8
+        }
+    ],
+    "inStock": true,
+    "gender": "Unisex",
+    "category": "T-Shirts",
+    "categoryId": 2,
+    "createdAt": "2025-02-11T07:41:54.000Z",
+    "updatedAt": "2025-02-13T21:34:47.000Z"
   },
   {
-    id: 3,
-    name: 'Women\'s Graphic Print Tee',
-    price: 34.99,
-    discountPercentage: 15,
-    images: [
-      '/placeholder.svg?height=600&width=400&text=Graphic+Front',
-      '/placeholder.svg?height=600&width=400&text=Graphic+Back',
-      '/placeholder.svg?height=600&width=400&text=Graphic+Side',
+    "id": 4,
+    "name": "Classic Cotton T-Shirt",
+    "description": "A comfortable and stylish cotton t-shirt for everyday wear.",
+    "price": 19.99,
+    "discountPercentage": 10,
+    "color": "white",
+    "images": ["https://res.cloudinary.com/midefulness/image/upload/v1739572241/BloodsMate/temp/ACH_5502_yhf279.jpg","https://res.cloudinary.com/midefulness/image/upload/v1739572240/BloodsMate/temp/ACH_5553_eigzq6.jpg","https://res.cloudinary.com/midefulness/image/upload/v1739572239/BloodsMate/temp/ACH_5509_n11ozi.jpg","https://res.cloudinary.com/midefulness/image/upload/v1739572239/BloodsMate/temp/ACH_5520_k4vjc2.jpg","https://res.cloudinary.com/midefulness/image/upload/v1739572237/BloodsMate/temp/ACH_5500_yowljw.jpg","https://res.cloudinary.com/midefulness/image/upload/v1739572235/BloodsMate/temp/ACH_5560_wpu9kp.jpg"],
+    "sizes": [
+        "S",
+        "M",
+        "L",
+        "XL"
     ],
-    description: 'Express yourself with our unique graphic print design. Made with eco-friendly inks.',
-    sizes: ['S', 'M', 'L', 'XL'],
-    stock: 30,
-    gender: 'Women',
-    category: 'Graphic Tees',
-  },
-  {
-    id: 4,
-    name: 'Men\'s Striped Navy Tee',
-    price: 27.99,
-    images: [
-      '/placeholder.svg?height=600&width=400&text=Striped+Front',
-      '/placeholder.svg?height=600&width=400&text=Striped+Back',
-      '/placeholder.svg?height=600&width=400&text=Striped+Side',
+    "stock": [
+        {
+            "size": "S",
+            "quantity": 0
+        },
+        {
+            "size": "M",
+            "quantity": 40
+        },
+        {
+            "size": "L",
+            "quantity": 30
+        },
+        {
+            "size": "XL",
+            "quantity": 20
+        }
     ],
-    description: 'Classic navy stripes for a nautical-inspired look. Perfect for summer days.',
-    sizes: ['XS', 'S', 'M', 'L', 'XL'],
-    stock: 35,
-    gender: 'Men',
-    category: 'T-Shirts',
-  },
-  {
-    id: 5,
-    name: 'Heather Gray Tee',
-    price: 26.99,
-    images: [
-      '/placeholder.svg?height=600&width=400&text=Gray+Front',
-      '/placeholder.svg?height=600&width=400&text=Gray+Back',
-      '/placeholder.svg?height=600&width=400&text=Gray+Side',
-    ],
-    description: 'Soft and comfortable heather gray t-shirt for everyday wear. Versatile and stylish.',
-    sizes: ['S', 'M', 'L', 'XL', 'XXL'],
-    stock: 45,
-    gender: 'Unisex',
-    category: 'T-Shirts',
-  },
-  {
-    id: 6,
-    name: 'Neon Green Tee',
-    price: 31.99,
-    discountPercentage: 5,
-    images: [
-      '/placeholder.svg?height=600&width=400&text=Neon+Front',
-      '/placeholder.svg?height=600&width=400&text=Neon+Back',
-      '/placeholder.svg?height=600&width=400&text=Neon+Side',
-    ],
-    description: 'Stand out from the crowd with this bold neon green tee. Perfect for parties and festivals.',
-    sizes: ['XS', 'S', 'M', 'L'],
-    stock: 25,
-    gender: 'Unisex',
-    category: 'T-Shirts',
-  },
-];
+    "inStock": true,
+    "gender": "Unisex",
+    "category": "T-Shirts",
+    "categoryId": 2,
+    "createdAt": "2025-02-11T15:06:12.000Z",
+    "updatedAt": "2025-02-11T15:06:12.000Z"
+  }
+]
 
