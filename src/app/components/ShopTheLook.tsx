@@ -67,7 +67,7 @@ export default function ShopTheLook() {
       initial={{ opacity: 0, y: 50 }}
       whileInView={{ opacity: 1, y: 0 }}
       transition={{ duration: 0.8, ease: 'easeOut' }}
-      viewport={{ once: true, amount: 0.2 }} // Trigger animation once, when 20% of the section is visible
+      viewport={{ once: true, amount: 0.1 }} // Trigger animation once, when 20% of the section is visible
     >
       <div className="container mx-auto px-4">
         <h2 className="text-3xl font-bold mb-8 text-center">Elevate Your Look</h2>

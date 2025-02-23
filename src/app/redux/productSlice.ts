@@ -1,28 +1,6 @@
 import { createSlice, createAsyncThunk } from "@reduxjs/toolkit";
 import * as api from "../api/apiClient";
-
-export interface Stock {
-  size: string;
-  quantity: number;
-}
-
-export interface Product {
-  id: number;
-  name: string;
-  description: string;
-  price: number;
-  discountPercentage?: number;
-  images: string[];
-  sizes: string[];
-  stock: Stock[];
-  color: string;
-  inStock: boolean;
-  gender: "Men" | "Women" | "Unisex";
-  category: string;
-  categoryId: number;
-  createdAt: string;
-  updatedAt: string;
-}
+import { Product } from "@/app/data/products";
 
 interface ProductState {
   items: Product[];

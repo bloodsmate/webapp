@@ -94,9 +94,9 @@ export default function FeaturedProducts() {
                 animate={{ opacity: 1, y: 0 }}
                 transition={{ duration: 0.5, delay: index * 0.1 }}
                 className="bg-white shadow-lg overflow-hidden transform transition duration-300 hover:scale-105"
-                style={{ height: '750px' }}
+                style={{ height: 'auto', minHeight: '650px' }}
               >
-                <div className="relative h-96 md:h-[520px]">
+                <div className="relative h-[420px] 2xl:h-[420px]">
                   <Link href={`/products/${product.id}`} prefetch={false}>
                     <Image
                       src={product.images[0]}

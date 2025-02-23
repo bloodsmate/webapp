@@ -25,10 +25,10 @@ export default function ProductCard({ product, index }: { product: Product; inde
         animate={{ opacity: 1, y: 0 }}
         transition={{ duration: 0.5, delay: index ? index * 0.1 : 0 }}
         className="bg-white shadow-lg overflow-hidden transform transition duration-300 hover:scale-105"
-        style={{ height: '835px' }}
+        style={{ height: 'auto', minHeight: '620px' }} // Adjusted height for mobile
       >
         {/* Image Container */}
-        <div className="relative h-96 md:h-[600px]">
+        <div className="relative h-96 lg:h-[400px] xl:h-[600px]">
           <Link href={`/products/${product.id}`} prefetch={false}>
             <Image
               src={product.images[0]}
@@ -46,7 +46,7 @@ export default function ProductCard({ product, index }: { product: Product; inde
         </div>
 
         {/* Product Details */}
-        <div className="p-4 h-48 flex flex-col justify-between">
+        <div className="p-4 flex flex-col justify-between h-48 sm:h-56">
           <div>
             <h3 className="text-xl font-semibold mb-1 text-gray-800 group-hover:text-gray-900 transition-colors">
               {product.name}

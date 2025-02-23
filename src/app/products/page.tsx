@@ -123,7 +123,7 @@ export default function ProductsPage() {
       quantity: 1,
       size: selectedSize,
       image: mainImageRef.current.get(product.id) || product.images[0],
-      discountPrice: (product.discountPercentage && product.discountPercentage > 0) ? discountedPrice(product) : 0,
+      discountPrice: Number((product.discountPercentage && product.discountPercentage > 0) ? discountedPrice(product) : 0),
     }));
     toast({
       title: "Added to cart",
@@ -240,17 +240,18 @@ export default function ProductsPage() {
                   <div
                     key={product.id}
                     className="relative bg-white shadow-lg hover:shadow-xl transition-shadow duration-300 overflow-hidden group"
-                    style={{ minHeight: '500px' }}
+                    style={{ height: 'auto', minHeight: '520px' }}
                   >
                     {/* Product Image with Hover Effect */}
-                    <div className="relative">
+                    <div className="relative h-96 lg:h-[350px] 2xl:h-[450px]">
                       <Link href={`/products/${product.id}`} prefetch={false}>
                         <Image
                           src={mainImage}
                           alt={product.name}
-                          width={300}
-                          height={600}
-                          className="w-full h-96 object-cover transition-transform duration-300 transform group-hover:scale-105"
+                          // width={300}
+                          // height={600}
+                          layout="fill"
+                          className="w-full object-cover transition-transform duration-300 transform group-hover:scale-105"
                         />
                       </Link>
 
