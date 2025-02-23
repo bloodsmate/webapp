@@ -163,7 +163,7 @@ export default function ProductsPage() {
       </div>
 
       {/* Sidebar Filter for Mobile */}
-      <div className={`fixed inset-0 z-40 transform ${isSidebarOpen ? 'translate-x-0' : '-translate-x-full'} transition-transform duration-300 ease-in-out md:hidden mt-16 bg-black`}>
+      <div className={`fixed inset-0 z-40 transform ${isSidebarOpen ? 'translate-x-0' : '-translate-x-full'} transition-transform duration-300 ease-in-out md:hidden mt-16`}>
         <Filters
           searchTerm={searchTerm}
           setSearchTerm={setSearchTerm}
@@ -182,7 +182,7 @@ export default function ProductsPage() {
 
       {/* Dropdown Filter for Mobile */}
       {isDropdownOpen && (
-        <div className="md:hidden bg-white p-4 rounded-lg shadow-lg mb-4">
+        <div className="mb-4">
           <Filters
             searchTerm={searchTerm}
             setSearchTerm={setSearchTerm}

@@ -28,13 +28,20 @@ export default function AuthPage() {
   const { user, loading, error, isAuthenticated } = useSelector((state: RootState) => state.auth)
   const router = useRouter()
 
+  // Track the previous page before redirecting to the login page
+  const [previousPage, setPreviousPage] = useState<string | null>(null)
+
   useEffect(() => {
-    console.log(user);
     if (isAuthenticated) {
-      console.log("Is Authenticated: ", isAuthenticated);
-      // router.push("/")
+      // Redirect to the previous page or home page if no previous page is set
+      router.push(previousPage || "/")
     }
-  }, [isAuthenticated, router])
+  }, [isAuthenticated, router, previousPage])
+
+  // Set the previous page when the component mounts
+  useEffect(() => {
+    setPreviousPage(document.referrer || null)
+  }, [])
 
   const validateForm = () => {
     let isValid = true
@@ -66,7 +73,7 @@ export default function AuthPage() {
     e.preventDefault()
 
     if (validateForm()) {
-      if(isLogin) {
+      if (isLogin) {
         try {
           await dispatch(login({ email, password })).unwrap()
           toast({
@@ -74,6 +81,8 @@ export default function AuthPage() {
             description: "You have successfully logged in.",
             variant: "success",
           })
+          // Redirect to the previous page or home page
+          router.push(previousPage || "/")
         } catch (error) {
           toast({
             title: "Login Failed",
@@ -81,39 +90,39 @@ export default function AuthPage() {
             variant: "destructive",
           })
         }
-
       } else {
-        const userData:userRegistration = {
+        const userData: userRegistration = {
           name: name,
           email: email,
           password: password,
         }
 
         try {
-          const { data: registerData, loading, error } = await userRegister(userData);
+          const { data: registerData, loading, error } = await userRegister(userData)
           console.log(registerData)
 
-          if(!error) {
+          if (!error) {
             toast({
               title: "Signup Successful",
               description: "You have successfully signed up.",
               variant: "success",
             })
-          }else {
+            // Redirect to the login page after successful registration
+            setIsLogin(true)
+          } else {
             toast({
               title: "Signup Unsuccessful",
               description: "Something went wrong. Please try again.",
               variant: "destructive",
             })
           }
-        }catch(error) {
+        } catch (error) {
           toast({
             title: "Signup Unsuccessful",
             variant: "destructive",
           })
         }
       }
-      
     }
   }
 
@@ -205,9 +214,19 @@ export default function AuthPage() {
 
         {/* Right Section (Image or Content) */}
         <div className={`hidden sm:block w-1/2 bg-black text-white flex flex-col justify-center items-center p-8 rounded-xl ${isLogin ? 'order-2' : 'order-1'}`}>
-          <h2 className="text-3xl font-bold">{isLogin ? "Enter the Future of Payments" : "Welcome Aboard"}</h2>
+          {isLogin ? (
+            <>
+              <h2 className="text-3xl font-bold text-center mb-4">WELCOME BACK!</h2>
+              <p className="text-lg text-center">READY TO SHOP THE LATEST LOOKS?</p>
+            </>
+          ) : (
+            <>
+              <h2 className="text-3xl font-bold text-center mb-4">JOIN US TODAY!</h2>
+              <p className="text-lg text-center">DISCOVER THE LATEST TRENDS AND EXCLUSIVE OFFERS.</p>
+            </>
+          )}
         </div>
       </div>
     </div>
   )
-} 
+}
