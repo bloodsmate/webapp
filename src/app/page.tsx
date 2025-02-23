@@ -27,8 +27,8 @@ export default function Home() {
         <Hero />
         <HeartPulse />
         <FeaturedProducts />
-        <GoogleReviews />
-        <InstagramFeed />
+        {/* <GoogleReviews /> */}
+        {/* <InstagramFeed /> */}
         <ShopTheLook />
         <SubscribeSection />
       </main>

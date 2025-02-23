@@ -12,7 +12,7 @@ export default function WhatsAppButton() {
   }
 
   return (
-    <Button onClick={handleClick} className="z-40 fixed bottom-28 right-4 rounded-full p-4 bg-green-500 hover:bg-green-600">
+    <Button onClick={handleClick} className="z-40 fixed bottom-40 xs:bottom-28 right-4 rounded-full p-4 bg-green-500 hover:bg-green-600">
       <WhatsappIcon size={24} color="white" />
     </Button>
   )
