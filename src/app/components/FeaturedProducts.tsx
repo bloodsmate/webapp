@@ -8,21 +8,21 @@ import { Button } from "./ui/button"
 import { ChevronLeft, ChevronRight } from 'lucide-react'
 import QuickView from './QuickView'
 import { Product } from '../data/products'
-import { fetchProducts } from "../redux/productSlice";
-import { useDispatch, useSelector } from 'react-redux';
-import { AppDispatch, RootState } from '../redux/store';
+import { fetchProducts } from "../redux/productSlice"
+import { useDispatch, useSelector } from 'react-redux'
+import { AppDispatch, RootState } from '../redux/store'
 
 export default function FeaturedProducts() {
-  const dispatch = useDispatch<AppDispatch>();
-  const { items: products, loading, error } = useSelector((state: RootState) => state.products);
+  const dispatch = useDispatch<AppDispatch>()
+  const { items: products, loading, error } = useSelector((state: RootState) => state.products)
 
   const [currentIndex, setCurrentIndex] = useState(0)
   const [selectedProduct, setSelectedProduct] = useState<Product | null>(null)
   const [itemsPerPage, setItemsPerPage] = useState(4) // Default number of items per page
 
   useEffect(() => {
-    dispatch(fetchProducts());
-  }, [dispatch]);
+    dispatch(fetchProducts())
+  }, [dispatch])
 
   // Adjust items per page based on screen size
   useEffect(() => {
@@ -34,7 +34,7 @@ export default function FeaturedProducts() {
       } else if (window.innerWidth < 1400) {
         setItemsPerPage(3)
       } else {
-        setItemsPerPage(4) 
+        setItemsPerPage(4)
       }
     }
 
@@ -60,7 +60,14 @@ export default function FeaturedProducts() {
   }
 
   return (
-    <section id="featured" className="py-16 bg-gray-50">
+    <motion.section
+      id="featured"
+      className="py-16 bg-gray-50"
+      initial={{ opacity: 0, y: 50 }}
+      whileInView={{ opacity: 1, y: 0 }}
+      transition={{ duration: 0.8, ease: 'easeOut' }}
+      viewport={{ once: true, amount: 0.2 }} // Trigger animation once, when 20% of the section is visible
+    >
       <div className="container mx-auto px-4">
         <h2 className="text-3xl font-bold mb-8 text-center">Must-Have Styles</h2>
 
@@ -87,15 +94,16 @@ export default function FeaturedProducts() {
                 animate={{ opacity: 1, y: 0 }}
                 transition={{ duration: 0.5, delay: index * 0.1 }}
                 className="bg-white shadow-lg overflow-hidden transform transition duration-300 hover:scale-105"
-                style={{ height: '620px' }}
+                style={{ height: '750px' }}
               >
-                <div className="relative h-96">
+                <div className="relative h-96 md:h-[520px]">
                   <Link href={`/products/${product.id}`} prefetch={false}>
                     <Image
                       src={product.images[0]}
                       alt={product.name}
                       fill
                       className="object-cover"
+                      priority={index < 4} // Preload the first 4 images
                     />
                   </Link>
 
@@ -158,6 +166,6 @@ export default function FeaturedProducts() {
           <QuickView product={selectedProduct} onClose={() => setSelectedProduct(null)} />
         )}
       </AnimatePresence>
-    </section>
+    </motion.section>
   )
 }

@@ -7,6 +7,7 @@ import { Button } from './ui/button'
 import { RootState } from '../redux/store'
 import Link from 'next/link'
 import Image from "next/image"
+import { useEffect, useRef } from 'react'
 
 interface CartPopupProps {
   isOpen: boolean

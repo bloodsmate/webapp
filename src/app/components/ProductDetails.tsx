@@ -293,7 +293,6 @@ export default function ProductDetails({ product }: { product: Product }) {
                           ? "border-blue-600 bg-blue-100"
                           : "border-gray-300"
                       } ${isOutOfStock ? "opacity-50" : "hover:border-blue-600"}`}
-                      // disabled={isOutOfStock}
                     >
                       {size}
                       {isOutOfStock && (
