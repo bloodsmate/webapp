@@ -244,3 +244,14 @@ h1 {
 .animate-pulse-slow {
   animation: pulse-slow 4s infinite;
 }
+
+
+
+@layer base {
+  * {
+    @apply border-border outline-ring/50;
+  }
+  body {
+    @apply bg-background text-foreground;
+  }
+}

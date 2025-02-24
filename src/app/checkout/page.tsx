@@ -2,12 +2,12 @@
 
 import { useState } from 'react'
 import { useSelector } from "react-redux"
-import { Button } from "../components/ui/button"
-import { Input } from "../components/ui/input"
-import { Label } from "../components/ui/label"
+import { Button } from "@/app/components/ui/button"
+import { Input } from "@/app/components/ui/input"
+import { Label } from "@/app/components/ui/label"
 import type { RootState } from "../redux/store"
-import { Progress } from "../components/ui/progress"
-import PayHereButton from "../components/PayHereButton"
+import { Progress } from "@/app/components/ui/progress"
+import PayHereButton from "@/app/components/PayHereButton"
 
 function CheckoutForm() {
   const [loading, setLoading] = useState(false)
