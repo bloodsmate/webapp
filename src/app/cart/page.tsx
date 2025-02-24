@@ -19,6 +19,7 @@ import {
   AlertDialogHeader,
   AlertDialogTitle,
 } from '@/app/components/ui/alert-dialog';
+import { deliveryFee } from '@/app/data/constants';
 
 export default function CartPage() {
   const dispatch = useDispatch<AppDispatch>();
@@ -82,7 +83,6 @@ export default function CartPage() {
   const subtotal = cartItems.reduce((sum, item) => sum + (item.price * item.quantity), 0);
   const afterDiscount = cartItems.reduce((sum, item) => sum + (item.discountPrice > 0 ? item.discountPrice : item.price) * item.quantity, 0);
   const discount = subtotal - afterDiscount;
-  const deliveryFee = 5.00;
   const total = subtotal - discount + deliveryFee;
 
   return (

@@ -37,4 +37,6 @@ export const lookImages = [
     "https://res.cloudinary.com/midefulness/image/upload/v1740310839/BloodsMate/Shop%20The%20Look/Grey/ACH_5673_fsysme.jpg",
     "https://res.cloudinary.com/midefulness/image/upload/v1740310828/BloodsMate/Shop%20The%20Look/Grey/ACH_5647_dqr1vt.jpg",
     
-]
+];
+
+export const deliveryFee = 400;
