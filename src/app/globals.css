@@ -255,3 +255,18 @@ h1 {
     @apply bg-background text-foreground;
   }
 }
+
+/* Export PDF */
+.strikethrough {
+  position: relative;
+  display: inline-block;
+}
+
+.strikethrough::after {
+  content: '';
+  position: absolute;
+  left: 0;
+  top: 50%;
+  width: 100%;
+  border-top: 1px solid black;
+}
