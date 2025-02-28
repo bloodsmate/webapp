@@ -68,7 +68,7 @@ export default function Chatbot() {
   return (
     <>
       {!isOpen && (
-        <Button className="z-40 fixed bottom-16 right-4 rounded-full p-4" onClick={() => setIsOpen(true)}>
+        <Button className="z-40 fixed bottom-28 xs:bottom-16 right-4 rounded-full p-4" onClick={() => setIsOpen(true)}>
           <MessageCircle size={24} />
         </Button>
       )}

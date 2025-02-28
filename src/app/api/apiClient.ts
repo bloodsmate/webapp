@@ -78,12 +78,12 @@ export const getWaitlist = async () => {
 }
 
 export const createOrder = async (orderData: any) => {
-  const response = await apiClient.post("/orders", orderData)
+  const response = await apiClient.post("/orders/place", orderData)
   return response.data
 }
 
-export const getOrders = async () => {
-  const response = await apiClient.get("/orders")
+export const getOrdersByUserId = async (orderId: Number) => {
+  const response = await apiClient.get(`/orders/${orderId}`)
   return response.data
 }
 

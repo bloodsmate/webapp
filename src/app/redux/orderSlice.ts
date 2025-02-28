@@ -1,21 +1,30 @@
 import { createSlice, createAsyncThunk } from "@reduxjs/toolkit"
 import * as api from "../api/apiClient"
 
-export const fetchOrders = createAsyncThunk("orders/fetchOrders", async (_, { rejectWithValue }) => {
-  try {
-    return await api.getOrders()
-  } catch (error) {
-    return rejectWithValue((error as Error).message)
+// Fetch orders by userId
+export const fetchOrdersByUserId = createAsyncThunk(
+  "orders/fetchOrdersByUserId",
+  async (userId: string, { rejectWithValue }) => {
+    try {
+      return await api.getOrdersByUserId(userId) // Replace with your API call
+    } catch (error) {
+      return rejectWithValue((error as Error).message)
+    }
   }
-})
+)
 
-export const createOrder = createAsyncThunk("orders/createOrder", async (orderData: any, { rejectWithValue }) => {
-  try {
-    return await api.createOrder(orderData)
-  } catch (error) {
-    return rejectWithValue((error as Error).message)
+// Create a new order
+export const createOrder = createAsyncThunk(
+  "orders/createOrder",
+  async (orderData: any, { rejectWithValue }) => {
+    try {
+      const response = await api.createOrder(orderData) // Replace with your API call
+      return response
+    } catch (error) {
+      return rejectWithValue((error as Error).message)
+    }
   }
-})
+)
 
 const orderSlice = createSlice({
   name: "orders",
@@ -27,22 +36,32 @@ const orderSlice = createSlice({
   reducers: {},
   extraReducers: (builder) => {
     builder
-      .addCase(fetchOrders.pending, (state) => {
+      // Fetch orders by userId
+      .addCase(fetchOrdersByUserId.pending, (state) => {
         state.loading = true
       })
-      .addCase(fetchOrders.fulfilled, (state, action) => {
+      .addCase(fetchOrdersByUserId.fulfilled, (state, action) => {
         state.loading = false
         state.items = action.payload
       })
-      .addCase(fetchOrders.rejected, (state, action) => {
+      .addCase(fetchOrdersByUserId.rejected, (state, action) => {
         state.loading = false
         state.error = action.payload as string
       })
+
+      // Create a new order
+      .addCase(createOrder.pending, (state) => {
+        state.loading = true
+      })
       .addCase(createOrder.fulfilled, (state, action) => {
-        state.items.push(action.payload)
+        state.loading = false
+        state.items.push(action.payload) // Add the new order to the list
+      })
+      .addCase(createOrder.rejected, (state, action) => {
+        state.loading = false
+        state.error = action.payload as string
       })
   },
 })
 
 export default orderSlice.reducer
-

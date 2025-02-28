@@ -69,14 +69,20 @@ export default function YouMightAlsoLike({ currentProductId }: YouMightAlsoLikeP
       >
         {relatedProducts.map((product) => (
           <SwiperSlide key={product.id}>
-            <div className="border rounded-lg overflow-hidden">
+            <div className="relative border rounded-lg overflow-hidden">
               <Image
                 src={product.images[0]}
                 alt={product.name}
                 width={300}
-                height={300}
-                className="w-full h-64 object-cover"
+                height={600}
+                className="w-full h-96 md:h-[500px] object-cover"
               />
+              {/* Discount Price Tag */}
+              {(product.discountPercentage > 0) && (
+                <div className="absolute top-4 right-4 bg-red-600 text-white text-sm font-semibold px-3 py-1 rounded-full">
+                  Save {product.discountPercentage}%
+                </div>
+              )}
               <div className="p-4">
                 <h4 className="font-semibold mb-2">{product.name}</h4>
                 <div className="flex items-center gap-2 mb-3">
@@ -86,7 +92,7 @@ export default function YouMightAlsoLike({ currentProductId }: YouMightAlsoLikeP
                         LKR {(product.price * (1 - product.discountPercentage / 100)).toFixed(2)}
                       </p>
                       <p className="text-sm text-gray-400 line-through">LKR {product.price.toFixed(2)}</p>
-                      <span className="ml-2 text-green-400 font-semibold">Save {product.discountPercentage}%</span>
+                      {/* <span className="ml-2 text-green-400 font-semibold">Save {product.discountPercentage}%</span> */}
                     </>
                   ) : (
                     <p className="text-gray-500 font-semibold">LKR {product.price.toFixed(2)}</p>
@@ -95,7 +101,7 @@ export default function YouMightAlsoLike({ currentProductId }: YouMightAlsoLikeP
                 <Button
                   onClick={() => setSelectedProduct(product)}
                   variant="outline"
-                  className="w-full"
+                  className="w-full hover:bg-black hover:text-white"
                 >
                   Quick View
                 </Button>
