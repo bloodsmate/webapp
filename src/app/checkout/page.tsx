@@ -84,11 +84,14 @@ function CheckoutForm() {
   }
 
   const saveOrderAndClearCart = async () => {
-    setIsProcessingOrder(true)
+    setIsProcessingOrder(true); // Show loader while processing
     try {
-      const orderId = authUser ? resultAction.payload.id : `guest-${Date.now()}`
-
+      // Generate a unique order ID for all users (logged-in or guest)
+      const orderId = `order-${Date.now()}-${Math.floor(Math.random() * 1000)}`; // Unique ID for every order
+  
+      // Prepare order data
       const orderData = {
+        orderId: orderId,
         userId: authUser?.id || null,
         shippingAddress: `${formData.address}, ${formData.city}, ${formData.zipCode}`,
         paymentMethod: paymentMethod.toUpperCase(),
@@ -101,21 +104,25 @@ function CheckoutForm() {
           size: item.size,
           image: item.image,
         })),
-      }
-
-      const resultAction = await dispatch(createOrder(orderData))
+      };
+  
+      // Dispatch the createOrder action
+      const resultAction = await dispatch(createOrder(orderData));
+  
+      // Handle the result of the createOrder action
       if (createOrder.fulfilled.match(resultAction)) {
-        dispatch(clearCart())
-        router.push(`/order-confirmation/${orderId}`)
+        dispatch(clearCart()); // Clear the cart after successful order creation
+        router.push(`/order-confirmation/${orderId}`); // Redirect to the order confirmation page
       } else {
-        throw new Error(resultAction.payload || "Failed to create order")
+        throw new Error(resultAction.payload || "Failed to create order"); // Throw an error if the order creation fails
       }
     } catch (error) {
-      console.error('Failed to save order:', error)
+      console.error('Failed to save order:', error); // Log the error for debugging
+      // Optionally, show a user-friendly error message here
     } finally {
-      setIsProcessingOrder(false)
+      setIsProcessingOrder(false); // Hide loader after processing
     }
-  }
+  };
 
   return (
     <div className="container mx-auto px-4">

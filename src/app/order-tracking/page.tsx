@@ -1,98 +1,77 @@
 'use client'
 
-import { useState } from 'react'
-import { Button } from "../components/ui/button"
-import { Input } from "../components/ui/input"
-import { Order, OrderStatus } from '../types/order'
+import { useState, useEffect } from 'react'
+import { useRouter } from 'next/navigation'
+import { Button } from '@/app/components/ui/button'
+import { Input } from '@/app/components/ui/input'
+import { Label } from '@/app/components/ui/label'
+import { Search } from 'lucide-react'
+import { useDispatch } from "react-redux";
+import { AppDispatch, RootState } from "@/app/redux/store";
+import { toast } from '@/app/hooks/use-toast';
+import { fetchOrdersByOrderId } from "@/app/redux/orderSlice";
 
-const mockOrder: Order = {
-    id: '12345',
-    userId: 'user123',
-    items: [
-      { id: 1, name: 'Classic White Tee', size: 'M', quantity: 2, price: 24.99 },
-      { id: 2, name: 'Vintage Black Tee', size: 'L', quantity: 1, price: 29.99 },
-    ],
-    total: 79.97,
-    status: OrderStatus.DELIVERED,
-    createdAt: '2023-06-01T10:00:00Z',
-    updatedAt: '2023-06-05T15:00:00Z',
-  }
-  
-  export default function OrderTrackingPage() {
-    const [orderNumber, setOrderNumber] = useState('')
-    const [order, setOrder] = useState<Order | null>(null)
-  
-    const handleTrackOrder = (e: React.FormEvent) => {
-      e.preventDefault()
-      if (orderNumber === mockOrder.id) {
-        setOrder(mockOrder)
+export default function OrderTrackingPage() {
+  const dispatch = useDispatch<AppDispatch>();
+
+  const router = useRouter()
+  const [orderId, setOrderId] = useState('')
+  const [error, setError] = useState('')
+
+  const handleTrackOrder = async () => {
+    if (!orderId) {
+      setError('Order ID is required.')
+      return
+    }
+
+    try {
+      const resultAction = await dispatch(fetchOrdersByOrderId(orderId))
+
+      if (fetchOrdersByOrderId.fulfilled.match(resultAction)) {
+        const order = resultAction.payload
+
+        if (order) {
+          router.push(`/order-confirmation/${orderId}`)
+        } else {
+          setError('Order not found. Please check your order ID and try again.')
+        }
       } else {
-        setOrder(null)
-        alert('Order not found')
+        throw new Error(resultAction.payload || 'Failed to fetch order details')
       }
+    } catch (error) {
+      console.error('Error tracking order:', error)
+      setError('An error occurred while tracking your order. Please try again.')
     }
-  
-    const getStatusColor = (status: OrderStatus) => {
-      switch (status) {
-        case OrderStatus.PENDING:
-        case OrderStatus.PROCESSING:
-          return 'bg-yellow-500'
-        case OrderStatus.SHIPPED:
-          return 'bg-blue-500'
-        case OrderStatus.DELIVERED:
-          return 'bg-green-500'
-        case OrderStatus.CANCELLED:
-          return 'bg-red-500'
-        default:
-          return 'bg-gray-500'
-      }
-    }
-  
-    return (
-      <div className="container mx-auto px-4 py-8 min-h-screen">
-        <h1 className="text-3xl font-bold mb-8">Order Tracking</h1>
-        <form onSubmit={handleTrackOrder} className="mb-8">
-          <div className="flex gap-4">
-            <Input
-              type="text"
-              value={orderNumber}
-              onChange={(e) => setOrderNumber(e.target.value)}
-              placeholder="Enter your order number"
-              className="flex-grow"
-            />
-            <Button type="submit">Track Order</Button>
-          </div>
-        </form>
-        {order && (
-          <div className="bg-white shadow-md rounded-lg p-6">
-            <h2 className="text-2xl font-bold mb-4">Order #{order.id}</h2>
-            <div className="mb-6">
-              <h3 className="text-xl font-semibold mb-2">Items</h3>
-              <ul className="space-y-2">
-                {order.items.map((item) => (
-                  <li key={item.id} className="flex justify-between">
-                    <span>{item.name} ({item.size}) x{item.quantity}</span>
-                    <span>${(item.price * item.quantity).toFixed(2)}</span>
-                  </li>
-                ))}
-              </ul>
-              <div className="mt-4 text-xl font-bold">Total: ${order.total.toFixed(2)}</div>
-            </div>
-            <div>
-              <h3 className="text-xl font-semibold mb-2">Order Status</h3>
-              <div className="flex items-center">
-                <div className={`w-4 h-4 rounded-full ${getStatusColor(order.status)} mr-2`}></div>
-                <span className="font-semibold">{order.status}</span>
-              </div>
-              <p className="text-sm text-gray-600 mt-2">
-                Order placed on: {new Date(order.createdAt).toLocaleDateString()}
-              </p>
-              <p className="text-sm text-gray-600">
-                Last updated: {new Date(order.updatedAt).toLocaleDateString()}
-              </p>
-            </div>
-          </div>
-        )}
-      </div>
-    )
   }
+
+  return (
+    <div className="container main-content mx-auto px-4 py-12">
+      <div className="max-w-2xl mx-auto bg-white p-8 rounded-lg shadow-lg text-center">
+        <h1 className="text-3xl font-bold mb-6">Track Your Order</h1>
+        <p className="text-gray-600 mb-8">Enter your order ID to view the status of your order.</p>
+
+        {/* Order ID Input */}
+        <div className="space-y-4">
+          <div>
+            <Label htmlFor="orderId">Order ID</Label>
+            <Input
+              id="orderId"
+              value={orderId}
+              onChange={(e) => setOrderId(e.target.value)}
+              placeholder="Enter your order ID"
+            />
+          </div>
+
+          {/* Error Message */}
+          {error && <p className="text-red-500 text-sm">{error}</p>}
+
+          {/* Track Button */}
+          <Button onClick={handleTrackOrder} className="w-full">
+            <Search className="w-4 h-4 mr-2" />
+            Track Order
+          </Button>
+        </div>
+      </div>
+    </div>
+  )
+}

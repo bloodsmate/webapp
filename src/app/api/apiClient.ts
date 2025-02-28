@@ -82,8 +82,13 @@ export const createOrder = async (orderData: any) => {
   return response.data
 }
 
-export const getOrdersByUserId = async (orderId: Number) => {
-  const response = await apiClient.get(`/orders/${orderId}`)
+export const getOrdersByUserId = async (userId: Number) => {
+  const response = await apiClient.get(`/orders/${userId}`)
+  return response.data
+}
+
+export const getOrdersByOrderId = async (orderId: string) => {
+  const response = await apiClient.get(`/orders/tracking/${orderId}`)
   return response.data
 }
 
