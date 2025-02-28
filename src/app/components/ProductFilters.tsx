@@ -9,11 +9,11 @@ interface FiltersProps {
   searchTerm: string;
   setSearchTerm: (term: string) => void;
   selectedSizes: string[];
-  setSelectedSizes: (sizes: string[]) => void;
+  setSelectedSizes: (sizes: string[] | ((prev: string[]) => string[])) => void; // Allow function or value
   selectedGenders: string[];
-  setSelectedGenders: (genders: string[]) => void;
+  setSelectedGenders: (genders: string[] | ((prev: string[]) => string[])) => void; // Allow function or value
   selectedAvailability: boolean | null;
-  setSelectedAvailability: (availability: boolean | null) => void;
+  setSelectedAvailability: (availability: boolean | null | ((prev: boolean | null) => boolean | null)) => void; // Allow function or value
   allSizes: string[];
   allGenders: string[];
   isMobile?: boolean;
@@ -35,19 +35,19 @@ export default function Filters({
   onClose,
 }: FiltersProps) {
   const handleSizeChange = (size: string) => {
-    setSelectedSizes((prev) =>
+    setSelectedSizes((prev: string[]) =>
       prev.includes(size) ? prev.filter((s) => s !== size) : [...prev, size]
     );
   };
 
   const handleGenderChange = (gender: string) => {
-    setSelectedGenders((prev) =>
+    setSelectedGenders((prev: string[]) =>
       prev.includes(gender) ? prev.filter((g) => g !== gender) : [...prev, gender]
     );
   };
 
   const handleAvailabilityChange = (availability: boolean) => {
-    setSelectedAvailability((prev) =>
+    setSelectedAvailability((prev: boolean | null) =>
       prev === availability ? null : availability
     );
   };

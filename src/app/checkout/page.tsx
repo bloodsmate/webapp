@@ -8,7 +8,7 @@ import { Label } from "@/app/components/ui/label"
 import { Progress } from "@/app/components/ui/progress"
 import { RadioGroup, RadioGroupItem } from "@/app/components/ui/radio-group"
 import { AlertDialog, AlertDialogAction, AlertDialogCancel, AlertDialogContent, AlertDialogDescription, AlertDialogFooter, AlertDialogHeader, AlertDialogTitle } from "@/app/components/ui/alert-dialog"
-import type { RootState } from "@/app/redux/store"
+import { AppDispatch, RootState } from '@/app/redux/store';
 import { clearCart } from "@/app/redux/cartSlice"
 import { createOrder } from "@/app/redux/orderSlice"
 import { useRouter } from 'next/navigation'
@@ -17,7 +17,7 @@ import { deliveryFee } from '@/app/data/constants'
 import Loader from '@/app/components/Loader'
 
 function CheckoutForm() {
-  const dispatch = useDispatch()
+  const dispatch = useDispatch<AppDispatch>()
   const router = useRouter()
   const [loading, setLoading] = useState(false)
   const [step, setStep] = useState(1)
@@ -97,10 +97,15 @@ function CheckoutForm() {
         paymentMethod: paymentMethod.toUpperCase(),
         shippingCost: deliveryFee,
         email: formData.email,
-        cartItems: cartItems.map((item) => ({
+        totalAmount: cartItems.reduce(
+          (sum, item) => sum + (item.discountPrice > 0 ? item.discountPrice * item.quantity : item.price * item.quantity),
+          0
+        ), // Calculate totalAmount
+        OrderItems: cartItems.map((item) => ({
           productId: item.id,
           quantity: item.quantity,
-          totalAmount: item.discountPrice > 0 ? item.discountPrice * item.quantity : item.price * item.quantity,
+          price: item.discountPrice > 0 ? item.discountPrice : item.price, // Include price
+          totalPrice: item.discountPrice > 0 ? item.discountPrice * item.quantity : item.price * item.quantity, // Calculate totalPrice
           size: item.size,
           image: item.image,
         })),
@@ -109,18 +114,19 @@ function CheckoutForm() {
       // Dispatch the createOrder action
       const resultAction = await dispatch(createOrder(orderData));
   
-      // Handle the result of the createOrder action
       if (createOrder.fulfilled.match(resultAction)) {
-        dispatch(clearCart()); // Clear the cart after successful order creation
-        router.push(`/order-confirmation/${orderId}`); // Redirect to the order confirmation page
+        dispatch(clearCart());
+        router.push(`/order-confirmation/${orderId}`);
       } else {
-        throw new Error(resultAction.payload || "Failed to create order"); // Throw an error if the order creation fails
+        const errorMessage = resultAction.payload
+          ? String(resultAction.payload) 
+          : "Failed to create order";
+        throw new Error(errorMessage);
       }
     } catch (error) {
-      console.error('Failed to save order:', error); // Log the error for debugging
-      // Optionally, show a user-friendly error message here
+      console.error('Failed to save order:', error);
     } finally {
-      setIsProcessingOrder(false); // Hide loader after processing
+      setIsProcessingOrder(false);
     }
   };
 

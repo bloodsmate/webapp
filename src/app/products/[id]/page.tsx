@@ -127,12 +127,18 @@ export default function ProductPage({ params }: { params: { id: string } }) {
   return (
     <>
       <div className="container mx-auto px-4 py-8">
-        <Breadcrumb product={product} />
-        <div className="mt-8">
-          <ProductDetails product={product} />
-        </div>
-        <div className="mt-8 space-y-6"></div>
-        <YouMightAlsoLike currentProductId={product.id} />
+        {product ? (
+          <>
+            <Breadcrumb product={product} />
+            <div className="mt-8">
+              <ProductDetails product={product} />
+            </div>
+            <div className="mt-8 space-y-6"></div>
+            <YouMightAlsoLike currentProductId={product.id} />
+          </>
+        ) : (
+          <p>Product not found.</p> // Fallback UI
+        )}
       </div>
       <SubscribeSection />
     </>

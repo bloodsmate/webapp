@@ -59,7 +59,7 @@ export default function RootLayout({
           description="Quality T-shirts for every style"
           canonical="/"
         />
-        <ThemeProvider attribute="class" defaultTheme="system" enableSystem>
+        <ThemeProvider defaultTheme="system" enableSystem>
           <Providers>
             <ClientLayout>{children}</ClientLayout>
             <Toaster />
