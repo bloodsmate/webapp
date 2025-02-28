@@ -212,20 +212,20 @@ export default function ProductDetails({ product }: { product: Product }) {
 
   const handleWishlist = () => {
     if (isInWishlist) {
-      dispatch(removeFromWishlist(product.id));
+      // dispatch(removeFromWishlist(product.id));
       toast({
         title: "Removed from wishlist",
         description: `${product.name} has been removed from your wishlist.`,
       });
     } else {
-      dispatch(
-        addToWishlist({
-          id: product.id,
-          name: product.name,
-          price: product.price,
-          image: product.images[0],
-        })
-      );
+      // dispatch(
+      //   addToWishlist({
+      //     id: product.id,
+      //     name: product.name,
+      //     price: product.price,
+      //     image: product.images[0],
+      //   })
+      // );
       toast({
         title: "Added to wishlist",
         description: `${product.name} has been added to your wishlist.`,
@@ -279,7 +279,7 @@ export default function ProductDetails({ product }: { product: Product }) {
                 }}
               />
               {/* Discount Price Tag */}
-              {product.discountPercentage > 0 && (
+              {(product.discountPercentage ?? 0) > 0 && (
                 <div className="absolute bottom-4 left-4 bg-red-600 text-white text-sm font-semibold px-3 py-1 rounded-full">
                   Save {product.discountPercentage}%
                 </div>
@@ -431,7 +431,7 @@ export default function ProductDetails({ product }: { product: Product }) {
                 productId={product.id}
                 productName={product.name}
                 size={selectedSize}
-                onJoinWaitlist={handleJoinWaitlist}
+                // onJoinWaitlist={handleJoinWaitlist}
               />
             )}
 

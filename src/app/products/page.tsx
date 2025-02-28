@@ -57,7 +57,7 @@ export default function ProductsPage() {
   const [selectedSizes, setSelectedSizes] = useState<string[]>([]);
   const [selectedGenders, setSelectedGenders] = useState<string[]>([]);
   const [selectedAvailability, setSelectedAvailability] = useState<boolean | null>(null);
-  const [selectedSizesByProduct, setSelectedSizesByProduct] = useState<Map<number, string>>(new Map());
+  const [selectedSizesByProduct, setSelectedSizesByProduct] = useState<Map<number, string | null>>(new Map())
 
   const [isSidebarOpen, setIsSidebarOpen] = useState(false);
   const [isDropdownOpen, setIsDropdownOpen] = useState(false);
@@ -256,7 +256,7 @@ export default function ProductsPage() {
                       </Link>
 
                       {/* Discount Price Tag */}
-                      {(product.discountPercentage > 0) && (
+                      {(product.discountPercentage ?? 0) > 0 && (
                         <div className="absolute top-4 right-4 bg-red-600 text-white text-sm font-semibold px-3 py-1 rounded-full">
                           Save {product.discountPercentage}%
                         </div>

@@ -107,7 +107,7 @@ export default function FeaturedProducts() {
                     />
                   </Link>
 
-                  {(product.discountPercentage > 0) && (
+                  {(product.discountPercentage ?? 0) > 0 && (
                     <div className="absolute top-4 right-4 bg-red-600 text-white text-sm font-semibold px-3 py-1 rounded-full">
                       Save {product.discountPercentage}%
                     </div>

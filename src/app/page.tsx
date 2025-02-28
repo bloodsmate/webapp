@@ -10,7 +10,7 @@ import SubscribeSection from './components/SubscribeSection'
 import ShopTheLook from './components/ShopTheLook'
 import HeartPulse from './components/HeartPulse'
 
-const Scene = dynamic(() => import('./components/Scene'), { ssr: false })
+// const Scene = dynamic(() => import('./components/Scene'), { ssr: false })
 
 export default function Home() {
   return (

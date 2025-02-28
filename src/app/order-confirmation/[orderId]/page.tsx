@@ -1,110 +1,133 @@
-'use client'
+'use client';
 
-import { useEffect, useRef, useState } from 'react'
-import { useRouter } from 'next/navigation'
-import { Button } from '@/app/components/ui/button'
-import { CheckCircle, AlertCircle } from 'lucide-react'
-import Image from 'next/image'
-import html2canvas from 'html2canvas'
-import jsPDF from 'jspdf'
-import { useDispatch, useSelector } from "react-redux"
-import { AppDispatch, RootState } from "@/app/redux/store"
-import { logo_black_url } from "@/app/data/constants"
-import { fetchOrdersByOrderId } from "@/app/redux/orderSlice"
-import { toast } from '@/app/hooks/use-toast'
-import Loader from '@/app/components/Loader'
+import { useEffect, useRef, useState } from 'react';
+import { useRouter } from 'next/navigation';
+import { Button } from '@/app/components/ui/button';
+import { CheckCircle, AlertCircle } from 'lucide-react';
+import Image from 'next/image';
+import html2canvas from 'html2canvas';
+import jsPDF from 'jspdf';
+import { useDispatch, useSelector } from 'react-redux';
+import { AppDispatch, RootState } from '@/app/redux/store';
+import { logo_black_url } from '@/app/data/constants';
+import { fetchOrdersByOrderId } from '@/app/redux/orderSlice';
+import { toast } from '@/app/hooks/use-toast';
+import Loader from '@/app/components/Loader';
+
+interface OrderItem {
+  id: string;
+  price: number;
+  quantity: number;
+  totalPrice: number;
+  size: string;
+  Product: {
+    name: string;
+    images: string[];
+  };
+}
+
+interface Order {
+  orderId: string;
+  status: string;
+  orderDate: string;
+  shippingAddress: string;
+  paymentMethod: string;
+  OrderItems: OrderItem[];
+  totalAmount: number;
+  shippingCost: number;
+}
 
 export default function OrderConfirmationPage({ params }: { params: { orderId: string } }) {
-  const router = useRouter()
-  const dispatch = useDispatch<AppDispatch>()
-  const orders = useSelector((state: RootState) => state.orders.items)
-  const [order, setOrder] = useState(null) // Initialize as null
-  const orderConfirmationRef = useRef(null) // Ref to capture the order confirmation section
-  const [showWarning, setShowWarning] = useState(false) // State to show warning for non-logged-in users
-  const [loading, setLoading] = useState(true) // Loading state
+  const router = useRouter();
+  const dispatch = useDispatch<AppDispatch>();
+  const orders = useSelector((state: RootState) => state.orders.items);
+  const [order, setOrder] = useState<Order | null>(null); // Initialize as null
+  const orderConfirmationRef = useRef<HTMLDivElement>(null); // Ref to capture the order confirmation section
+  const [showWarning, setShowWarning] = useState(false); // State to show warning for non-logged-in users
+  const [loading, setLoading] = useState(true); // Loading state
 
   useEffect(() => {
     const fetchOrder = async () => {
-      setLoading(true)
+      setLoading(true);
       try {
-        const resultAction = await dispatch(fetchOrdersByOrderId(params.orderId))
+        const resultAction = await dispatch(fetchOrdersByOrderId(params.orderId));
         if (fetchOrdersByOrderId.fulfilled.match(resultAction)) {
-          setOrder(resultAction.payload) // Set the order data
+          setOrder(resultAction.payload);
         } else {
           toast({
             title: 'Failed to fetch order details',
             description: 'An error occurred while tracking your order.',
             variant: 'destructive',
-          })
-          router.push('/order-tracking') // Redirect to order tracking page
+          });
+          router.push('/order-tracking'); // Redirect to order tracking page
         }
       } catch (error) {
-        console.error('Error tracking order:', error)
+        console.error('Error tracking order:', error);
         toast({
           title: 'Error tracking order',
           description: 'An error occurred while tracking your order. Please try again.',
           variant: 'destructive',
-        })
+        });
       } finally {
-        setLoading(false) // Ensure loading is set to false
+        setLoading(false); // Ensure loading is set to false
       }
-    }
+    };
 
-    fetchOrder()
-  }, [dispatch, params.orderId, router])
+    fetchOrder();
+  }, [dispatch, params.orderId, router]);
 
   // Function to handle PDF export
   const handleExportPDF = async () => {
-    const input = orderConfirmationRef.current
+    const input = orderConfirmationRef.current;
 
     if (input && order) {
       // Ensure all images are loaded before capturing
-      const images = input.getElementsByTagName('img')
-      const imageLoadPromises = Array.from(images).map((img) => {
+      const images = input.getElementsByTagName('img');
+      const imageLoadPromises = Array.from(images).map((img: HTMLImageElement) => {
         if (!img.complete) {
           return new Promise((resolve) => {
-            img.onload = resolve
-          })
+            img.onload = resolve;
+          });
         }
-        return Promise.resolve()
-      })
+        return Promise.resolve();
+      });
 
       // Wait for all images to load
-      await Promise.all(imageLoadPromises)
+      await Promise.all(imageLoadPromises);
 
       // Add custom strikethrough for PDF export
-      const strikethroughElements = input.querySelectorAll('.strikethrough')
-      strikethroughElements.forEach((element) => {
-        const span = document.createElement('span')
-        span.style.position = 'absolute'
-        span.style.borderTop = '1px solid black'
-        span.style.width = '100%'
-        span.style.top = '50%'
-        span.style.left = '0'
-        element.style.position = 'relative'
-        element.appendChild(span)
-      })
+      const strikethroughElements = input.querySelectorAll<HTMLElement>('.strikethrough');
+      strikethroughElements.forEach((element: HTMLElement) => {
+        const span = document.createElement('span');
+        span.style.position = 'absolute';
+        span.style.borderTop = '1px solid black';
+        span.style.width = '100%';
+        span.style.top = '50%';
+        span.style.left = '0';
+        element.style.position = 'relative';
+        element.appendChild(span);
+      });
 
       // Capture the content
       html2canvas(input, { scale: 2 }).then((canvas) => {
-        const imgData = canvas.toDataURL('image/png')
-        const pdf = new jsPDF('p', 'mm', 'a4') // Create a PDF in portrait mode with A4 size
-        const imgWidth = 210 // A4 width in mm
-        const imgHeight = (canvas.height * imgWidth) / canvas.width // Calculate height to maintain aspect ratio
+        const imgData = canvas.toDataURL('image/png');
+        const pdf = new jsPDF('p', 'mm', 'a4'); // Create a PDF in portrait mode with A4 size
+        const imgWidth = 210; // A4 width in mm
+        const imgHeight = (canvas.height * imgWidth) / canvas.width; // Calculate height to maintain aspect ratio
 
-        pdf.addImage(imgData, 'PNG', 0, 0, imgWidth, imgHeight)
-        pdf.save(`order_${order.orderId}.pdf`) // Save the PDF with the order ID as the filename
-      })
+        pdf.addImage(imgData, 'PNG', 0, 0, imgWidth, imgHeight);
+        pdf.save(`order_${order.orderId}.pdf`); // Save the PDF with the order ID as the filename
+      });
     }
-  }
+  };
 
   // Calculate subtotal, discount, and total
-  const subtotal = order?.OrderItems?.reduce((sum, item) => sum + item.price * item.quantity, 0) || 0
-  const discount = order?.OrderItems?.reduce((sum, item) => sum + (item.price * item.quantity - item.totalPrice), 0) || 0
-  const total = (order?.totalAmount || 0) + (order?.shippingCost || 0)
+  const subtotal = order?.OrderItems?.reduce((sum, item) => sum + item.price * item.quantity, 0) || 0;
+  const discount = order?.OrderItems?.reduce((sum, item) => sum + (item.price * item.quantity - item.totalPrice), 0) || 0;
+  const total = (order?.totalAmount || 0) + (order?.shippingCost || 0);
 
   if (loading) {
-    return <Loader size="large" />
+    return <Loader size="large" />;
   }
 
   if (!order) {
@@ -113,7 +136,7 @@ export default function OrderConfirmationPage({ params }: { params: { orderId: s
         <p className="text-red-500">Order not found. Please check your order ID and try again.</p>
         <Button onClick={() => router.push('/order-tracking')}>Go to Order Tracking</Button>
       </div>
-    )
+    );
   }
 
   return (
@@ -181,7 +204,7 @@ export default function OrderConfirmationPage({ params }: { params: { orderId: s
           <div>
             <h2 className="text-xl font-semibold mb-4">Order Items</h2>
             <ul className="space-y-4">
-              {order.OrderItems?.map((item) => (
+              {order.OrderItems?.map((item: OrderItem) => (
                 <li key={item.id} className="flex flex-col sm:flex-row items-center space-y-4 sm:space-y-0 sm:space-x-4">
                   <div className="relative w-20 h-20">
                     <Image
@@ -233,5 +256,5 @@ export default function OrderConfirmationPage({ params }: { params: { orderId: s
         <Button onClick={handleExportPDF}>Export as PDF</Button>
       </div>
     </div>
-  )
+  );
 }
