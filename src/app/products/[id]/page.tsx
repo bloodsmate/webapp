@@ -99,7 +99,6 @@ export default function ProductPage({ params }: { params: { id: string } }) {
   const [isLoading, setIsLoading] = useState(true)
 
   useEffect(() => {
-    console.log("Binali Modaya");
     dispatch(fetchProduct(Number(params.id)));
     setIsLoading(false);
   }, [dispatch, params.id]);
