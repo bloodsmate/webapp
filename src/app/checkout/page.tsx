@@ -26,6 +26,7 @@ function CheckoutForm() {
   const [isConfirmDialogOpen, setIsConfirmDialogOpen] = useState(false)
   const [isProcessingOrder, setIsProcessingOrder] = useState(false)
   const [errors, setErrors] = useState<{ [key: string]: string }>({})
+  const [orderId, setOrderId] = useState<string | null>(null) // Add state for orderId
   const cartItems = useSelector((state: RootState) => state.cart.items)
   const authUser = useSelector((state: RootState) => state.auth.user)
   const [formData, setFormData] = useState({
@@ -110,24 +111,24 @@ function CheckoutForm() {
   }
 
   const handleConfirmOrder = async () => {
-    if (paymentMethod === 'COD') {
-      setIsConfirmDialogOpen(true)
-    } else if (paymentMethod === 'DEBIT_CARD') {
+    const orderId = generateOrderId() // Generate orderId here
+    setOrderId(orderId) // Store orderId in state
 
-      setLoading(true);
+    if (paymentMethod === 'COD') {
+      setIsConfirmDialogOpen(true) // Open the confirmation dialog
+    } else if (paymentMethod === 'DEBIT_CARD') {
+      setLoading(true)
       try {
-        const orderId = generateOrderId()
         const data = await dispatch(createPayHerePayment(
           { amount: total, email: formData.email, orderId, name: formData.name, address: formData.address, city: formData.city, phone: formData.phone }
         ))
         doPayments(data.payload.paymentData)
         await saveOrderAndClearCart(orderId)
       } catch (error) {
-        console.error('Error preparing payment:', error);
+        console.error('Error preparing payment:', error)
       } finally {
-        setLoading(false);
+        setLoading(false)
       }
-
     } else if (paymentMethod === 'KOKO') {
       router.push('/koko-pay-redirect')
     }
@@ -336,7 +337,9 @@ function CheckoutForm() {
               </AlertDialogHeader>
               <AlertDialogFooter>
                 <AlertDialogCancel>Cancel</AlertDialogCancel>
-                <AlertDialogAction onClick={saveOrderAndClearCart}>Confirm</AlertDialogAction>
+                <AlertDialogAction onClick={() => orderId && saveOrderAndClearCart(orderId)}>
+                  Confirm
+                </AlertDialogAction>
               </AlertDialogFooter>
             </AlertDialogContent>
           </AlertDialog>
