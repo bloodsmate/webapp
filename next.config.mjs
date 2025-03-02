@@ -1,6 +1,6 @@
 /** @type {import('next').NextConfig} */
 
-const isGithubPages = process.env.GITHUB_PAGES === 'true';
+const isGithubPages = process.env.PAGES_GITHUB === 'true';
 const repoName = 'webapp';
 const orgName = 'bloodsmate';
 
