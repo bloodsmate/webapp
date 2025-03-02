@@ -14,29 +14,7 @@ import { fetchOrdersByOrderId } from '@/app/redux/orderSlice';
 import { toast } from '@/app/hooks/use-toast';
 import Loader from '@/app/components/Loader';
 import { notFound } from "next/navigation";
-
-interface OrderItem {
-  id: string;
-  price: number;
-  quantity: number;
-  totalPrice: number;
-  size: string;
-  Product: {
-    name: string;
-    images: string[];
-  };
-}
-
-interface Order {
-  orderId: string;
-  status: string;
-  orderDate: string;
-  shippingAddress: string;
-  paymentMethod: string;
-  OrderItems: OrderItem[];
-  totalAmount: number;
-  shippingCost: number;
-}
+import { Order, OrderItem } from '@/app/data/orderTypes';
 
 export default function OrderConfirmationClient({ params }: { params: { orderId: string } }) {
   const router = useRouter();
@@ -47,14 +25,14 @@ export default function OrderConfirmationClient({ params }: { params: { orderId:
   const [showWarning, setShowWarning] = useState(false); // State to show warning for non-logged-in users
   const [loading, setLoading] = useState(true); // Loading state
 
-  useEffect(()=>{
-    const checkParams = () => {
-      if(!params || params.orderId){
-        notFound(); // Redirect to 404 page only after confirming the product is not found
-      }
-    }
-    checkParams();
-  },[]);
+//   useEffect(()=>{
+//     const checkParams = () => {
+//       if(!params || params.orderId){
+//         notFound(); // Redirect to 404 page only after confirming the product is not found
+//       }
+//     }
+//     checkParams();
+//   },[]);
 
   useEffect(() => {
     const fetchOrder = async () => {

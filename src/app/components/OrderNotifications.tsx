@@ -3,7 +3,7 @@
 import { useState, useEffect } from 'react'
 import { motion, AnimatePresence } from 'framer-motion'
 import { X } from 'lucide-react'
-import { Order } from '../types/order'
+import { Order, OrderItem } from '@/app/data/orderTypes';
 
 interface OrderNotificationsProps {
   orders: Order[]
@@ -29,7 +29,7 @@ export default function OrderNotifications({ orders }: OrderNotificationsProps) 
   }, [orders])
 
   const removeNotification = (orderId: string) => {
-    setVisibleNotifications((prev) => prev.filter((order) => order.id !== orderId))
+    setVisibleNotifications((prev) => prev.filter((order) => order.orderId !== orderId))
   }
 
   return (
@@ -37,7 +37,7 @@ export default function OrderNotifications({ orders }: OrderNotificationsProps) 
       <AnimatePresence>
         {visibleNotifications.map((order) => (
           <motion.div
-            key={order.id}
+            key={order.orderId}
             initial={{ opacity: 0, y: 50 }}
             animate={{ opacity: 1, y: 0 }}
             exit={{ opacity: 0, x: 100 }}
@@ -45,11 +45,11 @@ export default function OrderNotifications({ orders }: OrderNotificationsProps) 
           >
             <div className="flex justify-between items-start">
               <div>
-                <h3 className="font-semibold">Order #{order.id}</h3>
+                <h3 className="font-semibold">Order #{order.orderId}</h3>
                 <p className="text-sm text-gray-600">Status: {order.status}</p>
               </div>
               <button
-                onClick={() => removeNotification(order.id)}
+                onClick={() => removeNotification(order.orderId)}
                 className="text-gray-400 hover:text-gray-600"
               >
                 <X size={16} />
