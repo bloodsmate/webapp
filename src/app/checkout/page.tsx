@@ -11,6 +11,7 @@ import { AlertDialog, AlertDialogAction, AlertDialogCancel, AlertDialogContent, 
 import { AppDispatch, RootState } from '@/app/redux/store';
 import { clearCart } from "@/app/redux/cartSlice"
 import { createOrder } from "@/app/redux/orderSlice"
+import { createPayHerePayment } from "@/app/redux/paymentSlice"
 import { useRouter } from 'next/navigation'
 import Image from 'next/image'
 import { deliveryFee } from '@/app/data/constants'
@@ -24,6 +25,7 @@ function CheckoutForm() {
   const [paymentMethod, setPaymentMethod] = useState('')
   const [isConfirmDialogOpen, setIsConfirmDialogOpen] = useState(false)
   const [isProcessingOrder, setIsProcessingOrder] = useState(false)
+  const [errors, setErrors] = useState<{ [key: string]: string }>({})
   const cartItems = useSelector((state: RootState) => state.cart.items)
   const authUser = useSelector((state: RootState) => state.auth.user)
   const [formData, setFormData] = useState({
@@ -31,7 +33,7 @@ function CheckoutForm() {
     email: "",
     address: "",
     city: "",
-    zipCode: "",
+    phone: "",
   })
 
   const shippingCost = deliveryFee
@@ -43,9 +45,9 @@ function CheckoutForm() {
       setFormData({
         name: authUser.name,
         email: authUser.email,
-        address: "123 Main St, Colombo",
-        city: "Colombo",
-        zipCode: "10000",
+        address: "",
+        city: "",
+        phone: "",
       })
     }
   }, [authUser])
@@ -55,80 +57,118 @@ function CheckoutForm() {
       ...formData,
       [e.target.name]: e.target.value,
     })
+    // Clear error when user starts typing
+    if (errors[e.target.name]) {
+      setErrors({
+        ...errors,
+        [e.target.name]: "",
+      })
+    }
   }
 
-  const handleSubmit = async (e: React.FormEvent) => {
-    e.preventDefault()
-    setLoading(true)
+  const validateStep1 = () => {
+    const newErrors: { [key: string]: string } = {}
+    if (!formData.name) newErrors.name = "Name is required"
+    if (!formData.email) newErrors.email = "Email is required"
+    if (!formData.address) newErrors.address = "Address is required"
+    if (!formData.city) newErrors.city = "City is required"
+    if (!formData.phone) newErrors.phone = "Phone is required"
+    setErrors(newErrors)
+    return Object.keys(newErrors).length === 0
+  }
 
-    const orderResponse = {
-      orderId: "123456",
+  const handleNextStep = () => {
+    if (validateStep1()) {
+      setStep(2)
     }
-
-    setLoading(false)
-    setStep(2)
   }
 
   const handlePaymentMethodChange = (method: string) => {
     setPaymentMethod(method)
   }
 
+  const generateOrderId = () => {
+    return `BLOODSMATE-${Date.now()}-${Math.floor(Math.random() * 1000)}`
+  }
+
+  const doPayments = (paymentData: any) => {
+    const form = document.createElement('form')
+    form.method = 'POST'
+    form.action = 'https://sandbox.payhere.lk/pay/checkout'
+    form.style.display = 'none'
+
+    for (const key in paymentData) {
+      const input = document.createElement('input')
+      input.type = 'hidden'
+      input.name = key
+      input.value = paymentData[key]
+      form.appendChild(input)
+    }
+
+    document.body.appendChild(form)
+    form.submit()
+  }
+
   const handleConfirmOrder = async () => {
     if (paymentMethod === 'COD') {
       setIsConfirmDialogOpen(true)
     } else if (paymentMethod === 'DEBIT_CARD') {
-      router.push('/payhere-redirect')
+
+      setLoading(true);
+      try {
+        const orderId = generateOrderId()
+        const data = await dispatch(createPayHerePayment(
+          { amount: total, email: formData.email, orderId, name: formData.name, address: formData.address, city: formData.city, phone: formData.phone }
+        ))
+        doPayments(data.payload.paymentData)
+        await saveOrderAndClearCart(orderId)
+      } catch (error) {
+        console.error('Error preparing payment:', error);
+      } finally {
+        setLoading(false);
+      }
+
     } else if (paymentMethod === 'KOKO') {
       router.push('/koko-pay-redirect')
     }
   }
 
-  const saveOrderAndClearCart = async () => {
-    setIsProcessingOrder(true); // Show loader while processing
+  const saveOrderAndClearCart = async (orderId: string) => {
+    setIsProcessingOrder(true)
     try {
-      // Generate a unique order ID for all users (logged-in or guest)
-      const orderId = `order-${Date.now()}-${Math.floor(Math.random() * 1000)}`; // Unique ID for every order
-  
-      // Prepare order data
       const orderData = {
         orderId: orderId,
         userId: authUser?.id || null,
-        shippingAddress: `${formData.address}, ${formData.city}, ${formData.zipCode}`,
+        shippingAddress: `${formData.address}, ${formData.city}`,
         paymentMethod: paymentMethod.toUpperCase(),
         shippingCost: deliveryFee,
         email: formData.email,
-        totalAmount: cartItems.reduce(
-          (sum, item) => sum + (item.discountPrice > 0 ? item.discountPrice * item.quantity : item.price * item.quantity),
-          0
-        ), // Calculate totalAmount
-        OrderItems: cartItems.map((item) => ({
+        cartItems: cartItems.map((item) => ({
           productId: item.id,
           quantity: item.quantity,
-          price: item.discountPrice > 0 ? item.discountPrice : item.price, // Include price
-          totalPrice: item.discountPrice > 0 ? item.discountPrice * item.quantity : item.price * item.quantity, // Calculate totalPrice
+          totalAmount: item.discountPrice > 0 ? item.discountPrice * item.quantity : item.price * item.quantity,
           size: item.size,
           image: item.image,
         })),
-      };
-  
-      // Dispatch the createOrder action
-      const resultAction = await dispatch(createOrder(orderData));
-  
+      }
+
+      const resultAction = await dispatch(createOrder(orderData))
+
       if (createOrder.fulfilled.match(resultAction)) {
-        dispatch(clearCart());
-        router.push(`/order-confirmation/${orderId}`);
+        await dispatch(clearCart())
+        router.push(`/order-confirmation/${orderId}`)
       } else {
         const errorMessage = resultAction.payload
-          ? String(resultAction.payload) 
-          : "Failed to create order";
-        throw new Error(errorMessage);
+          ? String(resultAction.payload)
+          : "Failed to create order"
+        throw new Error(errorMessage)
       }
     } catch (error) {
-      console.error('Failed to save order:', error);
+      console.error('Failed to save order:', error)
     } finally {
-      setIsProcessingOrder(false);
+      setIsProcessingOrder(false)
     }
-  };
+  }
 
   return (
     <div className="container mx-auto px-4">
@@ -165,27 +205,32 @@ function CheckoutForm() {
                   <h2 className="text-xl font-semibold mb-6">Shipping Information</h2>
                   <div className="space-y-4">
                     <div>
-                      <Label htmlFor="name">Full Name</Label>
+                      <Label htmlFor="name">Full Name <span className="text-red-500">*</span></Label>
                       <Input id="name" name="name" required value={formData.name} onChange={handleInputChange} />
+                      {errors.name && <p className="text-red-500 text-sm">{errors.name}</p>}
                     </div>
                     <div>
-                      <Label htmlFor="email">Email</Label>
+                      <Label htmlFor="email">Email <span className="text-red-500">*</span></Label>
                       <Input id="email" name="email" type="email" required value={formData.email} onChange={handleInputChange} />
+                      {errors.email && <p className="text-red-500 text-sm">{errors.email}</p>}
                     </div>
                     <div>
-                      <Label htmlFor="address">Address</Label>
+                      <Label htmlFor="address">Address <span className="text-red-500">*</span></Label>
                       <Input id="address" name="address" required value={formData.address} onChange={handleInputChange} />
+                      {errors.address && <p className="text-red-500 text-sm">{errors.address}</p>}
                     </div>
                     <div>
-                      <Label htmlFor="city">City</Label>
+                      <Label htmlFor="city">City <span className="text-red-500">*</span></Label>
                       <Input id="city" name="city" required value={formData.city} onChange={handleInputChange} />
+                      {errors.city && <p className="text-red-500 text-sm">{errors.city}</p>}
                     </div>
                     <div>
-                      <Label htmlFor="zipCode">Zip Code</Label>
-                      <Input id="zipCode" name="zipCode" required value={formData.zipCode} onChange={handleInputChange} />
+                      <Label htmlFor="phone">Phone <span className="text-red-500">*</span></Label>
+                      <Input id="phone" name="phone" required value={formData.phone} onChange={handleInputChange} />
+                      {errors.phone && <p className="text-red-500 text-sm">{errors.phone}</p>}
                     </div>
                     <div className="flex justify-between">
-                      <Button type="button" variant="outline" onClick={() => setStep(2)} disabled={loading}>
+                      <Button type="button" variant="outline" onClick={handleNextStep} disabled={loading}>
                         Next
                       </Button>
                     </div>

@@ -4,7 +4,7 @@ import { Button } from "@/app/components/ui/button"
 import { PhoneIcon as WhatsappIcon } from "lucide-react"
 
 export default function WhatsAppButton() {
-  const phoneNumber = "0758657450" // Replace with your actual WhatsApp number
+  const phoneNumber = "0768794004" // Replace with your actual WhatsApp number
   const message = encodeURIComponent("Hello! I have a question about your T-shirts.")
 
   const handleClick = () => {

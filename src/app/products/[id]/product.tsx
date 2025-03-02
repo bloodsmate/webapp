@@ -98,14 +98,14 @@ export default function ProductPageClient({ params }: { params: { id: string } }
   const product = products.find(p => p.id === parseInt(params.id))
   const [isLoading, setIsLoading] = useState(true)
 
-  useEffect(()=>{
-    const checkParams = () => {
-      if(!params || params.id){
-        notFound(); // Redirect to 404 page only after confirming the product is not found
-      }
-    }
-    checkParams();
-  },[]);
+//   useEffect(()=>{
+//     const checkParams = () => {
+//       if(!params || params.id){
+//         notFound(); // Redirect to 404 page only after confirming the product is not found
+//       }
+//     }
+//     checkParams();
+//   },[]);
 
   useEffect(() => {
     dispatch(fetchProduct(Number(params.id)));

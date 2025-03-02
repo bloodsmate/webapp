@@ -1,30 +1,9 @@
 import { createSlice, createAsyncThunk } from "@reduxjs/toolkit";
-import * as api from "../api/apiClient";
-
-interface OrderItem {
-  productId: number;
-  quantity: number;
-  price: number;
-  totalPrice: number;
-  size: string;
-  image: string;
-}
-
-interface Order {
-  orderId: string;
-  userId: string | null;
-  orderDate: string;
-  totalAmount: number;
-  shippingCost: number;
-  status: string;
-  shippingAddress: string;
-  paymentMethod: string;
-  email: string;
-  OrderItems: OrderItem[];
-}
+import * as api from "@/app/api/apiClient";
+import { Order, OrderCheckout, OrderItemCheckout } from '@/app/data/orderTypes';
 
 interface OrdersState {
-  items: Order[];
+  items: OrderCheckout[];
   loading: boolean;
   error: string | null;
 }
@@ -59,7 +38,7 @@ export const fetchOrdersByOrderId = createAsyncThunk(
 
 export const createOrder = createAsyncThunk(
   "orders/createOrder",
-  async (orderData: Omit<Order, "orderDate" | "status">, { rejectWithValue }) => {
+  async (orderData: any, { rejectWithValue }) => {
     try {
       const response = await api.createOrder(orderData);
       return response;

@@ -127,7 +127,7 @@ export default function ProductsPage() {
     }));
     toast({
       title: "Added to cart",
-      description: `${product.name} (Size: ${selectedSize}) added to cart!`,
+      description: `${product.name} (Size: ${selectedSize}) added to cart!`
     });
   };
 

@@ -93,7 +93,9 @@ export const getOrdersByOrderId = async (orderId: string) => {
 }
 
 export const processPayment = async (paymentData: any) => {
-  const response = await apiClient.post("/payments", paymentData)
+  const response = await apiClient.post("/payment/create-payment", paymentData)
+  console.log(response);
+  console.log(response.data);
   return response.data
 }
 
