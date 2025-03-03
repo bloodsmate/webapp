@@ -28,7 +28,7 @@ export const login = async (email: string, password: string) => {
 
 export const getUser = async () => {
     const response = await apiClient.get(`/users/token/checkAuth`)
-    return response.data
+    return response.data.user
   }
 
 export const logout = async () => {
@@ -85,6 +85,7 @@ export const createOrder = async (orderData: any) => {
 
 export const getOrdersByUserId = async (userId: Number) => {
   const response = await apiClient.get(`/orders/${userId}`)
+  console.log(response.data);
   return response.data
 }
 
@@ -105,6 +106,16 @@ export const createMarxOrder = async (paymentData: any) => {
 
 export const verifyMarxOrder = async (paymentData: any) => {
   const response = await apiClient.post("/payment/verify-marx-payment", paymentData)
+  return response.data
+}
+
+export const updateShippingDetails = async (accountData: any) => {
+  const response = await apiClient.put("/users/shipping-details", accountData)
+  return response.data
+}
+
+export const updateAccountDetails = async (accountData: any) => {
+  const response = await apiClient.put("/users/account-details", accountData)
   return response.data
 }
 

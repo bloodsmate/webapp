@@ -24,6 +24,7 @@ export default function AuthPage() {
   const [name, setName] = useState("")
   const [errors, setErrors] = useState({ email: "", password: "", name: "" })
   const [showPassword, setShowPassword] = useState(false)
+  const [isLoading, setIsLoading] = useState(false)
   const dispatch = useDispatch<AppDispatch>()
   const { user, loading, error, isAuthenticated } = useSelector((state: RootState) => state.auth)
   const router = useRouter()
@@ -73,6 +74,7 @@ export default function AuthPage() {
     e.preventDefault()
 
     if (validateForm()) {
+      setIsLoading(true)
       if (isLogin) {
         try {
           await dispatch(login({ email, password })).unwrap()
@@ -89,6 +91,8 @@ export default function AuthPage() {
             description: error as string,
             variant: "destructive",
           })
+        } finally {
+          setIsLoading(false)
         }
       } else {
         const userData: userRegistration = {
@@ -121,6 +125,8 @@ export default function AuthPage() {
             title: "Signup Unsuccessful",
             variant: "destructive",
           })
+        } finally {
+          setIsLoading(false)
         }
       }
     }
@@ -168,83 +174,131 @@ export default function AuthPage() {
                 </div>
                 {errors.password && <p className="text-red-500 text-xs mt-1">{errors.password}</p>}
               </div>
-              <Button type="submit" className="w-full bg-[#1A1A1A] text-white font-bold py-3 px-4 rounded">Sign In</Button>
+              <Button type="submit" className="w-full bg-[#1A1A1A] text-white font-bold py-3 px-4 rounded" disabled={isLoading}>
+                {isLoading ? (
+                  <span className="flex items-center gap-2">
+                    <svg className="h-4 w-4 animate-spin" viewBox="0 0 24 24">
+                      <circle
+                        className="opacity-25"
+                        cx="12"
+                        cy="12"
+                        r="10"
+                        stroke="currentColor"
+                        strokeWidth="4"
+                        fill="none"
+                      />
+                      <path
+                        className="opacity-75"
+                        fill="currentColor"
+                        d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"
+                      />
+                    </svg>
+                    Signing in...
+                  </span>
+                ) : (
+                  "Sign In"
+                )}
+              </Button>
             </form>
           </motion.div>
 
-              {/* Signup Form */}
-              <motion.div
-                initial={{ opacity: 0, x: 50 }}
-                animate={!isLogin ? { opacity: 1, x: 0 } : { opacity: 0, x: 50 }}
-                transition={{ duration: 0.5 }}
-                className={`${!isLogin ? "block" : "hidden"} w-full`}
-              >
-                <h2 className="text-3xl font-bold text-gray-900 mb-4">Create Account</h2>
-                <p className="text-gray-600 mb-6">Sign up to get started</p>
-                <form onSubmit={handleSubmit} className="space-y-6">
-                  <div>
-                    <Label htmlFor="name">Name</Label>
-                    <Input id="name" name="name" type="text" required placeholder="Enter your name" value={name} onChange={(e) => setName(e.target.value)} />
-                    {errors.name && <p className="text-red-500 text-xs mt-1">{errors.name}</p>}
-                  </div>
-                  <div>
-                    <Label htmlFor="email">Email</Label>
-                    <Input id="email" name="email" type="email" required placeholder="Enter your email" value={email} onChange={(e) => setEmail(e.target.value)} />
-                    {errors.email && <p className="text-red-500 text-xs mt-1">{errors.email}</p>}
-                  </div>
-                  <div>
-                    <Label htmlFor="password">Password</Label>
-                    <div className="relative">
-                      <Input id="password" name="password" type={showPassword ? "text" : "password"} required placeholder="Enter your password" value={password} onChange={(e) => setPassword(e.target.value)} />
-                      <button type="button" onClick={() => setShowPassword(!showPassword)} className="absolute right-3 top-3 text-gray-500">
-                        {showPassword ? <FaEye /> : <FaEyeSlash />}
-                      </button>
-                    </div>
-                    {errors.password && <p className="text-red-500 text-xs mt-1">{errors.password}</p>}
-                  </div>
-                  <Button type="submit" className="w-full bg-[#1A1A1A] text-white font-bold py-3 px-4 rounded">Sign Up</Button>
-                </form>
-              </motion.div>
-
-              <p className="text-sm text-gray-600 mt-4">
-                {isLogin ? "Don't have an account? " : "Already have an account? "}
-                <button onClick={() => setIsLogin(!isLogin)} className="text-gray-900 font-medium">{isLogin ? "Sign Up" : "Log in"}</button>
-              </p>
-            </div>
-
-              {/* Right Section (Modern Auth Page Design) */}
-              <div className="hidden sm:flex w-1/2 flex-col justify-center items-center p-12 rounded-xl bg-gradient-to-br from-black to-gray-900 text-white">
-                <motion.div
-                  initial={{ opacity: 0, y: 20 }}
-                  animate={{ opacity: 1, y: 0 }}
-                  transition={{ duration: 0.5, delay: 0.2 }}
-                  className="text-center space-y-6"
-                >
-                  {isLogin ? (
-                    <>
-                      <FaShoppingBag className="w-20 h-20 mx-auto text-gray-400 drop-shadow-md" />
-                      <h2 className="text-5xl font-extrabold tracking-tight leading-tight">
-                        Welcome Back!  
-                      </h2>
-                      <p className="text-lg text-gray-300 max-w-md">
-                        Ready to explore the latest styles? <br />
-                        <span className="text-gray-200 font-medium">Sign in to continue your journey.</span>
-                      </p>
-                    </>
-                  ) : (
-                    <>
-                      <FaTag className="w-20 h-20 mx-auto text-gray-400 drop-shadow-md" />
-                      <h2 className="text-5xl font-extrabold tracking-tight leading-tight">
-                        Join Us Today!  
-                      </h2>
-                      <p className="text-lg text-gray-300 max-w-md">
-                        Become part of an exclusive community. <br />
-                        <span className="text-gray-200 font-medium">Sign up now to unlock special deals and trends.</span>
-                      </p>
-                    </>
-                  )}
-                </motion.div>
+          {/* Signup Form */}
+          <motion.div
+            initial={{ opacity: 0, x: 50 }}
+            animate={!isLogin ? { opacity: 1, x: 0 } : { opacity: 0, x: 50 }}
+            transition={{ duration: 0.5 }}
+            className={`${!isLogin ? "block" : "hidden"} w-full`}
+          >
+            <h2 className="text-3xl font-bold text-gray-900 mb-4">Create Account</h2>
+            <p className="text-gray-600 mb-6">Sign up to get started</p>
+            <form onSubmit={handleSubmit} className="space-y-6">
+              <div>
+                <Label htmlFor="name">Name</Label>
+                <Input id="name" name="name" type="text" required placeholder="Enter your name" value={name} onChange={(e) => setName(e.target.value)} />
+                {errors.name && <p className="text-red-500 text-xs mt-1">{errors.name}</p>}
               </div>
+              <div>
+                <Label htmlFor="email">Email</Label>
+                <Input id="email" name="email" type="email" required placeholder="Enter your email" value={email} onChange={(e) => setEmail(e.target.value)} />
+                {errors.email && <p className="text-red-500 text-xs mt-1">{errors.email}</p>}
+              </div>
+              <div>
+                <Label htmlFor="password">Password</Label>
+                <div className="relative">
+                  <Input id="password" name="password" type={showPassword ? "text" : "password"} required placeholder="Enter your password" value={password} onChange={(e) => setPassword(e.target.value)} />
+                  <button type="button" onClick={() => setShowPassword(!showPassword)} className="absolute right-3 top-3 text-gray-500">
+                    {showPassword ? <FaEye /> : <FaEyeSlash />}
+                  </button>
+                </div>
+                {errors.password && <p className="text-red-500 text-xs mt-1">{errors.password}</p>}
+              </div>
+              <Button type="submit" className="w-full bg-[#1A1A1A] text-white font-bold py-3 px-4 rounded" disabled={isLoading}>
+                {isLoading ? (
+                  <span className="flex items-center gap-2">
+                    <svg className="h-4 w-4 animate-spin" viewBox="0 0 24 24">
+                      <circle
+                        className="opacity-25"
+                        cx="12"
+                        cy="12"
+                        r="10"
+                        stroke="currentColor"
+                        strokeWidth="4"
+                        fill="none"
+                      />
+                      <path
+                        className="opacity-75"
+                        fill="currentColor"
+                        d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"
+                      />
+                    </svg>
+                    Signing up...
+                  </span>
+                ) : (
+                  "Sign Up"
+                )}
+              </Button>
+            </form>
+          </motion.div>
+
+          <p className="text-sm text-gray-600 mt-4">
+            {isLogin ? "Don't have an account? " : "Already have an account? "}
+            <button onClick={() => setIsLogin(!isLogin)} className="text-gray-900 font-medium">{isLogin ? "Sign Up" : "Log in"}</button>
+          </p>
+        </div>
+
+        {/* Right Section (Modern Auth Page Design) */}
+        <div className="hidden sm:flex w-1/2 flex-col justify-center items-center p-12 rounded-xl bg-gradient-to-br from-black to-gray-900 text-white">
+          <motion.div
+            initial={{ opacity: 0, y: 20 }}
+            animate={{ opacity: 1, y: 0 }}
+            transition={{ duration: 0.5, delay: 0.2 }}
+            className="text-center space-y-6"
+          >
+            {isLogin ? (
+              <>
+                <FaShoppingBag className="w-20 h-20 mx-auto text-gray-400 drop-shadow-md" />
+                <h2 className="text-5xl font-extrabold tracking-tight leading-tight">
+                  Welcome Back!  
+                </h2>
+                <p className="text-lg text-gray-300 max-w-md">
+                  Ready to explore the latest styles? <br />
+                  <span className="text-gray-200 font-medium">Sign in to continue your journey.</span>
+                </p>
+              </>
+            ) : (
+              <>
+                <FaTag className="w-20 h-20 mx-auto text-gray-400 drop-shadow-md" />
+                <h2 className="text-5xl font-extrabold tracking-tight leading-tight">
+                  Join Us Today!  
+                </h2>
+                <p className="text-lg text-gray-300 max-w-md">
+                  Become part of an exclusive community. <br />
+                  <span className="text-gray-200 font-medium">Sign up now to unlock special deals and trends.</span>
+                </p>
+              </>
+            )}
+          </motion.div>
+        </div>
       </div>
     </div>
   )

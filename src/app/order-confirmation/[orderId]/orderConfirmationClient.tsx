@@ -3,7 +3,7 @@
 import { useEffect, useRef, useState } from 'react';
 import { useRouter } from 'next/navigation';
 import { Button } from '@/app/components/ui/button';
-import { CheckCircle, AlertCircle } from 'lucide-react';
+import { CheckCircle, AlertCircle, Loader as LoaderIcon } from 'lucide-react';
 import Image from 'next/image';
 import html2canvas from 'html2canvas';
 import jsPDF from 'jspdf';
@@ -24,15 +24,6 @@ export default function OrderConfirmationClient({ params }: { params: { orderId:
   const orderConfirmationRef = useRef<HTMLDivElement>(null); // Ref to capture the order confirmation section
   const [showWarning, setShowWarning] = useState(false); // State to show warning for non-logged-in users
   const [loading, setLoading] = useState(true); // Loading state
-
-//   useEffect(()=>{
-//     const checkParams = () => {
-//       if(!params || params.orderId){
-//         notFound(); // Redirect to 404 page only after confirming the product is not found
-//       }
-//     }
-//     checkParams();
-//   },[]);
 
   useEffect(() => {
     const fetchOrder = async () => {
@@ -115,7 +106,11 @@ export default function OrderConfirmationClient({ params }: { params: { orderId:
   const total = (order?.totalAmount || 0) + (order?.shippingCost || 0);
 
   if (loading) {
-    return <Loader size="large" />;
+    return (
+      <div className="fixed inset-0 flex items-center justify-center bg-white z-50">
+        <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-gray-900"></div>
+      </div>
+    );
   }
 
   if (!order) {
@@ -125,6 +120,18 @@ export default function OrderConfirmationClient({ params }: { params: { orderId:
         <Button onClick={() => router.push('/order-tracking')}>Go to Order Tracking</Button>
       </div>
     );
+  }
+
+  const checkPaymentMethod = (paymentMethod: string) => {
+    if (paymentMethod == "COD") {
+      return "Cash On Delivery";
+    } else if (paymentMethod == "DEBIT_CARD") {
+      return "Debit Card/Credit Card";
+    } else if (paymentMethod == "KOKO") {
+      return "KOKO";
+    } else {
+      return "AMEX";
+    }
   }
 
   return (
@@ -142,7 +149,7 @@ export default function OrderConfirmationClient({ params }: { params: { orderId:
           />
         </div>
 
-        {/* Success Icon */}
+        {/* Success Icon - Indicates Order Placed Successfully */}
         <div className="flex justify-center mb-6">
           <CheckCircle className="w-16 h-16 text-green-500" />
         </div>
@@ -160,6 +167,58 @@ export default function OrderConfirmationClient({ params }: { params: { orderId:
           </div>
         </div>
 
+        {/* Payment Status */}
+        {order.paymentStatus === null && (
+          <div className="flex items-center justify-center space-x-2 mb-6">
+            <LoaderIcon className="w-6 h-6 animate-spin" />
+            <p>Loading payment status...</p>
+          </div>
+        )}
+
+        {order.paymentStatus === 'NOT_COMPLETED' && (
+          <div className="bg-yellow-100 border-l-4 border-yellow-500 text-yellow-700 p-4 mb-8">
+            <div className="flex items-center">
+              <p>
+                <strong>Payment Status:</strong> Not Completed
+              </p>
+            </div>
+            <p className="mt-2">Your order has been placed successfully. Please have the payment ready upon delivery.</p>
+          </div>
+        )}
+
+        {order.paymentStatus === 'PENDING' && (
+          <div className="bg-yellow-100 border-l-4 border-yellow-500 text-yellow-700 p-4 mb-8">
+            <div className="flex items-center">
+              <p>
+                <strong>Payment Status:</strong> Pending
+              </p>
+            </div>
+            <p className="mt-2">Your payment is still being processed. Please check back later.</p>
+          </div>
+        )}
+
+        {order.paymentStatus === 'COMPLETED' && (
+          <div className="bg-green-100 border-l-4 border-green-500 text-green-700 p-4 mb-8">
+            <div className="flex items-center">
+              <p>
+                <strong>Payment Status:</strong> Success
+              </p>
+            </div>
+            <p className="mt-2">Your payment has been successfully processed.</p>
+          </div>
+        )}
+
+        {order.paymentStatus === 'FAILED' && (
+          <div className="bg-red-100 border-l-4 border-red-500 text-red-700 p-4 mb-8">
+            <div className="flex items-center">
+              <p>
+                <strong>Payment Status:</strong> Failed
+              </p>
+            </div>
+            <p className="mt-2">Your payment failed. Please try again or contact support.</p>
+          </div>
+        )}
+
         {/* Order Details */}
         <div className="text-left space-y-6">
           {/* Order ID and Date */}
@@ -168,7 +227,7 @@ export default function OrderConfirmationClient({ params }: { params: { orderId:
               <p className="text-sm text-gray-600">Order ID</p>
               <p className="font-semibold">{order.orderId}</p>
             </div>
-            <div>
+            <div className="text-right">
               <p className="text-sm text-gray-600">Order Date</p>
               <p className="font-semibold">{order.orderDate}</p>
             </div>
@@ -185,7 +244,7 @@ export default function OrderConfirmationClient({ params }: { params: { orderId:
           {/* Payment Method */}
           <div>
             <h2 className="text-xl font-semibold mb-4">Payment Method</h2>
-            <p className="text-gray-600">{order.paymentMethod}</p>
+            <p className="text-gray-600">{checkPaymentMethod(order.paymentMethod)}</p>
           </div>
 
           {/* Order Items */}

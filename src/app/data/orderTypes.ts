@@ -13,6 +13,7 @@ export interface OrderItem {
 export interface Order {
   orderId: string;
   status: string;
+  paymentStatus: string;
   orderDate: string;
   shippingAddress: string;
   paymentMethod: string;

@@ -4,7 +4,7 @@ import { useState, useEffect } from 'react';
 import Link from 'next/link';
 import { usePathname } from 'next/navigation';
 import { useSelector, useDispatch } from 'react-redux';
-import { ShoppingBag, User, Home, Shirt, Info, Mail } from 'lucide-react';
+import { ShoppingBag, User, Home, Shirt, LogOut } from 'lucide-react';
 import { Button } from './ui/button';
 import { motion, useScroll, useMotionValueEvent, AnimatePresence } from 'framer-motion';
 import type { RootState, AppDispatch } from "../redux/store"
@@ -16,18 +16,20 @@ import { logout, checkAuth } from '../redux/authSlice';
 
 export default function Navbar() {
   const dispatch = useDispatch<AppDispatch>();
-  const { isAuthenticated, user } = useSelector((state: RootState) => state.auth);
+  const { isAuthenticated, user, status } = useSelector((state: RootState) => state.auth);
   const cartItems = useSelector((state: RootState) => state.cart.items);
   const [isScrolled, setIsScrolled] = useState(false);
   const [isCartOpen, setIsCartOpen] = useState(false);
   const { scrollY } = useScroll();
   const pathname = usePathname();
 
+  const token = typeof window !== 'undefined' ? localStorage.getItem("authToken") : null;
+
   useEffect(() => {
-    if (isAuthenticated && !user?.name) {
+    if (token && !user?.name) {
       dispatch(checkAuth());
     }
-  }, [isAuthenticated, user?.name, dispatch]);
+  }, [token, user, status, dispatch]);
 
   useMotionValueEvent(scrollY, 'change', (latest) => {
     setIsScrolled(latest > 50);
@@ -71,12 +73,6 @@ export default function Navbar() {
               <Link href="/products" className="text-gray-600 hover:text-gray-800 transition-colors duration-200">
                 Products
               </Link>
-              <Link href="/about" className="text-gray-600 hover:text-gray-800 transition-colors duration-200">
-                About
-              </Link>
-              <Link href="/contact" className="text-gray-600 hover:text-gray-800 transition-colors duration-200">
-                Contact
-              </Link>
               <button
                 onClick={() => setIsCartOpen((prev) => !prev)}
                 className="text-gray-600 hover:text-gray-800 relative transition-colors duration-200"
@@ -93,7 +89,7 @@ export default function Navbar() {
                   <button className="flex items-center space-x-1">
                     <User className="w-6 h-6 text-gray-600 hover:text-gray-800 transition-colors duration-200" />
                     <span className="text-gray-600 hover:text-gray-800 transition-colors duration-200">
-                      {user?.name || 'Loading...'}
+                      {user ? user?.name : 'Loading...'}
                     </span>
                   </button>
                   <div className="absolute right-0 mt-2 w-48 bg-white border border-gray-200 rounded-lg shadow-lg opacity-0 group-hover:opacity-100 transition-opacity duration-200">
@@ -127,9 +123,8 @@ export default function Navbar() {
 
       {/* Bottom App Bar (Mobile Only) */}
       <motion.div
-        className={`fixed bottom-0 left-0 right-0 shadow-lg md:hidden z-50 transition-colors duration-300 ${
-          isScrolled ? 'bg-white' : 'bg-transparent'
-        }`}
+        className={`fixed bottom-0 left-0 right-0 shadow-lg md:hidden z-50 bg-white`}
+        style={{ height: '64px' }}
       >
         <div className="container mx-auto px-4">
           <div className="flex justify-between items-center py-2">
@@ -153,14 +148,26 @@ export default function Navbar() {
               )}
               <span className="text-xs mt-1">Cart</span>
             </button>
-            <Link href="/about" className="flex flex-col items-center text-gray-600 hover:text-gray-800">
-              <Info className="w-6 h-6" />
-              <span className="text-xs mt-1">About</span>
-            </Link>
-            <Link href="/contact" className="flex flex-col items-center text-gray-600 hover:text-gray-800">
-              <Mail className="w-6 h-6" />
-              <span className="text-xs mt-1">Contact</span>
-            </Link>
+            {isAuthenticated ? (
+              <>
+                <Link href="/profile" className="flex flex-col items-center text-gray-600 hover:text-gray-800">
+                  <User className="w-6 h-6" />
+                  <span className="text-xs mt-1">Profile</span>
+                </Link>
+                <button
+                  onClick={handleLogout}
+                  className="flex flex-col items-center text-gray-600 hover:text-gray-800"
+                >
+                  <LogOut className="w-6 h-6" /> {/* Added LogOut icon */}
+                  <span className="text-xs mt-1">Logout</span>
+                </button>
+              </>
+            ) : (
+              <Link href="/auth" className="flex flex-col items-center text-gray-600 hover:text-gray-800">
+                <User className="w-6 h-6" /> {/* Added User icon for Login */}
+                <span className="text-xs mt-1">Login</span>
+              </Link>
+            )}
           </div>
         </div>
       </motion.div>
@@ -169,6 +176,14 @@ export default function Navbar() {
       <AnimatePresence>
         {isCartOpen && <CartPopup isOpen={isCartOpen} onClose={() => setIsCartOpen(false)} />}
       </AnimatePresence>
+
+      <style jsx global>{`
+        @media (max-width: 768px) {
+          body {
+            padding-bottom: 64px; /* Match the height of the bottom navigation bar */
+          }
+        }
+      `}</style>
     </>
   );
 }

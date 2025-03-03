@@ -13,6 +13,7 @@ import { logo_black_url } from '@/app/data/constants';
 import { fetchOrdersByOrderId } from '@/app/redux/orderSlice';
 import { toast } from '@/app/hooks/use-toast';
 import { Order, OrderItem } from '@/app/data/orderTypes';
+import * as api from "@/app/api/apiClient"
 
 export default function PaymentConfirmationClient({ params }: { params: { orderId: string } }) {
   const router = useRouter();
@@ -66,23 +67,27 @@ export default function PaymentConfirmationClient({ params }: { params: { orderI
 
   const verifyPayment = async (trId: string, merchantRID: string) => {
     try {
-      const response = await fetch('http://localhost:3001/api/payment/verify-marx-payment', {
-        method: 'POST',
-        headers: {
-          'Content-Type': 'application/json',
-        },
-        body: JSON.stringify({ trId, merchantRID }),
-      });
+        const verifyData = JSON.stringify({ trId, merchantRID });
+        
+        const response = await api.verifyMarxOrder(verifyData);
+    //   const response = await fetch('http://localhost:3001/api/payment/verify-marx-payment', {
+    //     method: 'POST',
+    //     headers: {
+    //       'Content-Type': 'application/json',
+    //     },
+    //     body: JSON.stringify({ trId, merchantRID }),
+    //   });
 
-      const data = await response.json();
+    //   const data = await response.json();
+    console.log(response);
 
-      if (data.status === 'SUCCESS') {
+      if (response.status === 'SUCCESS') {
         setPaymentStatus('success');
-      } else if (data.status === 'PENDING') {
+      } else if (response.status === 'PENDING') {
         setPaymentStatus('pending');
       } else {
         setPaymentStatus('failed');
-        setErrorMessage(data.message || 'Payment verification failed');
+        setErrorMessage(response.message || 'Payment verification failed');
       }
     } catch (error) {
       console.error('Error verifying payment:', error);
@@ -153,6 +158,18 @@ export default function PaymentConfirmationClient({ params }: { params: { orderI
         <Button onClick={() => router.push('/order-tracking')}>Go to Order Tracking</Button>
       </div>
     );
+  }
+
+  const checkPaymentMethod = (paymentMethod:string) => {
+    if(paymentMethod == "COD") {
+        return "Cash On Delivery";
+    } else if(paymentMethod == "DEBIT_CARD") {
+        return "Debit Card/Credit Card";
+    } else if (paymentMethod == "KOKO"){
+        return "KOKO";
+    } else {
+        return "AMEX";
+    }
   }
 
   return (
@@ -228,7 +245,7 @@ export default function PaymentConfirmationClient({ params }: { params: { orderI
               <p className="text-sm text-gray-600">Order ID</p>
               <p className="font-semibold">{order.orderId}</p>
             </div>
-            <div>
+            <div className='text-right'>
               <p className="text-sm text-gray-600">Order Date</p>
               <p className="font-semibold">{order.orderDate}</p>
             </div>
@@ -245,7 +262,7 @@ export default function PaymentConfirmationClient({ params }: { params: { orderI
           {/* Payment Method */}
           <div>
             <h2 className="text-xl font-semibold mb-4">Payment Method</h2>
-            <p className="text-gray-600">{order.paymentMethod}</p>
+            <p className="text-gray-600">{checkPaymentMethod(order.paymentMethod)}</p>
           </div>
 
           {/* Order Items */}
