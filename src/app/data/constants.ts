@@ -39,4 +39,4 @@ export const lookImages = [
     
 ];
 
-export const deliveryFee = 400;
+export const deliveryFee = 399;

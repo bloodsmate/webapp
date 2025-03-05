@@ -40,7 +40,7 @@ export const userSignIn = async (userDetails: userLogin): Promise<ApiResponse> =
         console.error(err);
         console.log("Error");
         loading = false;
-        error = err instanceof Error ? err.message : "An unknown error occurred in user registration";
+        error = err instanceof Error ? err.message : "An unknown error occurred in user login";
         return { data, loading, error };
     }
 };

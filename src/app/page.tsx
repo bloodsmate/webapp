@@ -1,16 +1,23 @@
 import dynamic from 'next/dynamic'
 import { Suspense } from 'react'
-import Hero from './components/Hero'
-import FeaturedProducts from './components/FeaturedProducts'
-import Footer from './components/Footer'
-import GoogleReviews from './components/GoogleReviews'
-import InstagramFeed from './components/InstagramFeed'
-import SEO from './components/SEO'
-import SubscribeSection from './components/SubscribeSection'
-import ShopTheLook from './components/ShopTheLook'
-import HeartPulse from './components/HeartPulse'
+import Hero from '@/app/components/Hero'
+import FeaturedProducts from '@/app/components/FeaturedProducts'
+import Footer from '@/app/components/Footer'
+import GoogleReviews from '@/app/components/GoogleReviews'
+import InstagramFeed from '@/app/components/InstagramFeed'
+import SEO from '@/app/components/SEO'
+import SubscribeSection from '@/app/components/SubscribeSection'
+import ShopTheLook from '@/app/components/ShopTheLook'
+import HeartPulse from '@/app/components/HeartPulse'
 
-const Scene = dynamic(() => import('./components/Scene'), { ssr: false })
+// const Scene = dynamic(() => import('./components/Scene'), { ssr: false })
+
+// export async function generateStaticParams() {
+//   return {
+//     paths: [],
+//     fallback: 'blocking',
+//   };
+// }
 
 export default function Home() {
   return (
@@ -26,7 +33,7 @@ export default function Home() {
         </Suspense> */}
         <Hero />
         <HeartPulse />
-        <FeaturedProducts />
+        <FeaturedProducts name="Must-Have Styles" />
         {/* <GoogleReviews /> */}
         {/* <InstagramFeed /> */}
         <ShopTheLook />

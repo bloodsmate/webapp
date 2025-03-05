@@ -36,7 +36,10 @@ export default function OrderTrackingPage() {
           setError('Order not found. Please check your order ID and try again.')
         }
       } else {
-        throw new Error(resultAction.payload || 'Failed to fetch order details')
+        const errorMessage = resultAction.payload
+          ? String(resultAction.payload)
+          : "Failed to create order";
+        throw new Error(errorMessage);
       }
     } catch (error) {
       console.error('Error tracking order:', error)

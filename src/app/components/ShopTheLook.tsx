@@ -1,16 +1,16 @@
-"use client"
+"use client";
 
-import { useState, useEffect } from "react"
-import Image from "next/image"
-import { motion, AnimatePresence } from "framer-motion"
-import { ChevronLeft, ChevronRight, ChevronUp, ChevronDown } from "lucide-react"
-import { Button } from "@/app/components/ui/button"
-import ProductCard from "./ProductCard"
-import { products } from '../data/products'
-import { lookImages } from '../data/constants'
-import { useDispatch, useSelector } from "react-redux"
-import { fetchProducts } from "../redux/productSlice"
-import type { AppDispatch, RootState } from "../redux/store"
+import { useState, useEffect } from "react";
+import Image from "next/image";
+import { motion, AnimatePresence } from "framer-motion";
+import { ChevronLeft, ChevronRight, ChevronUp, ChevronDown } from "lucide-react";
+import { Button } from "@/app/components/ui/button";
+import ProductCard from "./ProductCard";
+import { Product } from '../data/products';
+import { lookImages } from '../data/constants';
+import { useDispatch, useSelector } from "react-redux";
+import { fetchProducts } from "../redux/productSlice";
+import type { AppDispatch, RootState } from "../redux/store";
 import productNotFound from "@/app/assets/product_not_found.png";
 
 const lookProducts = [
@@ -19,47 +19,47 @@ const lookProducts = [
   { id: 2, imageIds: [8, 9, 10, 11], x: 55, y: 50 }, // Product 2 appears in images 8-11
   { id: 6, imageIds: [12, 13, 14, 15], x: 55, y: 50 }, // Product 6 appears in images 12-15
   { id: 3, imageIds: [16, 17, 18, 19], x: 55, y: 50 }, // Product 3 appears in images 16-19
-]
+];
 
 export default function ShopTheLook() {
-  const dispatch = useDispatch<AppDispatch>()
-  const { items: allProducts, loading, error } = useSelector((state: RootState) => state.products)
-  const [selectedProduct, setSelectedProduct] = useState(null)
-  const [currentImageIndex, setCurrentImageIndex] = useState(0)
-  const [isLoading, setIsLoading] = useState(true)
+  const dispatch = useDispatch<AppDispatch>();
+  const { items: allProducts, loading, error } = useSelector((state: RootState) => state.products);
+  const [selectedProduct, setSelectedProduct] = useState<Product | null>(null);
+  const [currentImageIndex, setCurrentImageIndex] = useState(0);
+  const [isLoading, setIsLoading] = useState(true);
 
   // Fetch products on component mount
   useEffect(() => {
-    dispatch(fetchProducts())
-  }, [dispatch])
+    dispatch(fetchProducts());
+  }, [dispatch]);
 
   // Get products for the current image
   const currentImageProducts = lookProducts
     .filter((product) => product.imageIds.includes(currentImageIndex))
     .map((product) => allProducts.find((p) => p.id === product.id))
-    .filter(Boolean) // Remove undefined values
+    .filter((p): p is Product => p !== undefined); // Remove undefined values and assert type
 
   // Set the first product as selected when the image changes
   useEffect(() => {
     if (currentImageProducts.length > 0) {
-      setSelectedProduct(currentImageProducts[0])
+      setSelectedProduct(currentImageProducts[0]);
     }
-  }, [currentImageIndex, currentImageProducts])
+  }, [currentImageIndex, currentImageProducts]);
 
   const nextImage = () => {
-    setIsLoading(true)
-    setCurrentImageIndex((prevIndex) => (prevIndex + 1) % lookImages.length)
-  }
+    setIsLoading(true);
+    setCurrentImageIndex((prevIndex) => (prevIndex + 1) % lookImages.length);
+  };
 
   const prevImage = () => {
-    setIsLoading(true)
-    setCurrentImageIndex((prevIndex) => (prevIndex - 1 + lookImages.length) % lookImages.length)
-  }
+    setIsLoading(true);
+    setCurrentImageIndex((prevIndex) => (prevIndex - 1 + lookImages.length) % lookImages.length);
+  };
 
   // Handle image load
   const handleImageLoad = () => {
-    setIsLoading(false)
-  }
+    setIsLoading(false);
+  };
 
   return (
     <motion.section
@@ -92,23 +92,25 @@ export default function ShopTheLook() {
                   transition={{ duration: 0.5 }}
                   onLoad={handleImageLoad}
                   loading="lazy"
-                  priority={currentImageIndex === 0} // Preload the first image
                 />
               </AnimatePresence>
               {lookProducts
                 .filter((product) => product.imageIds.includes(currentImageIndex))
-                .map((product) => (
-                  <motion.button
-                    key={product.id}
-                    className="absolute w-8 h-8 bg-white rounded-full shadow-md flex items-center justify-center hover:bg-primary hover:text-white transition-colors"
-                    style={{ left: `${product.x}%`, top: `${product.y}%` }}
-                    onClick={() => setSelectedProduct(allProducts.find((p) => p.id === product.id))}
-                    whileHover={{ scale: 1.1 }}
-                    whileTap={{ scale: 0.9 }}
-                  >
-                    +
-                  </motion.button>
-                ))}
+                .map((product) => {
+                  const productData = allProducts.find((p) => p.id === product.id);
+                  return (
+                    <motion.button
+                      key={product.id}
+                      className="absolute w-8 h-8 bg-white rounded-full shadow-md flex items-center justify-center hover:bg-primary hover:text-white transition-colors"
+                      style={{ left: `${product.x}%`, top: `${product.y}%` }}
+                      onClick={() => productData && setSelectedProduct(productData)}
+                      whileHover={{ scale: 1.1 }}
+                      whileTap={{ scale: 0.9 }}
+                    >
+                      +
+                    </motion.button>
+                  );
+                })}
             </div>
             <button
               onClick={prevImage}
@@ -145,7 +147,7 @@ export default function ShopTheLook() {
                   onClick={() =>
                     setSelectedProduct(
                       currentImageProducts[
-                        (currentImageProducts.indexOf(selectedProduct) - 1 + currentImageProducts.length) %
+                        (currentImageProducts.indexOf(selectedProduct!) - 1 + currentImageProducts.length) %
                           currentImageProducts.length
                       ]
                     )
@@ -158,7 +160,7 @@ export default function ShopTheLook() {
                   onClick={() =>
                     setSelectedProduct(
                       currentImageProducts[
-                        (currentImageProducts.indexOf(selectedProduct) + 1) % currentImageProducts.length
+                        (currentImageProducts.indexOf(selectedProduct!) + 1) % currentImageProducts.length
                       ]
                     )
                   }
@@ -172,5 +174,5 @@ export default function ShopTheLook() {
         </div>
       </div>
     </motion.section>
-  )
-} 
+  );
+}

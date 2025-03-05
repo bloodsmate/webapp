@@ -5,7 +5,7 @@ import { motion } from 'framer-motion'
 import { Facebook, Instagram, Twitter, InstagramIcon as Tiktok } from 'lucide-react'
 import Image from 'next/image'
 import { logo_white_url } from '../data/constants'
-import { FaCcVisa, FaCcMastercard } from "react-icons/fa";
+import { FaCcVisa, FaCcMastercard, FaCcAmex } from "react-icons/fa";
 import { useRef, useEffect } from 'react';
 import gsap from 'gsap';
 
@@ -96,7 +96,6 @@ const Wave = () => {
 };
 
 export default function Footer() {
-
   return (
     <footer className="bg-black text-white pt-20 pb-8 relative overflow-hidden">
       {/* 3D Wave Effect */}
@@ -123,36 +122,20 @@ export default function Footer() {
             </p>
           </motion.div>
 
-          {/* Quick Links */}
+          {/* Order Tracking */}
           <motion.div
             initial={{ opacity: 0, y: 20 }}
             animate={{ opacity: 1, y: 0 }}
             transition={{ duration: 0.5, delay: 0.1 }}
             className="text-center md:text-left"
           >
-            <h4 className="text-lg font-semibold mb-4">Quick Links</h4>
-            <ul className="space-y-2">
-              <li>
-                <Link href="/products" className="text-gray-400 hover:text-white transition-colors">
-                  Products
-                </Link>
-              </li>
-              <li>
-                <Link href="/about" className="text-gray-400 hover:text-white transition-colors">
-                  About Us
-                </Link>
-              </li>
-              <li>
-                <Link href="/contact" className="text-gray-400 hover:text-white transition-colors">
-                  Contact
-                </Link>
-              </li>
-              <li>
-                <Link href="/faq" className="text-gray-400 hover:text-white transition-colors">
-                  FAQ
-                </Link>
-              </li>
-            </ul>
+            <h4 className="text-lg font-semibold mb-4">Track Your Order</h4>
+            <Link
+              href="/order-tracking"
+              className="text-gray-400 hover:text-white transition-colors underline"
+            >
+              Click here to track your order
+            </Link>
           </motion.div>
 
           {/* Social Media Links */}
@@ -176,6 +159,9 @@ export default function Footer() {
               <a href="#" className="text-gray-400 hover:text-white transition-colors">
                 <Tiktok className="w-6 h-6" />
               </a>
+              {/* <a href="#" className="text-gray-400 hover:text-white transition-colors">
+                <Threads className="w-6 h-6" />
+              </a> */}
             </div>
           </motion.div>
 
@@ -190,6 +176,7 @@ export default function Footer() {
             <div className="flex justify-center md:justify-start space-x-4">
               <FaCcVisa size={32} className="text-blue-900" />
               <FaCcMastercard size={32} className="text-red-600" />
+              <FaCcAmex size={32} className="text-blue-500" />
               <img
                 src="https://res.cloudinary.com/midefulness/image/upload/v1736096286/BloodsMate/koko-pay_d6id9w.png"
                 alt="koko pay"
@@ -199,14 +186,24 @@ export default function Footer() {
           </motion.div>
         </div>
 
-        {/* Copyright */}
+        {/* Copyright and Developer Credit */}
         <div className="mt-8 pt-8 border-t border-gray-800 text-center text-gray-400">
-          <p>&copy; 2025 BloodsMate. All rights reserved.</p>
+          <p>
+            &copy; 2025 BloodsMate. All rights reserved. | Developed by{' '}
+            <a
+              href="https://codeidol.com"
+              target="_blank"
+              rel="noopener noreferrer"
+              className="text-white hover:text-gray-300 transition-colors"
+            >
+              CodeIdol
+            </a>
+          </p>
         </div>
       </div>
 
       {/* 3D Wave */}
       <Wave />
     </footer>
-  )
+  );
 }

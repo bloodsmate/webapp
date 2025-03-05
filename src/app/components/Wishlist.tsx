@@ -29,7 +29,8 @@ export default function Wishlist() {
               <h3 className="text-lg font-semibold">{item.name}</h3>
               <p className="text-gray-600 mb-4">${item.price.toFixed(2)}</p>
               <div className="mt-auto">
-                <Button onClick={() => dispatch(removeFromWishlist(item.id))} variant="outline" className="w-full">
+                {/* <Button onClick={() => dispatch(removeFromWishlist(item.id))} variant="outline" className="w-full"> */}
+                <Button variant="outline" className="w-full">
                   Remove from Wishlist
                 </Button>
               </div>

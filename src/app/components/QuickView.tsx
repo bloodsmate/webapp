@@ -1,107 +1,141 @@
 'use client'
 
-import { useState, useEffect, useRef } from 'react'
-import Image from 'next/image'
-import { motion, AnimatePresence } from 'framer-motion'
-import { X, ChevronLeft, ChevronRight } from 'lucide-react'
-import { Button } from "@/app/components/ui/button"
-import { RadioGroup, RadioGroupItem } from "@/app/components/ui/radio-group"
-import { Label } from "@/app/components/ui/label"
-import { useDispatch } from 'react-redux'
-import { Product } from '../data/products'
-import { addToCart } from '../redux/cartSlice'
-import sizeChartImage from "@/app/assets/bloodsmate_size_chart.png"
+import { useState, useEffect, useRef } from 'react';
+import Image from 'next/image';
+import { motion, AnimatePresence } from 'framer-motion';
+import { X, ChevronLeft, ChevronRight } from 'lucide-react';
+import { Button } from '@/app/components/ui/button';
+import { RadioGroup, RadioGroupItem } from '@/app/components/ui/radio-group';
+import { Label } from '@/app/components/ui/label';
+import { useDispatch } from 'react-redux';
+import { Product } from '@/app/data/products';
+import { addToCart } from '@/app/redux/cartSlice';
+import sizeChartImage from '@/app/assets/bloodsmate_size_chart.png';
+import { toast } from '@/app/hooks/use-toast';
 
 interface QuickViewProps {
-  product: Product
-  onClose: () => void
+  product: Product;
+  onClose: () => void;
 }
 
 export default function QuickView({ product, onClose }: QuickViewProps) {
-  const [selectedSize, setSelectedSize] = useState('')
-  const [currentImageIndex, setCurrentImageIndex] = useState(0)
-  const [isImageLoaded, setIsImageLoaded] = useState(false)
-  const [isMobile, setIsMobile] = useState(false)
-  const dispatch = useDispatch()
-  const sizeChartRef = useRef<HTMLDivElement>(null)
+  const [selectedSize, setSelectedSize] = useState('');
+  const [currentImageIndex, setCurrentImageIndex] = useState(0);
+  const [isImageLoaded, setIsImageLoaded] = useState(false);
+  const [isMobile, setIsMobile] = useState(false);
+  const [availableQuantity, setAvailableQuantity] = useState<number | null>(null);
+  const dispatch = useDispatch();
+  const sizeChartRef = useRef<HTMLDivElement>(null);
 
-  // Check if the device is mobile
   useEffect(() => {
     const checkIsMobile = () => {
-      setIsMobile(window.innerWidth <= 768) // Adjust breakpoint as needed
-    }
-    checkIsMobile() // Initial check
-    window.addEventListener('resize', checkIsMobile)
-    return () => window.removeEventListener('resize', checkIsMobile)
-  }, [])
+      setIsMobile(window.innerWidth <= 768);
+    };
+    checkIsMobile();
+    window.addEventListener('resize', checkIsMobile);
+    return () => window.removeEventListener('resize', checkIsMobile);
+  }, []);
 
-  // Disable background scroll when modal is open
   useEffect(() => {
-    document.body.style.overflow = 'hidden'
+    document.body.style.overflow = 'hidden';
     return () => {
-      document.body.style.overflow = 'auto'
-    }
-  }, [])
+      document.body.style.overflow = 'auto';
+    };
+  }, []);
 
   // Handle mouse-following zoom effect
   useEffect(() => {
-    const sizeChart = sizeChartRef.current
-    if (!sizeChart || isMobile) return // Disable zoom on mobile
+    const sizeChart = sizeChartRef.current;
+    if (!sizeChart || isMobile) return; // Disable zoom on mobile
 
     const handleMouseMove = (e: MouseEvent) => {
-      const { left, top, width, height } = sizeChart.getBoundingClientRect()
-      const x = ((e.clientX - left) / width) * 100
-      const y = ((e.clientY - top) / height) * 100
-      sizeChart.style.transformOrigin = `${x}% ${y}%`
-      sizeChart.style.transform = 'scale(2)' // Adjust zoom level here
-    }
+      const { left, top, width, height } = sizeChart.getBoundingClientRect();
+      const x = ((e.clientX - left) / width) * 100;
+      const y = ((e.clientY - top) / height) * 100;
+      sizeChart.style.transformOrigin = `${x}% ${y}%`;
+      sizeChart.style.transform = 'scale(2)'; // Adjust zoom level here
+    };
 
     const handleMouseLeave = () => {
-      sizeChart.style.transformOrigin = 'center'
-      sizeChart.style.transform = 'scale(1)'
-    }
+      sizeChart.style.transformOrigin = 'center';
+      sizeChart.style.transform = 'scale(1)';
+    };
 
-    sizeChart.addEventListener('mousemove', handleMouseMove)
-    sizeChart.addEventListener('mouseleave', handleMouseLeave)
+    sizeChart.addEventListener('mousemove', handleMouseMove);
+    sizeChart.addEventListener('mouseleave', handleMouseLeave);
 
     return () => {
-      sizeChart.removeEventListener('mousemove', handleMouseMove)
-      sizeChart.removeEventListener('mouseleave', handleMouseLeave)
+      sizeChart.removeEventListener('mousemove', handleMouseMove);
+      sizeChart.removeEventListener('mouseleave', handleMouseLeave);
+    };
+  }, [isMobile]);
+
+  // Update available quantity when size is selected
+  useEffect(() => {
+    if (selectedSize) {
+      const stockItem = product.stock.find((item) => item.size === selectedSize);
+      setAvailableQuantity(stockItem ? stockItem.quantity : 0);
+    } else {
+      setAvailableQuantity(null);
     }
-  }, [isMobile])
+  }, [selectedSize, product.stock]);
 
   const handleAddToCart = () => {
-    if (selectedSize) {
-      dispatch(addToCart({
+    if (!selectedSize) {
+      toast({
+        title: 'Error',
+        description: 'Please select a size.',
+        variant: 'destructive',
+      });
+      return;
+    }
+
+    if (availableQuantity === null || availableQuantity <= 0) {
+      toast({
+        title: 'Error',
+        description: 'This size is out of stock.',
+        variant: 'destructive',
+      });
+      return;
+    }
+
+    dispatch(
+      addToCart({
         id: product.id,
         name: product.name,
         price: product.price,
         quantity: 1,
         size: selectedSize,
         image: product.images[0],
-        discountPrice: Number((product.discountPercentage && product.discountPercentage > 0) ? discountedPrice : 0),
-      }))
-      onClose()
-    }
-  }
+        discountPrice: Number(
+          product.discountPercentage && product.discountPercentage > 0
+            ? discountedPrice
+            : 0
+        ),
+      })
+    );
+    onClose();
+  };
 
   const nextImage = () => {
-    setCurrentImageIndex((prevIndex) => (prevIndex + 1) % product.images.length)
-  }
+    setCurrentImageIndex((prevIndex) => (prevIndex + 1) % product.images.length);
+  };
 
   const prevImage = () => {
-    setCurrentImageIndex((prevIndex) => (prevIndex - 1 + product.images.length) % product.images.length)
-  }
+    setCurrentImageIndex(
+      (prevIndex) => (prevIndex - 1 + product.images.length) % product.images.length
+    );
+  };
 
   const discountedPrice = product.discountPercentage
     ? (product.price * (1 - product.discountPercentage / 100)).toFixed(2)
-    : product.price
+    : product.price;
 
   // Check if a size is out of stock
   const isSizeOutOfStock = (size: string) => {
-    const stockItem = product.stock.find((item) => item.size === size)
-    return stockItem ? stockItem.quantity === 0 : true
-  }
+    const stockItem = product.stock.find((item) => item.size === size);
+    return stockItem ? stockItem.quantity === 0 : true;
+  };
 
   return (
     <motion.div
@@ -143,7 +177,7 @@ export default function QuickView({ product, onClose }: QuickViewProps) {
                 alt={product.name}
                 width={500}
                 height={500}
-                className={isMobile ? "w-full h-full object-cover mt-2" : "w-full h-full object-cover"}
+                className={isMobile ? 'w-full h-full object-cover mt-2' : 'w-full h-full object-cover'}
                 onLoadingComplete={() => setIsImageLoaded(true)}
                 priority
               />
@@ -216,6 +250,13 @@ export default function QuickView({ product, onClose }: QuickViewProps) {
                   </div>
                 ))}
               </RadioGroup>
+              {selectedSize && availableQuantity !== null && (
+                <p className="mt-2 text-sm text-gray-600">
+                  {availableQuantity <= 3
+                    ? `Only ${availableQuantity} items left!`
+                    : `${availableQuantity} items available`}
+                </p>
+              )}
             </div>
 
             {/* Size Chart Image with Mouse-Following Zoom (Hidden on Mobile) */}
@@ -243,12 +284,12 @@ export default function QuickView({ product, onClose }: QuickViewProps) {
             </div>
 
             {/* Add to Cart Button */}
-            <Button onClick={handleAddToCart} className="w-full" disabled={!selectedSize}>
+            <Button onClick={handleAddToCart} className="w-full" disabled={!selectedSize || availableQuantity === 0}>
               Add to Cart
             </Button>
           </div>
         </div>
       </motion.div>
     </motion.div>
-  )
+  );
 }

@@ -1,10 +1,13 @@
 "use client"
 
-import { useState } from "react"
+import { useState, useEffect } from "react"
 import { Button } from "@/app/components/ui/button"
 import { Input } from "@/app/components/ui/input"
 import { MessageCircle, X } from "lucide-react"
-import { products } from "../data/products"
+import { useDispatch, useSelector } from 'react-redux'
+import { AppDispatch, RootState } from '@/app/redux/store'
+import { fetchProducts } from "@/app/redux/productSlice"
+import { Product } from "@/app/data/products"
 
 const defaultMessages = [
   "What are your shipping details?",
@@ -17,13 +20,20 @@ const defaultMessages = [
 interface Message {
   text: string
   isUser: boolean
-  suggestedProducts?: typeof products
+  suggestedProducts?: Product[]
 }
 
 export default function Chatbot() {
+  const dispatch = useDispatch<AppDispatch>()
+  const { items: products, loading, error } = useSelector((state: RootState) => state.products)
+
   const [isOpen, setIsOpen] = useState(false)
   const [messages, setMessages] = useState<Message[]>([])
   const [input, setInput] = useState("")
+
+  useEffect(() => {
+    dispatch(fetchProducts())
+  }, [dispatch])
 
   const suggestProducts = (query: string) => {
     const keywords = query.toLowerCase().split(" ")
@@ -63,6 +73,14 @@ export default function Chatbot() {
   const handleDefaultMessage = (message: string) => {
     setInput(message)
     handleSend()
+  }
+
+  if (loading) {
+    return <div>Loading...</div>
+  }
+
+  if (error) {
+    return <div>Error: {error}</div>
   }
 
   return (
@@ -131,4 +149,3 @@ export default function Chatbot() {
     </>
   )
 }
-

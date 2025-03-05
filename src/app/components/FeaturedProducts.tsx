@@ -12,7 +12,11 @@ import { fetchProducts } from "../redux/productSlice"
 import { useDispatch, useSelector } from 'react-redux'
 import { AppDispatch, RootState } from '../redux/store'
 
-export default function FeaturedProducts() {
+type Props = {
+  name: string
+}
+
+export default function FeaturedProducts({ name }: Props) {
   const dispatch = useDispatch<AppDispatch>()
   const { items: products, loading, error } = useSelector((state: RootState) => state.products)
 
@@ -69,12 +73,14 @@ export default function FeaturedProducts() {
       viewport={{ once: true, amount: 0.2 }} // Trigger animation once, when 20% of the section is visible
     >
       <div className="container mx-auto px-4">
-        <h2 className="text-3xl font-bold mb-8 text-center">Must-Have Styles</h2>
+        <h2 className="text-3xl font-bold mb-8 text-center">{name}</h2>
 
         <div className="relative">
+          {/* Navigation Buttons */}
           <button
             onClick={handlePrevious}
             className="absolute -left-4 sm:-left-12 top-1/2 transform -translate-y-1/2 bg-white/80 backdrop-blur-sm rounded-full p-2 shadow-lg hover:bg-white transition-colors z-10"
+            aria-label="Previous"
           >
             <ChevronLeft className="w-6 h-6 text-gray-900" />
           </button>
@@ -82,10 +88,12 @@ export default function FeaturedProducts() {
           <button
             onClick={handleNext}
             className="absolute -right-4 sm:-right-12 top-1/2 transform -translate-y-1/2 bg-white/80 backdrop-blur-sm rounded-full p-2 shadow-lg hover:bg-white transition-colors z-10"
+            aria-label="Next"
           >
             <ChevronRight className="w-6 h-6 text-gray-900" />
           </button>
 
+          {/* Product Grid */}
           <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 2xl:grid-cols-4 gap-8">
             {paginatedProducts.map((product, index) => (
               <motion.div
@@ -107,7 +115,7 @@ export default function FeaturedProducts() {
                     />
                   </Link>
 
-                  {(product.discountPercentage > 0) && (
+                  {(product.discountPercentage ?? 0) > 0 && (
                     <div className="absolute top-4 right-4 bg-red-600 text-white text-sm font-semibold px-3 py-1 rounded-full">
                       Save {product.discountPercentage}%
                     </div>
@@ -161,6 +169,7 @@ export default function FeaturedProducts() {
         </div>
       </div>
 
+      {/* Quick View Modal */}
       <AnimatePresence>
         {selectedProduct && (
           <QuickView product={selectedProduct} onClose={() => setSelectedProduct(null)} />

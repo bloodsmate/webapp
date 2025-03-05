@@ -1,4 +1,5 @@
-// src/app/layout.tsx
+import { useEffect } from 'react';
+import { useRouter } from 'next/navigation';
 import type { Metadata } from "next";
 import localFont from "next/font/local";
 import { Playfair_Display, Inter } from 'next/font/google';
@@ -34,8 +35,8 @@ const inter = Inter({
 });
 
 export const metadata: Metadata = {
-  title: "BloodsMate",
-  description: "Quality T-shirts for every style",
+  title: "Bloodsmate",
+  description: "ONE TEE ENDLESS POSSIBILITIES",
 };
 
 export default function RootLayout({
@@ -43,6 +44,7 @@ export default function RootLayout({
 }: Readonly<{
   children: React.ReactNode;
 }>) {
+
   return (
     <html lang="en" className="scroll-smooth">
       <head>
@@ -55,21 +57,21 @@ export default function RootLayout({
         className={`${playfair.variable} ${inter.variable} ${geistSans.variable} ${geistMono.variable} antialiased flex flex-col min-h-screen overflow-x-hidden`}
       >
         <SEO
-          title="BloodsMate"
-          description="Quality T-shirts for every style"
+          title="Bloodsmate"
+          description="ONE TEE ENDLESS POSSIBILITIES"
           canonical="/"
         />
-        <ThemeProvider attribute="class" defaultTheme="system" enableSystem>
+        <ThemeProvider defaultTheme="system" enableSystem>
           <Providers>
             <ClientLayout>{children}</ClientLayout>
             <Toaster />
           </Providers>
         </ThemeProvider>
 
-        <Script
+        {/* <Script
           src="https://www.payhere.lk/lib/payhere.js"
           strategy="lazyOnload"
-        />
+        /> */}
         <Script
           src="https://challenges.cloudflare.com/turnstile/v0/api.js"
           async
