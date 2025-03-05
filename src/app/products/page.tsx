@@ -449,7 +449,7 @@ export default function ProductsPage() {
                             description: `${product.name} (Size: ${selectedSize}) added to cart!`,
                           });
                         }}
-                        className="w-full bg-gray-900 hover:bg-gray-700 text-white font-semibold py-2 rounded-lg"
+                        className="w-full bg-gray-900 hover:bg-gray-700 hover:border hover:border-white text-white font-semibold py-2 rounded-lg"
                         disabled={!selectedSize || !product.inStock} // Disable if out of stock
                       >
                         {product.inStock ? 'Add to Cart' : 'Out of Stock'}

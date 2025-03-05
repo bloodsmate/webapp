@@ -20,10 +20,13 @@ import {
   AlertDialogTitle,
 } from '@/app/components/ui/alert-dialog';
 import { deliveryFee } from '@/app/data/constants';
+import { fetchProducts } from '@/app/redux/productSlice';
+import { Product, Stock } from '@/app/data/products';
 
 export default function CartPage() {
   const dispatch = useDispatch<AppDispatch>();
   const cartItems = useSelector((state: RootState) => state.cart.items);
+  const products = useSelector((state: RootState) => state.products.items);
   const [isCartOpen, setIsCartOpen] = useState(false);
   const [isRemoveDialogOpen, setIsRemoveDialogOpen] = useState(false);
   const [itemToRemove, setItemToRemove] = useState<{ id: number; size: string } | null>(null);
@@ -34,11 +37,36 @@ export default function CartPage() {
     }
   }, [cartItems]);
 
+  useEffect(() => {
+    dispatch(fetchProducts()); // Fetch products to get stock data
+  }, [dispatch]);
+
+  const getStockQuantity = (productId: number, size: string): number => {
+    const product = products.find((p) => p.id === productId);
+    if (!product) return 0;
+    const stockItem = product.stock.find((item: Stock) => item.size === size);
+    return stockItem ? stockItem.quantity : 0;
+  };
+
   const handleUpdateQuantity = async (id: number, size: string, newQuantity: number) => {
     if (newQuantity < 1) {
       toast({
         title: 'Invalid quantity',
         description: 'Quantity must be at least 1.',
+        variant: 'destructive',
+      });
+      return;
+    }
+
+    // Check available stock
+    const stockQuantity = getStockQuantity(id, size);
+    const existingCartItem = cartItems.find((item) => item.id === id && item.size === size);
+    const totalQuantityInCart = existingCartItem ? existingCartItem.quantity : 0;
+
+    if (newQuantity > stockQuantity) {
+      toast({
+        title: 'Insufficient Stock',
+        description: `Only ${stockQuantity} items available for ${size}.`,
         variant: 'destructive',
       });
       return;
@@ -80,8 +108,11 @@ export default function CartPage() {
     setItemToRemove(null);
   };
 
-  const subtotal = cartItems.reduce((sum, item) => sum + (item.price * item.quantity), 0);
-  const afterDiscount = cartItems.reduce((sum, item) => sum + (item.discountPrice > 0 ? item.discountPrice : item.price) * item.quantity, 0);
+  const subtotal = cartItems.reduce((sum, item) => sum + item.price * item.quantity, 0);
+  const afterDiscount = cartItems.reduce(
+    (sum, item) => sum + (item.discountPrice > 0 ? item.discountPrice : item.price) * item.quantity,
+    0
+  );
   const discount = subtotal - afterDiscount;
   const total = subtotal - discount + deliveryFee;
 
@@ -107,64 +138,73 @@ export default function CartPage() {
           <div className="grid grid-cols-1 lg:grid-cols-3 gap-8">
             {/* Cart Items */}
             <div className="lg:col-span-2">
-              {cartItems.map((item) => (
-                <div
-                  key={`${item.id}-${item.size}`}
-                  className="flex flex-col md:flex-row items-center justify-between p-6 border-b"
-                >
-                  <div className="flex items-center space-x-6 relative">
-                    <div className="relative">
-                      <Image
-                        src={item.image}
-                        alt={item.name}
-                        width={120}
-                        height={120}
-                        className="rounded-md"
-                      />
-                      <span className="absolute top-0 right-0 bg-black text-white text-sm px-2 py-1 rounded-full">
-                        {item.quantity}
-                      </span>
-                    </div>
-                    <div>
-                      <h3 className="text-xl font-semibold">{item.name}</h3>
-                      <p className="text-gray-600">Size: {item.size}</p>
-                      <p className="text-gray-600">
-                        LKR {(item.discountPrice > 0 ? (item.discountPrice * item.quantity).toFixed(2) : (item.price * item.quantity).toFixed(2))}
-                      </p>
-                      {item.discountPrice > 0 && (
-                        <p className="text-gray-400 line-through">
-                          LKR {(item.price * item.quantity).toFixed(2)}
+              {cartItems.map((item) => {
+                const stockQuantity = getStockQuantity(item.id, item.size);
+
+                return (
+                  <div
+                    key={`${item.id}-${item.size}`}
+                    className="flex flex-col md:flex-row items-center justify-between p-6 border-b"
+                  >
+                    <div className="flex items-center space-x-6 relative">
+                      <div className="relative">
+                        <Image
+                          src={item.image}
+                          alt={item.name}
+                          width={120}
+                          height={120}
+                          className="rounded-md"
+                        />
+                        <span className="absolute top-0 right-0 bg-black text-white text-sm px-2 py-1 rounded-full">
+                          {item.quantity}
+                        </span>
+                      </div>
+                      <div>
+                        <h3 className="text-xl font-semibold">{item.name}</h3>
+                        <p className="text-gray-600">Size: {item.size}</p>
+                        <p className="text-gray-600">
+                          LKR{' '}
+                          {item.discountPrice > 0
+                            ? (item.discountPrice * item.quantity).toFixed(2)
+                            : (item.price * item.quantity).toFixed(2)}
                         </p>
-                      )}
+                        {item.discountPrice > 0 && (
+                          <p className="text-gray-400 line-through">
+                            LKR {(item.price * item.quantity).toFixed(2)}
+                          </p>
+                        )}
+                      </div>
+                    </div>
+                    <div className="flex items-center space-x-4 mt-4 md:mt-0">
+                      <Button
+                        variant="outline"
+                        size="sm"
+                        onClick={() => handleUpdateQuantity(item.id, item.size, item.quantity - 1)}
+                        disabled={item.quantity <= 1}
+                      >
+                        -
+                      </Button>
+                      <span className="text-lg">{item.quantity}</span>
+                      <Button
+                        variant="outline"
+                        size="sm"
+                        onClick={() => handleUpdateQuantity(item.id, item.size, item.quantity + 1)}
+                        disabled={item.quantity >= stockQuantity} // Disable if stock is exceeded
+                      >
+                        +
+                      </Button>
+                      <Button
+                        variant="ghost"
+                        size="sm"
+                        className="text-red-500 hover:text-red-700"
+                        onClick={() => handleRemoveItem(item.id, item.size)}
+                      >
+                        Remove
+                      </Button>
                     </div>
                   </div>
-                  <div className="flex items-center space-x-4 mt-4 md:mt-0">
-                    <Button
-                      variant="outline"
-                      size="sm"
-                      onClick={() => handleUpdateQuantity(item.id, item.size, item.quantity - 1)}
-                    >
-                      -
-                    </Button>
-                    <span className="text-lg">{item.quantity}</span>
-                    <Button
-                      variant="outline"
-                      size="sm"
-                      onClick={() => handleUpdateQuantity(item.id, item.size, item.quantity + 1)}
-                    >
-                      +
-                    </Button>
-                    <Button
-                      variant="ghost"
-                      size="sm"
-                      className="text-red-500 hover:text-red-700"
-                      onClick={() => handleRemoveItem(item.id, item.size)}
-                    >
-                      Remove
-                    </Button>
-                  </div>
-                </div>
-              ))}
+                );
+              })}
             </div>
 
             {/* Order Summary */}
