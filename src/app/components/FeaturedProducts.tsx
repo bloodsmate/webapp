@@ -14,10 +14,9 @@ import { AppDispatch, RootState } from '../redux/store'
 
 type Props = {
   name: string
-  noOfSlides: number
 }
 
-export default function FeaturedProducts({ name, noOfSlides }: Props) {
+export default function FeaturedProducts({ name }: Props) {
   const dispatch = useDispatch<AppDispatch>()
   const { items: products, loading, error } = useSelector((state: RootState) => state.products)
 

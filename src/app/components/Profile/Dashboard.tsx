@@ -2,7 +2,6 @@ import { useEffect, useState } from 'react';
 import { useDispatch, useSelector } from 'react-redux';
 import { RootState, AppDispatch } from '@/app/redux/store';
 import { checkAuth } from '@/app/redux/authSlice';
-import FeaturedProducts from '@/app/components/FeaturedProducts'
 
 const Dashboard = () => {
     const dispatch = useDispatch<AppDispatch>();
