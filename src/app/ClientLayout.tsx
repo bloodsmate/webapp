@@ -11,13 +11,23 @@ import Chatbot from "./components/Chatbot";
 import WhatsAppButton from './components/WhatsAppButton';
 import { checkAuth } from "./redux/authSlice"
 import type { AppDispatch } from "./redux/store"
+import { useRouter } from 'next/navigation';
 // import { webSocketService } from "./services/websocket"
 
 export default function ClientLayout({ children }: { children: React.ReactNode }) {
   const pathname = usePathname()
-  const isAuthPage = pathname === "/login" || pathname === "/auth"
+  const isAuthPage = pathname === "/auth"
 
   const dispatch = useDispatch<AppDispatch>()
+
+  const router = useRouter();
+
+  useEffect(() => {
+    const path = window.location.pathname;
+    if (path && path !== '/') {
+      router.replace(path);
+    }
+  }, [router]);
 
   useEffect(() => {
     dispatch(checkAuth())
