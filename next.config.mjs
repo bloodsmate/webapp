@@ -7,7 +7,7 @@
 const nextConfig = {
     // basePath: isGithubPages ? `/${repoName}` : '',
     // assetPrefix: isGithubPages ? `/${orgName}/${repoName}/` : '',
-    // output: 'export',
+    output: 'export',
     images: {
         formats: ['image/webp'],
         deviceSizes: [320, 420, 768, 1024, 1200],
@@ -16,6 +16,7 @@ const nextConfig = {
     },
     reactStrictMode: true,
     swcMinify: true,
+    trailingSlash: true,
 };
 
 export default nextConfig;
