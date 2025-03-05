@@ -7,7 +7,12 @@ interface AuthState {
     id: string
     name: string
     email: string
+    password: string
     role: string
+    shippingAddress: string
+    city: string
+    zipCode: string
+    phone: string
   } | null
   isAuthenticated: boolean
   loading: boolean

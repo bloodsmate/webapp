@@ -1,4 +1,4 @@
-import { useState, useEffect } from 'react';
+import React, { useState, useEffect } from 'react';
 import { useDispatch, useSelector } from 'react-redux';
 import { AppDispatch, RootState } from '@/app/redux/store';
 import { checkAuth } from '@/app/redux/authSlice';
@@ -6,17 +6,33 @@ import { updateShippingDetails } from '@/app/redux/userSlice';
 import { Button } from '@/app/components/ui/button';
 import { Input } from '@/app/components/ui/input';
 import { Label } from '@/app/components/ui/label';
+import TailwindLoader from '@/app/components/TailwindLoader';
+import { toast } from '@/app/hooks/use-toast';
+
+interface ShippingAddressFormData {
+    shippingAddress: string;
+    city: string;
+    zipCode: string;
+    phone: string;
+}
+  
+interface Errors {
+    shippingAddress?: string;
+    city?: string;
+    zipCode?: string;
+    phone?: string;
+}
 
 const ShippingAddress = () => {
   const dispatch = useDispatch<AppDispatch>();
-  const { user, isLoading } = useSelector((state: RootState) => state.auth);
-  const [formData, setFormData] = useState({
+  const { user, loading } = useSelector((state: RootState) => state.auth);
+  const [formData, setFormData] = useState<ShippingAddressFormData>({
     shippingAddress: user?.shippingAddress || '',
     city: user?.city || '',
     zipCode: user?.zipCode || '',
     phone: user?.phone || '',
   });
-  const [errors, setErrors] = useState<{ [key: string]: string }>({});
+  const [errors, setErrors] = useState<Errors>({});
 
   const token = typeof window !== 'undefined' ? localStorage.getItem('authToken') : null;
 
@@ -30,13 +46,13 @@ const ShippingAddress = () => {
     const { name, value } = e.target;
     setFormData({ ...formData, [name]: value });
     // Clear errors when user starts typing
-    if (errors[name]) {
+    if (errors[name as keyof Errors]) {
       setErrors((prev) => ({ ...prev, [name]: '' }));
     }
   };
 
   const validateForm = () => {
-    const newErrors: { [key: string]: string } = {};
+    const newErrors: Errors = {};
 
     if (!formData.shippingAddress) newErrors.shippingAddress = 'Address is required';
     if (!formData.city) newErrors.city = 'City is required';
@@ -56,21 +72,30 @@ const ShippingAddress = () => {
     if (!validateForm()) return;
 
     if (user?.id) {
-      await dispatch(updateShippingDetails({ userId: user.id, ...formData }));
+      try {
+        await dispatch(
+          updateShippingDetails({ userId: user.id, ...formData })
+        ).unwrap();
+        toast({
+            title: "Shipping address updated successfully!",
+            variant: "success"
+        })
+      } catch (error) {
+        toast({
+            title: "Failed to update shipping address.",
+            variant: "destructive"
+        })
+      }
     }
   };
 
-  if (isLoading) {
-    return (
-      <div className="fixed inset-0 flex items-center justify-center bg-white z-50">
-        <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-gray-900"></div>
-      </div>
-    );
+  if (loading) {
+    return <TailwindLoader />;
   }
 
   return (
-    <div>
-      <h2 className="text-2xl font-semibold mb-4">Shipping Address</h2>
+    <div className="p-6 max-w-4xl mx-auto">
+      <h2 className="text-2xl font-semibold mb-6">Shipping Address</h2>
       <form onSubmit={handleSubmit} className="space-y-4">
         <div>
           <Label htmlFor="shippingAddress">Address</Label>

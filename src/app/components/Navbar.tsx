@@ -16,7 +16,7 @@ import { logout, checkAuth } from '../redux/authSlice';
 
 export default function Navbar() {
   const dispatch = useDispatch<AppDispatch>();
-  const { isAuthenticated, user, status } = useSelector((state: RootState) => state.auth);
+  const { isAuthenticated, user } = useSelector((state: RootState) => state.auth);
   const cartItems = useSelector((state: RootState) => state.cart.items);
   const [isScrolled, setIsScrolled] = useState(false);
   const [isCartOpen, setIsCartOpen] = useState(false);
@@ -29,7 +29,7 @@ export default function Navbar() {
     if (token && !user?.name) {
       dispatch(checkAuth());
     }
-  }, [token, user, status, dispatch]);
+  }, [token, user, dispatch]);
 
   useMotionValueEvent(scrollY, 'change', (latest) => {
     setIsScrolled(latest > 50);

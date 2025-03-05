@@ -1,9 +1,9 @@
 import { createSlice, createAsyncThunk } from "@reduxjs/toolkit";
 import * as api from "@/app/api/apiClient";
-import { Order, OrderCheckout, OrderItemCheckout } from '@/app/data/orderTypes';
+import { Order } from '@/app/data/orderTypes';
 
 interface OrdersState {
-  items: OrderCheckout[];
+  items: Order[];
   loading: boolean;
   error: string | null;
 }
