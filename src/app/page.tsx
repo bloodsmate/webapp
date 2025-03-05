@@ -12,12 +12,12 @@ import HeartPulse from '@/app/components/HeartPulse'
 
 // const Scene = dynamic(() => import('./components/Scene'), { ssr: false })
 
-export async function generateStaticParams() {
-  return {
-    paths: [],
-    fallback: 'blocking',
-  };
-}
+// export async function generateStaticParams() {
+//   return {
+//     paths: [],
+//     fallback: 'blocking',
+//   };
+// }
 
 export default function Home() {
   return (
