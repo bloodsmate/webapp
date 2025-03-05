@@ -1,12 +1,12 @@
 /** @type {import('next').NextConfig} */
 
-const isGithubPages = process.env.PAGES_GITHUB === 'true';
-const repoName = 'webapp';
-const orgName = 'bloodsmate';
+// const isGithubPages = process.env.PAGES_GITHUB === 'true';
+// const repoName = 'webapp';
+// const orgName = 'bloodsmate';
 
 const nextConfig = {
-    basePath: isGithubPages ? `/${repoName}` : '',
-    assetPrefix: isGithubPages ? `/${orgName}/${repoName}/` : '',
+    // basePath: isGithubPages ? `/${repoName}` : '',
+    // assetPrefix: isGithubPages ? `/${orgName}/${repoName}/` : '',
     output: 'export',
     images: {
         formats: ['image/webp'],

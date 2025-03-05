@@ -5,14 +5,18 @@ export interface OrderItem {
   totalPrice: number;
   size: string;
   Product: {
+    id: number;
     name: string;
     images: string[];
+    discountPercentage: number;
   };
 }
 
 export interface Order {
+  id: number;
   orderId: string;
   status: string;
+  paymentStatus: string;
   orderDate: string;
   shippingAddress: string;
   paymentMethod: string;

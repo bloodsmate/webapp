@@ -66,10 +66,10 @@ export default function RootLayout({
           </Providers>
         </ThemeProvider>
 
-        <Script
+        {/* <Script
           src="https://www.payhere.lk/lib/payhere.js"
           strategy="lazyOnload"
-        />
+        /> */}
         <Script
           src="https://challenges.cloudflare.com/turnstile/v0/api.js"
           async

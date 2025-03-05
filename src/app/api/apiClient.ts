@@ -1,8 +1,8 @@
 import axios from "axios"
 
 // const API_BASE_URL = process.env.NEXT_PUBLIC_API_BASE_URL || "http://localhost:3001/api"
-// const API_BASE_URL = "http://localhost:3001/api"
-const API_BASE_URL = process.env.API_BASE_URL;
+const API_BASE_URL = "http://localhost:3001/api"
+// const API_BASE_URL = process.env.API_BASE_URL;
 
 const apiClient = axios.create({
   baseURL: API_BASE_URL,
@@ -28,7 +28,7 @@ export const login = async (email: string, password: string) => {
 
 export const getUser = async () => {
     const response = await apiClient.get(`/users/token/checkAuth`)
-    return response.data
+    return response.data.user
   }
 
 export const logout = async () => {
@@ -85,6 +85,7 @@ export const createOrder = async (orderData: any) => {
 
 export const getOrdersByUserId = async (userId: Number) => {
   const response = await apiClient.get(`/orders/${userId}`)
+  console.log(response.data);
   return response.data
 }
 
@@ -95,8 +96,26 @@ export const getOrdersByOrderId = async (orderId: string) => {
 
 export const processPayment = async (paymentData: any) => {
   const response = await apiClient.post("/payment/create-payment", paymentData)
-  console.log(response);
-  console.log(response.data);
+  return response.data
+}
+
+export const createMarxOrder = async (paymentData: any) => {
+  const response = await apiClient.post("/payment/create-marx-order", paymentData)
+  return response.data
+}
+
+export const verifyMarxOrder = async (paymentData: any) => {
+  const response = await apiClient.post("/payment/verify-marx-payment", paymentData)
+  return response.data
+}
+
+export const updateShippingDetails = async (accountData: any) => {
+  const response = await apiClient.put("/users/shipping-details", accountData)
+  return response.data
+}
+
+export const updateAccountDetails = async (accountData: any) => {
+  const response = await apiClient.put("/users/account-details", accountData)
   return response.data
 }
 
