@@ -16,7 +16,7 @@ import Loader from '@/app/components/Loader';
 import { notFound } from "next/navigation";
 import { Order, OrderItem } from '@/app/data/orderTypes';
 
-export default function OrderConfirmationClient({ params }: { params: { orderId: string } }) {
+export default function OrderConfirmationClient({ orderId }: { orderId: string }) {
   const router = useRouter();
   const dispatch = useDispatch<AppDispatch>();
   const orders = useSelector((state: RootState) => state.orders.items);
@@ -29,7 +29,7 @@ export default function OrderConfirmationClient({ params }: { params: { orderId:
     const fetchOrder = async () => {
       setLoading(true);
       try {
-        const resultAction = await dispatch(fetchOrdersByOrderId(params.orderId));
+        const resultAction = await dispatch(fetchOrdersByOrderId(orderId));
         if (fetchOrdersByOrderId.fulfilled.match(resultAction)) {
           setOrder(resultAction.payload);
         } else {
@@ -53,7 +53,7 @@ export default function OrderConfirmationClient({ params }: { params: { orderId:
     };
 
     fetchOrder();
-  }, [dispatch, params.orderId, router]);
+  }, [dispatch, orderId, router]);
 
   // Function to handle PDF export
   const handleExportPDF = async () => {
