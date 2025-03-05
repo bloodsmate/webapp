@@ -26,7 +26,7 @@ export default function Home() {
         </Suspense> */}
         <Hero />
         <HeartPulse />
-        <FeaturedProducts />
+        <FeaturedProducts name="Must-Have Styles" noOfSlides="4" />
         {/* <GoogleReviews /> */}
         {/* <InstagramFeed /> */}
         <ShopTheLook />

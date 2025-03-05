@@ -1,7 +1,8 @@
 import axios from "axios"
 
 // const API_BASE_URL = process.env.NEXT_PUBLIC_API_BASE_URL || "http://localhost:3001/api"
-const API_BASE_URL = "http://localhost:3001/api"
+const API_BASE_URL = "https://backend-vbgu.onrender.com/api"
+// const API_BASE_URL = "http://localhost:3001/api"
 // const API_BASE_URL = process.env.API_BASE_URL;
 
 const apiClient = axios.create({

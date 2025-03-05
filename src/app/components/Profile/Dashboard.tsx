@@ -22,10 +22,7 @@ const Dashboard = () => {
         <p className="text-gray-600 mb-6">
             Welcome back, {user?.name || 'User'}! Here's a quick overview of your account.
         </p>
-        <div className="mb-8">
-        <h3 className="text-xl font-semibold text-gray-900 mb-4">Featured Products</h3>
-            <FeaturedProducts />
-        </div>
+        
       </div>
     );
   };
