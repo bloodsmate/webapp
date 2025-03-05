@@ -12,6 +12,13 @@ import HeartPulse from '@/app/components/HeartPulse'
 
 // const Scene = dynamic(() => import('./components/Scene'), { ssr: false })
 
+export async function generateStaticParams() {
+  return {
+    paths: [],
+    fallback: 'blocking',
+  };
+}
+
 export default function Home() {
   return (
     <div className="min-h-screen flex flex-col">
