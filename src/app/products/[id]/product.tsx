@@ -89,13 +89,13 @@ function Breadcrumb({ product }: { product: Product }) {
   );
 }
 
-export default function ProductPageClient({ params }: { params: { id: string } }) {
+export default function ProductPageClient({ id }: { id: string }) {
   const dispatch = useDispatch<AppDispatch>();
   const { selectedProduct: productData, loading, error } = useSelector(
     (state: RootState) => state.products
   );
   const { items: products, loading: productLoading, error: ProductError } = useSelector((state: RootState) => state.products);
-  const product = products.find(p => p.id === parseInt(params.id))
+  const product = products.find(p => p.id === parseInt(id))
   const [isLoading, setIsLoading] = useState(true)
 
 //   useEffect(()=>{
@@ -108,9 +108,9 @@ export default function ProductPageClient({ params }: { params: { id: string } }
 //   },[]);
 
   useEffect(() => {
-    dispatch(fetchProduct(Number(params.id)));
+    dispatch(fetchProduct(Number(id)));
     setIsLoading(false);
-  }, [dispatch, params.id]);
+  }, [dispatch, id]);
 
   if (isLoading) {
     return (

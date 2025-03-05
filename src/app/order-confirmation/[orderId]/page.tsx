@@ -4,5 +4,5 @@ export function generateStaticParams() {
   return [{ orderId: "test" }];
 }
 export default async function OrderConfirmationPage({ params }: { params: { orderId: string } }) {
-  return <OrderConfirmationClient params={params} />;
+  return <OrderConfirmationClient orderId={params.orderId} />;
 }
