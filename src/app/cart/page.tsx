@@ -219,7 +219,7 @@ export default function CartPage() {
         </AlertDialogContent>
       </AlertDialog>
 
-      <FeaturedProducts name="Must-Have Styles" noOfSlides="4" />
+      <FeaturedProducts name="Must-Have Styles" />
     </>
   );
 }
