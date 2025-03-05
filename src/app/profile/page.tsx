@@ -72,7 +72,7 @@ const ProfilePage = () => {
 
       {activeTab === 'dashboard' && (
         <div className="mb-8">
-          <FeaturedProducts name="Must-Have Styles" noOfSlides={3} />
+          <FeaturedProducts name="Must-Have Styles" />
         </div>
       )}
 
