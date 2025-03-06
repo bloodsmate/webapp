@@ -1,4 +1,4 @@
-"use client";
+'use client'
 
 import { useState, useEffect, useRef } from "react";
 import Image from "next/image";
@@ -11,6 +11,7 @@ import { addToWishlist, removeFromWishlist } from "@/app/redux/wishlistSlice";
 import { toast } from "@/app/hooks/use-toast";
 import Waitlist from "@/app/components/Waitlist";
 import ProductDetailsDescription from "@/app/components/ProductDetailsDescription";
+import { Tooltip, TooltipContent, TooltipTrigger, TooltipProvider } from "@/app/components/ui/tooltip";
 import {
   Accordion,
   AccordionContent,
@@ -18,7 +19,7 @@ import {
   AccordionTrigger,
 } from "@/app/components/ui/accordion";
 import type { RootState } from "../redux/store";
-import { FaCcVisa, FaCcMastercard } from "react-icons/fa";
+import { FaCcVisa, FaCcMastercard, FaCcAmex } from "react-icons/fa";
 import Loader from "./Loader";
 import sizeChartImage from "@/app/assets/bloodsmate_size_chart.png";
 import { Swiper, SwiperSlide } from "swiper/react";
@@ -110,6 +111,7 @@ function PaymentOptions() {
           <div className="flex items-center space-x-4 mt-4">
             <FaCcVisa size={32} className="text-blue-900" />
             <FaCcMastercard size={32} className="text-red-600" />
+            <FaCcAmex size={32} className="text-blue-600" />
             <img
               src="https://res.cloudinary.com/midefulness/image/upload/v1736096286/BloodsMate/koko-pay_d6id9w.png"
               alt="koko pay"
@@ -144,9 +146,13 @@ export default function ProductDetails({ product }: { product: Product }) {
   const [outOfStock, setOutOfStock] = useState<boolean>(false);
   const [isLoading, setIsLoading] = useState(true);
   const [joinedWaitlist, setJoinedWaitlist] = useState<boolean>(false);
+  const [quantity, setQuantity] = useState<number>(1); // Quantity selector
+  const [availableQuantity, setAvailableQuantity] = useState<number>(0); // Track available stock
   const dispatch = useDispatch();
   const wishlistItems = useSelector((state: RootState) => state.wishlist.items);
   const isInWishlist = wishlistItems.some((item) => item.id === product.id);
+
+  const cartItems = useSelector((state: RootState) => state.cart.items)
 
   // Zoom functionality
   const [isZoomed, setIsZoomed] = useState(false);
@@ -171,6 +177,78 @@ export default function ProductDetails({ product }: { product: Product }) {
     return () => clearTimeout(timer);
   }, []);
 
+
+  useEffect(() => {
+    if (selectedSize) {
+      const stockItem = product.stock.find((item) => item.size === selectedSize);
+      const stockQuantity = stockItem ? stockItem.quantity : 0;
+      setAvailableQuantity(stockQuantity);
+      setOutOfStock(stockQuantity === 0);
+      setQuantity(stockQuantity === 0 ? 0 : 1); // Reset quantity to 1 or 0
+    } else {
+      setAvailableQuantity(0);
+      setOutOfStock(false);
+      setQuantity(1); // Reset quantity to 1
+    }
+  }, [selectedSize, product.stock]);
+
+  const handleIncreaseQuantity = () => {
+    const newQuantity = quantity + 1;
+    if (newQuantity > availableQuantity) {
+      toast({
+        title: "Insufficient Stock",
+        description: `Only ${availableQuantity} items available.`,
+        variant: "destructive",
+      });
+    } else {
+      setQuantity(newQuantity);
+    }
+  };
+
+  const handleDecreaseQuantity = () => {
+    const newQuantity = quantity - 1;
+    if (newQuantity < 1) {
+      toast({
+        title: "Invalid Quantity",
+        description: "Quantity cannot be less than 1.",
+        variant: "destructive",
+      });
+    } else {
+      setQuantity(newQuantity);
+    }
+  };
+
+  const handleManualQuantityChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+    const newQuantity = Number(e.target.value);
+  
+    if (isNaN(newQuantity)) {
+      toast({
+        title: "Invalid Input",
+        description: "Please enter a valid number.",
+        variant: "destructive",
+      });
+      return;
+    }
+  
+    if (newQuantity < 1) {
+      toast({
+        title: "Invalid Quantity",
+        description: "Quantity cannot be less than 1.",
+        variant: "destructive",
+      });
+      setQuantity(1);
+    } else if (newQuantity > availableQuantity) {
+      toast({
+        title: "Insufficient Stock",
+        description: `Only ${availableQuantity} items available.`,
+        variant: "destructive",
+      });
+      setQuantity(availableQuantity);
+    } else {
+      setQuantity(newQuantity);
+    }
+  };
+
   const handleAddToCart = () => {
     if (!selectedSize) {
       toast({
@@ -180,33 +258,41 @@ export default function ProductDetails({ product }: { product: Product }) {
       });
       return;
     }
-
-    const stockItem = product.stock.find((item) => item.size === selectedSize);
-    if (!stockItem || stockItem.quantity === 0) {
+  
+    const existingCartItem = cartItems.find(
+      (item) => item.id === product.id && item.size === selectedSize
+    );
+    const totalQuantity = (existingCartItem?.quantity || 0) + quantity;
+  
+    if (totalQuantity > availableQuantity) {
       toast({
-        title: "Out of Stock",
-        description: `The selected size (${selectedSize}) is out of stock.`,
+        title: "Insufficient Stock",
+        description: `Only ${availableQuantity} items available for the selected size (${selectedSize}).`,
         variant: "destructive",
       });
       return;
     }
-
+  
     dispatch(
       addToCart({
         id: product.id,
         name: product.name,
         price: product.price,
-        quantity: 1,
+        quantity: quantity,
         size: selectedSize,
         image: product.images[0],
-        discountPrice: Number((product.discountPercentage && product.discountPercentage > 0) ? discountedPrice : 0),
+        discountPrice: Number(
+          product.discountPercentage && product.discountPercentage > 0
+            ? discountedPrice
+            : 0
+        ),
       })
     );
-
+  
     toast({
       title: "Added to cart",
       variant: "success",
-      description: `${product.name} (${selectedSize}) has been added to your cart.`,
+      description: `${product.name} (${selectedSize}) x${quantity} has been added to your cart.`,
     });
   };
 
@@ -306,8 +392,10 @@ export default function ProductDetails({ product }: { product: Product }) {
                   <SwiperSlide key={index}>
                     <button
                       onClick={() => setMainImage(index)}
-                      className={`relative w-20 h-20 rounded-md overflow-hidden flex-shrink-0 shadow-md ${
-                        mainImage === index ? "ring-2 ring-black" : ""
+                      className={`relative w-20 h-20 overflow-hidden rounded-md flex-shrink-0 shadow-md transition-transform duration-300 ${
+                        mainImage === index
+                          ? "ring-2 ring-[#002366] " // Modern design with scaling
+                          : "hover:scale-105"
                       }`}
                     >
                       <Image
@@ -369,42 +457,85 @@ export default function ProductDetails({ product }: { product: Product }) {
                   <p className="text-lg text-gray-500 line-through">
                     LKR {product.price.toFixed(2)}
                   </p>
-                  {/* <p className="text-lg font-semibold text-green-500">
-                    Save {product.discountPercentage}%
-                  </p> */}
                 </>
               )}
             </div>
             <div>
               <h3 className="text-lg font-bold mb-2">Select Size</h3>
               <div className="flex flex-wrap gap-2">
-                {product.sizes.map((size, index) => {
-                  const stockItem = product.stock.find((item) => item.size === size);
-                  const isOutOfStock = !stockItem || stockItem.quantity === 0;
+              {product.sizes.map((size, index) => {
+                const stockItem = product.stock.find((item) => item.size === size);
+                const isOutOfStock = !stockItem || stockItem.quantity === 0;
 
-                  return (
-                    <button
-                      key={size}
-                      onClick={() => {
-                        setSelectedSize(size);
-                        setOutOfStock(isOutOfStock);
-                      }}
-                      className={`relative flex items-center justify-center w-12 h-12 text-sm font-semibold border-2 rounded-md ${
-                        selectedSize === size
-                          ? "border-[#002366] bg-blue-100"
-                          : "border-gray-300"
-                      } ${isOutOfStock ? "opacity-50" : "hover:border-blue-600"}`}
-                    >
-                      {size}
+                return (
+                  <TooltipProvider>
+                    <Tooltip key={size}>
+                      <TooltipTrigger asChild>
+                        <button
+                          onClick={() => {
+                            setSelectedSize(size);
+                            setOutOfStock(isOutOfStock);
+                          }}
+                          className={`relative flex items-center justify-center w-12 h-12 text-sm font-semibold border-2 rounded-md ${
+                            selectedSize === size
+                              ? "border-[#002366] bg-blue-100"
+                              : "border-gray-300"
+                          } ${isOutOfStock ? "opacity-50 cursor-not-allowed" : "hover:border-blue-600"}`}
+                          // disabled={isOutOfStock}
+                        >
+                          {size}
+                          {isOutOfStock && (
+                            <span className="absolute inset-0 flex items-center justify-center text-red-600 text-lg font-bold">
+                              X
+                            </span>
+                          )}
+                        </button>
+                      </TooltipTrigger>
                       {isOutOfStock && (
-                        <span className="absolute inset-0 flex items-center justify-center text-red-600 text-lg font-bold">
-                          X
-                        </span>
+                        <TooltipContent>
+                          <p>This size is out of stock. Click to join the waitlist.</p>
+                        </TooltipContent>
                       )}
-                    </button>
-                  );
-                })}
+                    </Tooltip>
+                  </TooltipProvider>
+                );
+              })}
               </div>
+            </div>
+
+            {/* Quantity Selector */}
+            <div className="flex items-center space-x-4">
+              <label className="text-lg font-semibold">Quantity:</label>
+              <div className="flex items-center border border-gray-300 rounded-md overflow-hidden">
+                <button
+                  onClick={handleDecreaseQuantity}
+                  className="px-3 py-2 bg-gray-100 hover:bg-gray-200 transition-colors"
+                  disabled={quantity < 1 || outOfStock}
+                >
+                  -
+                </button>
+                <input
+                  type="number"
+                  min="1"
+                  max={availableQuantity}
+                  value={quantity}
+                  onChange={handleManualQuantityChange}
+                  className="w-16 text-center border-l border-r border-gray-300 focus:outline-none no-spinners"
+                  disabled={outOfStock}
+                />
+                <button
+                  onClick={handleIncreaseQuantity}
+                  className="px-3 py-2 bg-gray-100 hover:bg-gray-200 transition-colors"
+                  disabled={quantity > availableQuantity || outOfStock}
+                >
+                  +
+                </button>
+              </div>
+              {availableQuantity > 0 && availableQuantity <= 5 && (
+                <p className="text-sm text-red-600">
+                  Only {availableQuantity} items left!
+                </p>
+              )}
             </div>
 
             {/* Add to Cart and Wishlist Buttons */}
@@ -446,6 +577,7 @@ export default function ProductDetails({ product }: { product: Product }) {
               <div className="flex space-x-2">
                 <FaCcVisa size={32} className="text-blue-900" />
                 <FaCcMastercard size={32} className="text-red-600" />
+                <FaCcAmex size={32} className="text-blue-600" />
                 <img
                   src="https://res.cloudinary.com/midefulness/image/upload/v1736096286/BloodsMate/koko-pay_d6id9w.png"
                   alt="koko pay"

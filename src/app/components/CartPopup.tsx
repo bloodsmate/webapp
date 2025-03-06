@@ -1,46 +1,59 @@
 'use client'
 
-import { useSelector } from 'react-redux'
-import { motion } from 'framer-motion'
-import { ShoppingBag, X } from 'lucide-react'
-import { Button } from './ui/button'
-import { RootState } from '../redux/store'
-import Link from 'next/link'
-import Image from "next/image"
-import { useEffect, useRef } from 'react'
+import { useSelector, useDispatch } from 'react-redux';
+import { motion } from 'framer-motion';
+import { ShoppingBag, X, Trash2 } from 'lucide-react';
+import { Button } from '@/app/components/ui/button';
+import { RootState } from '@/app/redux/store';
+import Link from 'next/link';
+import Image from 'next/image';
+import { useEffect, useRef } from 'react';
+import { removeFromCart } from '@/app/redux/cartSlice';
+import { toast } from '@/app/hooks/use-toast';
 
 interface CartPopupProps {
-  isOpen: boolean
-  onClose: () => void
+  isOpen: boolean;
+  onClose: () => void;
 }
 
 export default function CartPopup({ isOpen, onClose }: CartPopupProps) {
-  const cartItems = useSelector((state: RootState) => state.cart.items)
-  const popupRef = useRef<HTMLDivElement>(null)
+  const cartItems = useSelector((state: RootState) => state.cart.items);
+  const dispatch = useDispatch();
+  const popupRef = useRef<HTMLDivElement>(null);
 
   // Calculate total price
-  const total = cartItems.reduce((sum, item) => 
-    sum + (item.discountPrice === 0 ? item.price : item.discountPrice) * item.quantity, 
-  0)
+  const total = cartItems.reduce(
+    (sum, item) => sum + (item.discountPrice === 0 ? item.price : item.discountPrice) * item.quantity,
+    0
+  );
 
   // Close popup when clicking outside
   useEffect(() => {
     const handleClickOutside = (event: MouseEvent) => {
       if (popupRef.current && !popupRef.current.contains(event.target as Node)) {
-        onClose()
+        onClose();
       }
-    }
+    };
 
     if (isOpen) {
-      document.addEventListener('mousedown', handleClickOutside)
+      document.addEventListener('mousedown', handleClickOutside);
     }
 
     return () => {
-      document.removeEventListener('mousedown', handleClickOutside)
-    }
-  }, [isOpen, onClose])
+      document.removeEventListener('mousedown', handleClickOutside);
+    };
+  }, [isOpen, onClose]);
 
-  if (!isOpen) return null
+  // Handle item removal
+  const handleRemoveItem = (id: number, size: string) => {
+    dispatch(removeFromCart({ id, size }));
+    toast({
+      title: 'Item removed',
+      description: 'The item has been removed from your cart.',
+    });
+  };
+
+  if (!isOpen) return null;
 
   return (
     <motion.div
@@ -68,12 +81,12 @@ export default function CartPopup({ isOpen, onClose }: CartPopupProps) {
           <ul className="divide-y">
             {cartItems.map((item) => (
               <li key={`${item.id}-${item.size}`} className="flex p-4 hover:bg-gray-50">
-                <Image 
-                  src={item.image || "/placeholder.svg"} 
-                  alt={item.name} 
-                  width={80} 
-                  height={80} 
-                  className="h-20 w-20 object-cover rounded-md" 
+                <Image
+                  src={item.image || '/placeholder.svg'}
+                  alt={item.name}
+                  width={80}
+                  height={80}
+                  className="h-20 w-20 object-cover rounded-md"
                 />
                 <div className="ml-4 flex-1">
                   <div className="flex justify-between text-base font-medium text-gray-900">
@@ -85,11 +98,25 @@ export default function CartPopup({ isOpen, onClose }: CartPopupProps) {
                         </p>
                       )}
                       <p>
-                        LKR{(item.discountPrice === 0 ? (item.price * item.quantity).toFixed(2) : (item.discountPrice * item.quantity).toFixed(2))}
+                        LKR
+                        {item.discountPrice === 0
+                          ? (item.price * item.quantity).toFixed(2)
+                          : (item.discountPrice * item.quantity).toFixed(2)}
                       </p>
                     </div>
                   </div>
-                  <p className="text-sm text-gray-500">Qty: {item.quantity}</p>
+                  <div className="flex gap-4 mt-1 justify-items-center items-center place-content-between">
+                    <div className="flex gap-4">
+                      <p className="text-sm text-gray-500">Size: {item.size}</p>
+                      <p className="text-sm text-gray-500">Qty: {item.quantity}</p>
+                    </div>  
+                    <button
+                      onClick={() => handleRemoveItem(item.id, item.size)}
+                      className="text-sm text-red-500 hover:text-red-700 flex items-center"
+                    >
+                      <Trash2 className="w-4 h-4 mr-1" /> Remove
+                    </button>
+                   </div> 
                 </div>
               </li>
             ))}
@@ -110,5 +137,5 @@ export default function CartPopup({ isOpen, onClose }: CartPopupProps) {
         </Link>
       </div>
     </motion.div>
-  )
+  );
 }

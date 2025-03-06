@@ -16,7 +16,7 @@ import { useRouter } from 'next/navigation';
 
 export default function ClientLayout({ children }: { children: React.ReactNode }) {
   const pathname = usePathname()
-  const isAuthPage = pathname === "/auth"
+  const isAuthPage = pathname === "/auth/"
 
   const dispatch = useDispatch<AppDispatch>()
 
