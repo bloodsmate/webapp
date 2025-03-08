@@ -1,42 +1,76 @@
-import { createSlice, createAsyncThunk } from "@reduxjs/toolkit"
-import * as api from "../api/apiClient"
+import { createSlice, createAsyncThunk, PayloadAction } from '@reduxjs/toolkit';
+import * as api from "@/app/api/apiClient";
 
-export const processPayment = createAsyncThunk(
-  "payment/processPayment",
-  async (paymentData: any, { rejectWithValue }) => {
+interface CreatePayHerePaymentArgs {
+  amount: number;
+  email: string;
+  orderId: string;
+  name: string;
+  address: string;
+  city: string;
+  phone: string;
+}
+
+export const createPayHerePayment = createAsyncThunk(
+  'payment/createPayHerePayment',
+  async ({ amount, email, orderId, name, address, city, phone }: CreatePayHerePaymentArgs, { rejectWithValue }) => {
     try {
-      return await api.processPayment(paymentData)
-    } catch (error) {
-      return rejectWithValue((error as Error).message)
+      const paymentData = {
+        orderId,
+        amount,
+        email,
+        name,
+        address,
+        city,
+        phone
+      }
+       
+      const response = await api.processPayment(paymentData);
+      console.log(response);
+      return response;
+
+      // const response = await axios.post('/api/payment/create-payment', {
+      //   amount,
+      //   email,
+      //   orderId,
+      // });
+      // return response.data.payment_url;
+    } catch (error: any) {
+      return rejectWithValue(error.response?.data || 'An error occurred');
     }
-  },
-)
+  }
+);
 
 const paymentSlice = createSlice({
-  name: "payment",
+  name: 'payment',
   initialState: {
+    paymentUrl: null as string | null,
     loading: false,
-    error: null,
-    paymentResult: null,
+    error: null as string | null,
   },
-  reducers: {},
+  reducers: {
+    resetPaymentState: (state) => {
+      state.paymentUrl = null;
+      state.loading = false;
+      state.error = null;
+    },
+  },
   extraReducers: (builder) => {
     builder
-      .addCase(processPayment.pending, (state) => {
-        state.loading = true
-        state.error = null
-        state.paymentResult = null
+      .addCase(createPayHerePayment.pending, (state) => {
+        state.loading = true;
+        state.error = null;
       })
-      .addCase(processPayment.fulfilled, (state, action) => {
-        state.loading = false
-        state.paymentResult = action.payload
+      .addCase(createPayHerePayment.fulfilled, (state, action: PayloadAction<string>) => {
+        state.loading = false;
+        state.paymentUrl = action.payload;
       })
-      .addCase(processPayment.rejected, (state, action) => {
-        state.loading = false
-        state.error = action.payload as string
-      })
+      .addCase(createPayHerePayment.rejected, (state, action: PayloadAction<any>) => {
+        state.loading = false;
+        state.error = action.payload || 'Failed to create payment';
+      });
   },
-})
+});
 
-export default paymentSlice.reducer
-
+export const { resetPaymentState } = paymentSlice.actions;
+export default paymentSlice.reducer;

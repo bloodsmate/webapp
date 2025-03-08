@@ -57,7 +57,7 @@ export default function ProductsPage() {
   const [selectedSizes, setSelectedSizes] = useState<string[]>([]);
   const [selectedGenders, setSelectedGenders] = useState<string[]>([]);
   const [selectedAvailability, setSelectedAvailability] = useState<boolean | null>(null);
-  const [selectedSizesByProduct, setSelectedSizesByProduct] = useState<Map<number, string>>(new Map());
+  const [selectedSizesByProduct, setSelectedSizesByProduct] = useState<Map<number, string | null>>(new Map())
 
   const [isSidebarOpen, setIsSidebarOpen] = useState(false);
   const [isDropdownOpen, setIsDropdownOpen] = useState(false);
@@ -68,6 +68,8 @@ export default function ProductsPage() {
   const indexOfFirstProduct = indexOfLastProduct - productsPerPage;
   const currentProducts = filteredProducts.slice(indexOfFirstProduct, indexOfLastProduct);
   const totalPages = Math.ceil(filteredProducts.length / productsPerPage);
+
+  const cartItems = useSelector((state: RootState) => state.cart.items)
 
   useEffect(() => {
     dispatch(fetchProducts());
@@ -127,7 +129,7 @@ export default function ProductsPage() {
     }));
     toast({
       title: "Added to cart",
-      description: `${product.name} (Size: ${selectedSize}) added to cart!`,
+      description: `${product.name} (Size: ${selectedSize}) added to cart!`
     });
   };
 
@@ -256,7 +258,7 @@ export default function ProductsPage() {
                       </Link>
 
                       {/* Discount Price Tag */}
-                      {(product.discountPercentage > 0) && (
+                      {(product.discountPercentage ?? 0) > 0 && (
                         <div className="absolute top-4 right-4 bg-red-600 text-white text-sm font-semibold px-3 py-1 rounded-full">
                           Save {product.discountPercentage}%
                         </div>
@@ -301,9 +303,7 @@ export default function ProductsPage() {
                     </div>
 
                     {/* Quick View Section */}
-                    <div
-                      className="absolute bottom-0 left-0 w-full bg-gray-800 bg-opacity-90 text-white p-4 transform translate-y-full group-hover:translate-y-0 transition-transform duration-300"
-                    >
+                    <div className="absolute bottom-0 left-0 w-full bg-gray-800 bg-opacity-90 text-white p-4 transform translate-y-full group-hover:translate-y-0 transition-transform duration-300">
                       <h4 className="text-lg font-bold mb-2">{product.name}</h4>
 
                       {/* Price Section */}
@@ -314,7 +314,6 @@ export default function ProductsPage() {
                               LKR {discountedPrice(product)}
                             </p>
                             <p className="text-sm text-gray-400 line-through">LKR {product.price.toFixed(2)}</p>
-                            {/* <span className="ml-2 text-green-400 font-semibold">Save {product.discountPercentage}%</span> */}
                           </>
                         ) : (
                           <p className="text-gray-300 font-semibold">LKR {product.price.toFixed(2)}</p>
@@ -323,7 +322,7 @@ export default function ProductsPage() {
 
                       {/* Image Slider */}
                       <div className="mb-4">
-                        <div className='relative'>
+                        <div className="relative">
                           <Swiper
                             modules={[Navigation]}
                             spaceBetween={10}
@@ -333,18 +332,10 @@ export default function ProductsPage() {
                               prevEl: '.swiper-button-prev',
                             }}
                             breakpoints={{
-                              320: {
-                                slidesPerView: 4,
-                              },
-                              640: {
-                                slidesPerView: 4,
-                              },
-                              1024: {
-                                slidesPerView: 4,
-                              },
-                              1500: {
-                                slidesPerView: 5,
-                              },
+                              320: { slidesPerView: 4 },
+                              640: { slidesPerView: 4 },
+                              1024: { slidesPerView: 4 },
+                              1500: { slidesPerView: 5 },
                             }}
                           >
                             {product.images.map((image, index) => (
@@ -380,35 +371,85 @@ export default function ProductsPage() {
 
                       {/* Size Selection */}
                       <div className="flex flex-wrap gap-2 mb-4">
-                        {product.sizes.map((size) => (
-                          <button
-                            key={size}
-                            onClick={() => handleSizeSelection(product.id, size)}
-                            className={`relative px-4 py-2 rounded-lg text-sm font-semibold border border-white ${
-                              getStockQuantity(product, size) === 0
-                                ? 'bg-gray-500 cursor-not-allowed text-gray-300 relative'
-                                : selectedSize === size
-                                ? 'bg-gray-900 text-white'
-                                : 'bg-gray-700 hover:bg-gray-900 text-white'
-                            }`}
-                            disabled={getStockQuantity(product, size) === 0}
-                          >
-                            {size}
-                            {getStockQuantity(product, size) === 0 && (
-                              <span
-                                className="absolute inset-0 flex items-center justify-center text-red-600 text-xl font-bold"
-                              >
-                                X
-                              </span>
-                            )}
-                          </button>
-                        ))}
+                        {product.sizes.map((size) => {
+                          const stockQuantity = getStockQuantity(product, size);
+                          const isOutOfStock = stockQuantity === 0;
+
+                          return (
+                            <button
+                              key={size}
+                              onClick={() => handleSizeSelection(product.id, size)}
+                              className={`relative px-4 py-2 rounded-lg text-sm font-semibold border border-white ${
+                                isOutOfStock
+                                  ? 'bg-gray-500 cursor-not-allowed text-gray-300 relative'
+                                  : selectedSize === size
+                                  ? 'bg-gray-900 text-white'
+                                  : 'bg-gray-700 hover:bg-gray-900 text-white'
+                              }`}
+                              disabled={isOutOfStock}
+                            >
+                              {size}
+                              {isOutOfStock && (
+                                <span className="absolute inset-0 flex items-center justify-center text-red-600 text-xl font-bold">
+                                  X
+                                </span>
+                              )}
+                            </button>
+                          );
+                        })}
                       </div>
 
                       {/* Add to Cart Button */}
                       <Button
-                        onClick={() => handleAddToCart(product)}
-                        className="w-full bg-gray-900 hover:bg-gray-700 text-white font-semibold py-2 rounded-lg"
+                        onClick={() => {
+                          const selectedSize = getSelectedSizeForProduct(product.id);
+                          if (!selectedSize) {
+                            toast({
+                              title: "Size not selected",
+                              description: "Please select a size before adding to cart.",
+                              variant: "destructive",
+                            });
+                            return;
+                          }
+
+                          // Check available stock
+                          const stockQuantity = getStockQuantity(product, selectedSize);
+                          const existingCartItem = cartItems.find(
+                            (item) => item.id === product.id && item.size === selectedSize
+                          );
+                          const totalQuantityInCart = existingCartItem ? existingCartItem.quantity : 0;
+
+                          if (totalQuantityInCart >= stockQuantity) {
+                            toast({
+                              title: "Insufficient Stock",
+                              description: `Only ${stockQuantity} items available for ${selectedSize}.`,
+                              variant: "destructive",
+                            });
+                            return;
+                          }
+
+                          dispatch(
+                            addToCart({
+                              id: product.id,
+                              name: product.name,
+                              price: product.price,
+                              quantity: 1,
+                              size: selectedSize,
+                              image: mainImageRef.current.get(product.id) || product.images[0],
+                              discountPrice: Number(
+                                product.discountPercentage && product.discountPercentage > 0
+                                  ? discountedPrice(product)
+                                  : 0
+                              ),
+                            })
+                          );
+
+                          toast({
+                            title: "Added to cart",
+                            description: `${product.name} (Size: ${selectedSize}) added to cart!`,
+                          });
+                        }}
+                        className="w-full bg-gray-900 hover:bg-gray-700 hover:border hover:border-white text-white font-semibold py-2 rounded-lg"
                         disabled={!selectedSize || !product.inStock} // Disable if out of stock
                       >
                         {product.inStock ? 'Add to Cart' : 'Out of Stock'}

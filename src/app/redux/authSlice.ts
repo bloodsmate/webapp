@@ -1,5 +1,5 @@
 import { createSlice, createAsyncThunk } from "@reduxjs/toolkit"
-import * as api from "../api/apiClient"
+import * as api from "@/app/api/apiClient"
 import { AxiosError } from "axios"
 
 interface AuthState {
@@ -7,7 +7,12 @@ interface AuthState {
     id: string
     name: string
     email: string
+    password: string
     role: string
+    shippingAddress: string | null
+    city: string | null
+    zipCode: string | null
+    phone: string | null
   } | null
   isAuthenticated: boolean
   loading: boolean

@@ -1,7 +1,9 @@
 import axios from "axios"
 
 // const API_BASE_URL = process.env.NEXT_PUBLIC_API_BASE_URL || "http://localhost:3001/api"
-const API_BASE_URL = "http://localhost:3001/api"
+const API_BASE_URL = "https://backend-vbgu.onrender.com/api"
+// const API_BASE_URL = "http://localhost:3001/api"
+// const API_BASE_URL = process.env.API_BASE_URL;
 
 const apiClient = axios.create({
   baseURL: API_BASE_URL,
@@ -27,7 +29,7 @@ export const login = async (email: string, password: string) => {
 
 export const getUser = async () => {
     const response = await apiClient.get(`/users/token/checkAuth`)
-    return response.data
+    return response.data.user
   }
 
 export const logout = async () => {
@@ -62,8 +64,8 @@ export const getWishlist = async () => {
   return response.data
 }
 
-export const addToWaitlist = async (productId: number, size: string) => {
-  const response = await apiClient.post("/waitlist", { productId, size })
+export const addToWaitlist = async (productId: number, size: string, email:string) => {
+  const response = await apiClient.post("/waitlist/", { productId, size, email })
   return response.data
 }
 
@@ -73,7 +75,7 @@ export const removeFromWaitlist = async (waitlistItemId: number) => {
 }
 
 export const getWaitlist = async () => {
-  const response = await apiClient.get("/waitlist")
+  const response = await apiClient.get("/waitlist/")
   return response.data
 }
 
@@ -84,6 +86,7 @@ export const createOrder = async (orderData: any) => {
 
 export const getOrdersByUserId = async (userId: Number) => {
   const response = await apiClient.get(`/orders/${userId}`)
+  console.log(response.data);
   return response.data
 }
 
@@ -93,8 +96,40 @@ export const getOrdersByOrderId = async (orderId: string) => {
 }
 
 export const processPayment = async (paymentData: any) => {
-  const response = await apiClient.post("/payments", paymentData)
+  const response = await apiClient.post("/payment/create-payment", paymentData)
   return response.data
 }
+
+export const createMarxOrder = async (paymentData: any) => {
+  const response = await apiClient.post("/payment/create-marx-order", paymentData)
+  return response.data
+}
+
+export const verifyMarxOrder = async (paymentData: any) => {
+  const response = await apiClient.post("/payment/verify-marx-payment", paymentData)
+  return response.data
+}
+
+export const updateShippingDetails = async (accountData: any) => {
+  const response = await apiClient.put("/users/shipping-details", accountData)
+  return response.data
+}
+
+export const updateAccountDetails = async (accountData: any) => {
+  const response = await apiClient.put("/users/account-details", accountData)
+  return response.data
+}
+
+export const subscribeToNewsletter = async (email: string) => {
+  const response = await apiClient.post("/subscribe", { email });
+  return response.data;
+};
+
+export const checkSubscriptionStatus = async (email: string) => {
+  const response = await apiClient.get(`/subscribe/check/${email}`);
+
+  console.log(response.data);
+  return response.data.isSubscribed;
+};
 
 export default apiClient
