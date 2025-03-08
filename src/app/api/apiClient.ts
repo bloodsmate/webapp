@@ -64,8 +64,8 @@ export const getWishlist = async () => {
   return response.data
 }
 
-export const addToWaitlist = async (productId: number, size: string) => {
-  const response = await apiClient.post("/waitlist", { productId, size })
+export const addToWaitlist = async (productId: number, size: string, email:string) => {
+  const response = await apiClient.post("/waitlist/", { productId, size, email })
   return response.data
 }
 
@@ -75,7 +75,7 @@ export const removeFromWaitlist = async (waitlistItemId: number) => {
 }
 
 export const getWaitlist = async () => {
-  const response = await apiClient.get("/waitlist")
+  const response = await apiClient.get("/waitlist/")
   return response.data
 }
 
@@ -119,5 +119,17 @@ export const updateAccountDetails = async (accountData: any) => {
   const response = await apiClient.put("/users/account-details", accountData)
   return response.data
 }
+
+export const subscribeToNewsletter = async (email: string) => {
+  const response = await apiClient.post("/subscribe", { email });
+  return response.data;
+};
+
+export const checkSubscriptionStatus = async (email: string) => {
+  const response = await apiClient.get(`/subscribe/check/${email}`);
+
+  console.log(response.data);
+  return response.data.isSubscribed;
+};
 
 export default apiClient

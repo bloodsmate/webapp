@@ -1,23 +1,53 @@
 'use client'
 
-import { useState } from 'react'
-import { Button } from "../components/ui/button"
-import { Input } from "../components/ui/input"
-import { toast } from '../hooks/use-toast'
-import Image from 'next/image'
+import { useState, useEffect } from 'react'
+import { Button } from "@/app/components/ui/button"
+import { Input } from "@/app/components/ui/input"
+import { toast } from '@/app/hooks/use-toast'
+import { useDispatch, useSelector } from "react-redux"
+import { AppDispatch, RootState } from "@/app/redux/store"
+import { subscribe, checkSubscription } from "@/app/redux/subscribeSlice"
 
 export default function SubscribeSection() {
   const [email, setEmail] = useState('')
+  const dispatch = useDispatch<AppDispatch>()
+  const { loading, error, isSubscribed } = useSelector((state: RootState) => state.subscribe)
 
-  const handleSubmit = (e: React.FormEvent) => {
+  // Check subscription status when email changes
+  useEffect(() => {
+    if (email && /\S+@\S+\.\S+/.test(email)) {
+      dispatch(checkSubscription(email))
+    }
+  }, [email, dispatch])
+
+  const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault()
-    // Here you would typically send the email to your backend
-    console.log('Subscribing email:', email)
-    toast({
-      title: "Subscribed!",
-      description: "You've successfully subscribed to our newsletter.",
-    })
-    setEmail('')
+
+    // Check if already subscribed
+    if (isSubscribed) {
+      toast({
+        title: "Already Subscribed",
+        description: "This email is already subscribed to our newsletter.",
+        variant: "default",
+      })
+      return
+    }
+
+    try {
+      await dispatch(subscribe(email)).unwrap()
+      toast({
+        title: "Subscribed!",
+        description: "You've successfully subscribed to our newsletter.",
+        variant: "success",
+      })
+      setEmail('')
+    } catch (error:any) {
+      toast({
+        title: "Error",
+        description: error || "Failed to subscribe. Please try again.",
+        variant: "destructive",
+      })
+    }
   }
 
   return (
@@ -47,21 +77,11 @@ export default function SubscribeSection() {
           <Button 
             type="submit" 
             className="w-full sm:w-auto bg-white hover:bg-gray-100 text-black font-semibold py-3 px-6 rounded-lg transition-all"
+            disabled={loading || isSubscribed}
           >
-            Subscribe
+            {loading ? "Subscribing..." : isSubscribed ? "Already Subscribed" : "Subscribe"}
           </Button>
         </form>
-      </div>
-
-      {/* Decorative Image */}
-      <div className="absolute bottom-0 right-0 z-0 opacity-50">
-        <Image
-          src="/images/subscribe-illustration.png" // Replace with your image path
-          alt="Subscribe Illustration"
-          width={400}
-          height={400}
-          className="object-cover"
-        />
       </div>
     </div>
   )

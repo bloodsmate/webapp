@@ -4,12 +4,14 @@ import { useSelector, useDispatch } from 'react-redux';
 import { motion } from 'framer-motion';
 import { ShoppingBag, X, Trash2 } from 'lucide-react';
 import { Button } from '@/app/components/ui/button';
-import { RootState } from '@/app/redux/store';
 import Link from 'next/link';
 import Image from 'next/image';
 import { useEffect, useRef } from 'react';
 import { removeFromCart } from '@/app/redux/cartSlice';
 import { toast } from '@/app/hooks/use-toast';
+import { fetchOrdersByUserId } from '@/app/redux/orderSlice';
+import { RootState, AppDispatch } from '@/app/redux/store';
+import { checkAuth } from '@/app/redux/authSlice';
 
 interface CartPopupProps {
   isOpen: boolean;
@@ -19,7 +21,23 @@ interface CartPopupProps {
 export default function CartPopup({ isOpen, onClose }: CartPopupProps) {
   const cartItems = useSelector((state: RootState) => state.cart.items);
   const dispatch = useDispatch();
+  const dispatchUser = useDispatch<AppDispatch>();
+  const { user } = useSelector((state: RootState) => state.auth);
   const popupRef = useRef<HTMLDivElement>(null);
+
+  const token = typeof window !== 'undefined' ? localStorage.getItem('authToken') : null;
+
+  useEffect(() => {
+    if (token && !user?.id) {
+      dispatchUser(checkAuth());
+    }
+  }, [token, user, dispatch]);
+
+  useEffect(() => {
+    if (user?.id) {
+      dispatchUser(fetchOrdersByUserId(user.id));
+    }
+  }, [dispatch, user?.id]);
 
   // Calculate total price
   const total = cartItems.reduce(

@@ -9,6 +9,7 @@ import waitlistReducer from "./waitlistSlice";
 import orderReducer from "./orderSlice";
 import paymentReducer from "./paymentSlice";
 import userReducer from "./userSlice";
+import subscribeReducer from "./subscribeSlice";
 
 const productPersistConfig = {
   key: "product", // Key for the persisted state
@@ -34,6 +35,7 @@ const rootReducer = {
   orders: orderReducer,
   payment: paymentReducer, // (not persisted)
   user: userReducer,
+  subscribe: subscribeReducer,
 };
 
 export const store = configureStore({
