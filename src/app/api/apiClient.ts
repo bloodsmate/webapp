@@ -1,12 +1,13 @@
 import axios from "axios"
+import { DEFAULT_BACKEND_URL } from "../data/constants";
 
 // const API_BASE_URL = process.env.NEXT_PUBLIC_API_BASE_URL || "http://localhost:3001/api"
-const API_BASE_URL = "https://backend-vbgu.onrender.com/api"
+// const API_BASE_URL = "https://backend-vbgu.onrender.com/api"
 // const API_BASE_URL = "http://localhost:3001/api"
 // const API_BASE_URL = process.env.API_BASE_URL;
 
 const apiClient = axios.create({
-  baseURL: API_BASE_URL,
+  baseURL: DEFAULT_BACKEND_URL,
   headers: {
     "Content-Type": "application/json",
     
@@ -43,7 +44,6 @@ export const getProducts = async () => {
 }
 
 export const getProduct = async (id: number) => {
-  console.log("Meka call una");
   const response = await apiClient.get(`/products/${id}`)
   console.log(response.data);
   return response.data
