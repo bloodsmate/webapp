@@ -20,7 +20,7 @@ const nextConfig = {
         imageSizes: [16, 32, 48, 64, 96],
         domains: ["res.cloudinary.com"],
     },
-    distDir: 'dist',
+    // distDir: 'dist',
     reactStrictMode: true,
     swcMinify: true,
     trailingSlash: true,

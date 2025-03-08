@@ -1,3 +1,6 @@
+// export const DEFAULT_BACKEND_URL = "http://localhost:3001/api"
+export const DEFAULT_BACKEND_URL = "https://backend-vbgu.onrender.com/api";
+
 import shopTheLookImage1 from "@/app/assets/shopTheLook/ACH_5509.jpg"
 import shopTheLookImage2 from "@/app/assets/shopTheLook/ACH_5542.jpg"
 import shopTheLookImage3 from "@/app/assets/shopTheLook/ACH_5553.jpg"
