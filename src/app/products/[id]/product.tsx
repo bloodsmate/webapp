@@ -115,7 +115,7 @@ export default function ProductPageClient({ id }: { id: string }) {
   if (isLoading) {
     return (
       <div className="container mx-auto px-4 py-8 flex justify-center items-center h-96">
-        <Loader size="large" /> {/* Ensure this component exists */}
+        <Loader size="large" />
       </div>
     );
   }
@@ -129,7 +129,7 @@ export default function ProductPageClient({ id }: { id: string }) {
   }
 
   if (!productData) {
-    notFound(); // Redirect to 404 page only after confirming the product is not found
+    notFound();
   }
 
   return (

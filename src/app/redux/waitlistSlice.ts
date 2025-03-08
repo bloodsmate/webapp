@@ -1,29 +1,32 @@
 import { createSlice, createAsyncThunk } from "@reduxjs/toolkit";
-import * as api from "../api/apiClient";
+import * as api from "@/app/api/apiClient";
+import { RootState } from "@/app/redux/store"
 
-// Define the `WaitlistItem` type
 type WaitlistItem = {
-  id: number; // Assuming `waitlistItemId` is a number
+  id: number;
   productId: number;
   size: string;
-  // Add other properties if needed
+  email: string;
 };
 
-// Define the `WaitlistState` type
 type WaitlistState = {
   items: WaitlistItem[];
   loading: boolean;
   error: string | null;
 };
 
-// Define the initial state
 const initialState: WaitlistState = {
   items: [],
   loading: false,
   error: null,
 };
 
-// Async thunk to fetch the waitlist
+export const selectIsUserInWaitlist = (state: RootState, productId: number, size: string, email: string) => {
+  return state.waitlist.items.some(
+    (item) => item.productId === productId && item.size === size && item.email === email
+  );
+};
+
 export const fetchWaitlist = createAsyncThunk(
   "waitlist/fetchWaitlist",
   async (_, { rejectWithValue }) => {
@@ -35,19 +38,17 @@ export const fetchWaitlist = createAsyncThunk(
   }
 );
 
-// Async thunk to add an item to the waitlist
 export const addToWaitlist = createAsyncThunk(
   "waitlist/addToWaitlist",
-  async ({ productId, size }: { productId: number; size: string }, { rejectWithValue }) => {
+  async ({ productId, size, email }: { productId: number; size: string, email:string }, { rejectWithValue }) => {
     try {
-      return await api.addToWaitlist(productId, size);
+      return await api.addToWaitlist(productId, size, email);
     } catch (error) {
       return rejectWithValue((error as Error).message);
     }
   }
 );
 
-// Async thunk to remove an item from the waitlist
 export const removeFromWaitlist = createAsyncThunk(
   "waitlist/removeFromWaitlist",
   async (waitlistItemId: number, { rejectWithValue }) => {
@@ -60,7 +61,6 @@ export const removeFromWaitlist = createAsyncThunk(
   }
 );
 
-// Create the slice
 const waitlistSlice = createSlice({
   name: "waitlist",
   initialState,
@@ -72,17 +72,17 @@ const waitlistSlice = createSlice({
       })
       .addCase(fetchWaitlist.fulfilled, (state, action) => {
         state.loading = false;
-        state.items = action.payload; // Ensure `action.payload` is of type `WaitlistItem[]`
+        state.items = action.payload;
       })
       .addCase(fetchWaitlist.rejected, (state, action) => {
         state.loading = false;
-        state.error = action.payload as string; // Ensure `action.payload` is of type `string`
+        state.error = action.payload as string;
       })
       .addCase(addToWaitlist.fulfilled, (state, action) => {
-        state.items.push(action.payload); // Ensure `action.payload` is of type `WaitlistItem`
+        state.items.push(action.payload);
       })
       .addCase(removeFromWaitlist.fulfilled, (state, action) => {
-        state.items = state.items.filter((item) => item.id !== action.payload); // Ensure `action.payload` is of type `number` (waitlistItemId)
+        state.items = state.items.filter((item) => item.id !== action.payload);
       });
   },
 });

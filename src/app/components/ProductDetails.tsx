@@ -6,8 +6,10 @@ import { Button } from "@/app/components/ui/button";
 import { Heart } from "lucide-react";
 import { Product } from "@/app/data/products";
 import { useDispatch, useSelector } from "react-redux";
+import { AppDispatch, RootState } from "@/app/redux/store";
 import { addToCart } from "@/app/redux/cartSlice";
 import { addToWishlist, removeFromWishlist } from "@/app/redux/wishlistSlice";
+import { addToWaitlist } from "@/app/redux/waitlistSlice";
 import { toast } from "@/app/hooks/use-toast";
 import Waitlist from "@/app/components/Waitlist";
 import ProductDetailsDescription from "@/app/components/ProductDetailsDescription";
@@ -18,7 +20,6 @@ import {
   AccordionItem,
   AccordionTrigger,
 } from "@/app/components/ui/accordion";
-import type { RootState } from "../redux/store";
 import { FaCcVisa, FaCcMastercard, FaCcAmex } from "react-icons/fa";
 import Loader from "./Loader";
 import sizeChartImage from "@/app/assets/bloodsmate_size_chart.png";
@@ -149,6 +150,7 @@ export default function ProductDetails({ product }: { product: Product }) {
   const [quantity, setQuantity] = useState<number>(1); // Quantity selector
   const [availableQuantity, setAvailableQuantity] = useState<number>(0); // Track available stock
   const dispatch = useDispatch();
+  const waitlistDispatch = useDispatch<AppDispatch>();
   const wishlistItems = useSelector((state: RootState) => state.wishlist.items);
   const isInWishlist = wishlistItems.some((item) => item.id === product.id);
 
@@ -304,12 +306,12 @@ export default function ProductDetails({ product }: { product: Product }) {
         description: `${product.name} has been removed from your wishlist.`,
       });
     } else {
-      // dispatch(
+      // waitlistDispatch(
       //   addToWishlist({
-      //     id: product.id,
-      //     name: product.name,
-      //     price: product.price,
-      //     image: product.images[0],
+      //     productId: product.id,
+      //     // name: product.name,
+      //     // price: product.price,
+      //     // image: product.images[0],
       //   })
       // );
       toast({
@@ -319,15 +321,31 @@ export default function ProductDetails({ product }: { product: Product }) {
     }
   };
 
-  const handleJoinWaitlist = (email: string) => {
+  const handleJoinWaitlist = async (email: string) => {
     // Simulate joining the waitlist
-    setTimeout(() => {
+    try {
       setJoinedWaitlist(true);
+
+      await waitlistDispatch(
+        addToWaitlist({
+          productId: product.id,
+          size: selectedSize,
+          email: email,
+        })
+      );
+
       toast({
         title: "Joined Waitlist",
         description: `You have joined the waitlist for ${product.name} (${selectedSize}). We will notify you when it's back in stock.`,
+        variant: "success",
       });
-    }, 1000);
+    } catch(error) {
+      toast({
+        title: "Error",
+        description: "Failed to join the waitlist. Please try again.",
+        variant: "destructive",
+      });
+    }
   };
 
   const discountedPrice = product.discountPercentage
