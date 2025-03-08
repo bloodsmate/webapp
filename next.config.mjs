@@ -7,7 +7,7 @@
 const nextConfig = {
     // basePath: isGithubPages ? `/${repoName}` : '',
     // assetPrefix: isGithubPages ? `/${orgName}/${repoName}/` : '',
-    output: 'export',
+    output: 'standalone',
     images: {
         unoptimized: true,
         // loader: 'cloudinary',

@@ -2,6 +2,7 @@ import ProductPageClient from './product';
 // import * as api from "@/app/api/apiClient";
 import { DEFAULT_BACKEND_URL } from '@/app/data/constants';
 import { Product } from "@/app/data/products";
+import { notFound } from 'next/navigation';
 
 // export async function generateStaticParams() {
 //   // Fetch products from the API
@@ -18,6 +19,7 @@ export async function generateStaticParams() {
   try {
     const response = await fetch(`${DEFAULT_BACKEND_URL}/products`);
     if (!response.ok) {
+      notFound();
       throw new Error('Failed to fetch products');
     }
     const data = await response.json();
@@ -37,6 +39,9 @@ export async function generateStaticParams() {
     id: product.id.toString(),
   }));
 }
+
+export const dynamicParams = true;
+export const revalidate = 60;
 
 export default async function ProductPage({ params }: { params: { id: string } }) {
   return <ProductPageClient id={params.id} />;
