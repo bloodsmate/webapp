@@ -189,7 +189,7 @@ export default function Footer() {
         {/* Copyright and Developer Credit */}
         <div className="mt-8 pt-8 border-t border-gray-800 text-center text-gray-400">
           <p>
-            &copy; 2025 BloodsMate. All rights reserved. | Developed by{' '}
+            &copy; 2025 Bloodsmate. All rights reserved. | Developed by{' '}
             <a
               href="https://codeidol.com"
               target="_blank"
