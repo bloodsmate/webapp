@@ -1,18 +1,7 @@
-import ProductPageClient from './product';
-// import * as api from "@/app/api/apiClient";
 import { DEFAULT_BACKEND_URL } from '@/app/data/constants';
 import { Product } from "@/app/data/products";
 import { notFound } from 'next/navigation';
-
-// export async function generateStaticParams() {
-//   // Fetch products from the API
-//   const products: Product[] = await api.getProducts();
-
-//   // Map products to the required format for static params
-//   return products.map((product: Product) => ({
-//     id: product.id.toString(), // Ensure the ID is a string
-//   }));
-// }
+import dynamic from 'next/dynamic';
 
 export async function generateStaticParams() {
   let products: Product[] = [];
@@ -24,7 +13,6 @@ export async function generateStaticParams() {
     }
     const data = await response.json();
 
-    // Extract the `products` array from the response
     if (data.products && Array.isArray(data.products)) {
       products = data.products;
     } else {
@@ -34,7 +22,6 @@ export async function generateStaticParams() {
     console.error('Error fetching products:', error);
   }
 
-  // Map the products to the required format for static params
   return products.map((product: Product) => ({
     id: product.id.toString(),
   }));
@@ -42,6 +29,10 @@ export async function generateStaticParams() {
 
 export const dynamicParams = true;
 export const revalidate = 60;
+
+const ProductPageClient = dynamic(() => import('./product'), {
+  ssr: false,
+});
 
 export default async function ProductPage({ params }: { params: { id: string } }) {
   return <ProductPageClient id={params.id} />;
