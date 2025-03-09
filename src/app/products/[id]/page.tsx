@@ -1,5 +1,11 @@
 import { DEFAULT_BACKEND_URL } from '@/app/data/constants';
 import dynamic from 'next/dynamic';
+import { Suspense } from 'react';
+
+// Lazy load the client component
+const ProductPageClient = dynamic(() => import('./product'), {
+  ssr: false, // Client-side rendering only
+});
 
 export async function generateStaticParams() {
   try {
@@ -18,6 +24,7 @@ export async function generateStaticParams() {
       return [];
     }
 
+    // Generate static paths for each product
     return data.products.map((product: { id: string }) => ({
       id: product.id.toString(),
     }));
@@ -27,14 +34,12 @@ export async function generateStaticParams() {
   }
 }
 
-const ProductPageClient = dynamic(() => import('./product'), {
-  ssr: false,
-});
-
 export default async function ProductPage({ params }: { params: { id: string } }) {
+  let product = null;
+
   try {
     const response = await fetch(`${DEFAULT_BACKEND_URL}/products/${params.id}`, {
-      cache: 'force-cache', // Fetch data at build time
+      cache: 'force-cache', // Fetch data at build time for better performance
     });
 
     if (!response.ok) {
@@ -42,12 +47,17 @@ export default async function ProductPage({ params }: { params: { id: string } }
       return <div>Product not found</div>;
     }
 
-    const product = await response.json();
+    product = await response.json();
     console.log("Fetched product:", product);
-
-    return <ProductPageClient id={params.id} />;
   } catch (error) {
     console.error(`Error fetching product ${params.id}:`, error);
     return <div>Product not found</div>;
   }
+
+  // Show a loading indicator while the product data is being fetched
+  return (
+    <Suspense fallback={<div>Loading product...</div>}>
+      <ProductPageClient id={params.id} />
+    </Suspense>
+  );
 }
