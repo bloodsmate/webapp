@@ -4,7 +4,7 @@ import dynamic from 'next/dynamic';
 export async function generateStaticParams() {
   try {
     const response = await fetch(`${DEFAULT_BACKEND_URL}/products`, {
-      cache: 'no-store',
+      cache: 'force-cache', // Fetch data at build time
     });
 
     if (!response.ok) {
@@ -34,7 +34,7 @@ const ProductPageClient = dynamic(() => import('./product'), {
 export default async function ProductPage({ params }: { params: { id: string } }) {
   try {
     const response = await fetch(`${DEFAULT_BACKEND_URL}/products/${params.id}`, {
-      cache: 'no-store',
+      cache: 'force-cache', // Fetch data at build time
     });
 
     if (!response.ok) {
