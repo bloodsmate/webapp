@@ -3,7 +3,7 @@
 import Image from 'next/image';
 import Link from 'next/link';
 import { Button } from "@/app/components/ui/button";
-import { useEffect, useState, useRef } from 'react';
+import { useEffect, useState, useRef, useCallback } from 'react';
 import { ChevronLeft, ChevronRight, Menu, X } from 'lucide-react';
 import SEO from '../components/SEO';
 import { Product, Stock } from '../data/products';
@@ -20,6 +20,7 @@ import 'swiper/css';
 import 'swiper/css/navigation';
 import 'swiper/css/pagination';
 import { Navigation } from 'swiper/modules';
+import { useRouter } from 'next/navigation';
 
 function Breadcrumb() {
   return (
@@ -48,6 +49,8 @@ function Breadcrumb() {
 
 export default function ProductsPage() {
   const dispatch = useDispatch<AppDispatch>();
+  const router = useRouter();
+
   const { items: products, loading, error } = useSelector((state: RootState) => state.products);
 
   const [currentPage, setCurrentPage] = useState(1);
@@ -132,6 +135,10 @@ export default function ProductsPage() {
       description: `${product.name} (Size: ${selectedSize}) added to cart!`
     });
   };
+
+  const handleNavigate = useCallback((productId: number) => {
+    router.push(`/products/${productId}`);
+  }, [router]);
 
   const discountedPrice = (product: Product) => {
     return product.discountPercentage
@@ -245,8 +252,8 @@ export default function ProductsPage() {
                     style={{ height: 'auto', minHeight: '520px' }}
                   >
                     {/* Product Image with Hover Effect */}
-                    <div className="relative h-96 lg:h-[350px] 2xl:h-[450px]">
-                      <Link href={`/products/${product.id}/`} as={`/products/${product.id}/`}>
+                    <div className="relative h-96 lg:h-[350px] 2xl:h-[450px]" onClick={() => handleNavigate(product.id)}>
+                      {/* <Link href={`/products/${product.id}/`} as={`/products/${product.id}/`} prefetch={false}> */}
                       {/* <Link href={`/products/${product.id}/`} as={`/products/${product.id}/`} prefetch={false}> */}
                         <Image
                           src={mainImage}
@@ -256,7 +263,7 @@ export default function ProductsPage() {
                           layout="fill"
                           className="w-full object-cover transition-transform duration-300 transform group-hover:scale-105"
                         />
-                      </Link>
+                      {/* </Link> */}
 
                       {/* Discount Price Tag */}
                       {(product.discountPercentage ?? 0) > 0 && (

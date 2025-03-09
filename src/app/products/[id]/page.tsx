@@ -29,14 +29,18 @@ export async function generateStaticParams() {
     console.error("Error fetching products:", error);
   }
 
-  const paths = products.map((product) => ({
+  return products.map((product) => ({
     id: product.id.toString(),
   }));
-
-  return paths.map((product) => ({
-    params: { id: product.id },
-  }));
 }
+
+// export async function getStaticPaths() {
+//   const paths = await generateStaticParams();
+//   return {
+//     paths,
+//     fallback: true, // or 'blocking'
+//   };
+// }
 
 // Main product page component
 export default async function ProductPage({ params }: { params: { id: string } }) {
@@ -58,5 +62,9 @@ export default async function ProductPage({ params }: { params: { id: string } }
     return <div>Product not found</div>;
   }
 
-  return <ProductPageClient id={product.id.toString()} />;
+  if (!product) {
+    return <div>Loading...</div>; // or a 404 page
+  }
+
+  return <ProductPageClient id={params.id.toString()} />;
 }
