@@ -487,7 +487,7 @@ export default function ProductDetails({ product }: { product: Product }) {
 
                 return (
                   <TooltipProvider>
-                    <Tooltip key={size}>
+                    <Tooltip key={index}>
                       <TooltipTrigger asChild>
                         <button
                           onClick={() => {
