@@ -7,7 +7,8 @@
 const nextConfig = {
     // basePath: isGithubPages ? `/${repoName}` : '',
     // assetPrefix: isGithubPages ? `/${orgName}/${repoName}/` : '',
-    output: 'standalone',
+    // output: 'standalone',
+    // output: 'export',
     images: {
         unoptimized: true,
         // loader: 'cloudinary',
@@ -21,8 +22,8 @@ const nextConfig = {
         domains: ["res.cloudinary.com"],
     },
     // distDir: 'dist',
-    reactStrictMode: true,
-    swcMinify: true,
+    // reactStrictMode: true,
+    // swcMinify: true,
     trailingSlash: true,
 };
 

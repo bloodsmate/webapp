@@ -90,6 +90,7 @@ function Breadcrumb({ product }: { product: Product }) {
 }
 
 export default function ProductPageClient({ id }: { id: string }) {
+  // const router = useRouter();
   const dispatch = useDispatch<AppDispatch>();
   const { selectedProduct: productData, loading, error } = useSelector(
     (state: RootState) => state.products
@@ -106,6 +107,12 @@ export default function ProductPageClient({ id }: { id: string }) {
 //     }
 //     checkParams();
 //   },[]);
+
+  // useEffect(() => {
+  //   if (router.isReady) {
+  //     router.reload(); // Force a refresh when the page loads
+  //   }
+  // }, [router]);
 
   useEffect(() => {
     dispatch(fetchProduct(Number(id)));
