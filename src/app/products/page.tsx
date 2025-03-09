@@ -246,7 +246,7 @@ export default function ProductsPage() {
                   >
                     {/* Product Image with Hover Effect */}
                     <div className="relative h-96 lg:h-[350px] 2xl:h-[450px]">
-                      <Link href={`/products/${product.id}`} prefetch={false}>
+                      <Link href={`/products/${product.id}/`} prefetch={false}>
                         <Image
                           src={mainImage}
                           alt={product.name}
